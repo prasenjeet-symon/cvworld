@@ -15,5 +15,8 @@
     "Symon",
     "titlecase",
     "zipcode"
-  ]
+  ],
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  },
 }

@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// User Model
+model User {
+  id             Int           @id @default(autoincrement())
+  email          String        @unique
+  fullName       String
+  profilePicture String?
+  password       String?
+  reference      String
+  subscription   Subscription?
+  resumes        Resumes[]
+}
+
+// subscription 
+model Subscription {
+  id          Int               @id @default(autoincrement())
+  planName    String
+  isActive    Boolean
+  expireOn    DateTime
+  activatedOn DateTime
+  cycle       SubscriptionCycle
+  discount    BigInt
+  basePrice   BigInt
+  user        User              @relation(fields: [userId], references: [id])
+  userId      Int               @unique
+}
+
+enum SubscriptionCycle {
+  MONTHLY
+  YEARLY
+}
+
+// for the resume
+model Resumes {
+  id     Int    @id @default(autoincrement())
+  data   String
+  user   User   @relation(fields: [userId], references: [id])
+  userId Int    @unique
+}
