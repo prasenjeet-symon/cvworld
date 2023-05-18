@@ -1,10 +1,10 @@
 import express from "express";
-import { signInOrSignUpWithGoogle, signInWithEmailAndPassword, signUpWithEmailAndPassword } from "../utils";
+import { signInAdmin, signInOrSignUpWithGoogle, signInWithEmailAndPassword, signUpWithEmailAndPassword } from "../utils";
 
 const router = express.Router();
 
 router.get("/", (req, res) => {
-  res.send("Authentication working...");
+  res.send({ message: "Authentication working..." });
 });
 
 /** Sign in with Google */
@@ -20,6 +20,11 @@ router.post("/sign_in_with_email_and_password", async (req, res) => {
 /** Sign up with email and password  */
 router.post("/sign_up_with_email_and_password", async (req, res) => {
   await signUpWithEmailAndPassword(req, res);
+});
+
+/** Sign the ADMIN */
+router.post("/sign_in_as_admin", async (req, res) => {
+  await signInAdmin(req, res);
 });
 
 export default router;

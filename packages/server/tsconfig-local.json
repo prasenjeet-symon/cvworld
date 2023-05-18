@@ -1,0 +1,10 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+      // Override or add additional compiler options here
+    },
+    "exclude": [
+        "./src/test/**"
+    ]
+  }
+  
