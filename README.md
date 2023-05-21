@@ -24,7 +24,10 @@ Server is located inside the packages folder.
 - Step 2
 
 ## Demo
-[Link to demo](https://cvworld.ioss.dev)
+- [Backend](https://cvworld.ioss.dev/admin)
+- [Frontend](https://cvworld.ioss.dev)
+- [Android](https://cvworld.ioss.dev#androidBuild)
+- [iOS](https://cvworld.ioss.dev#iosBuild)
 
 ## Deployment
 To deploy this project run
