@@ -24,7 +24,7 @@ Server is located inside the packages folder.
 - Step 2
 
 ## Demo
-Insert gif or link to demo
+[Link to demo](https://cvworld.ioss.dev)
 
 ## Deployment
 To deploy this project run
