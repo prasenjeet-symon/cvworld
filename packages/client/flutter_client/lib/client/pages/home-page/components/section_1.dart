@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class SectionOne extends StatelessWidget {
   const SectionOne({super.key});
@@ -41,8 +42,8 @@ class SectionOneDesktop extends StatelessWidget {
               child: Row(
                 children: [
                   Expanded(
-                      child: Image.network(
-                    'https://cdni.iconscout.com/illustration/free/thumb/teamwork-2112512-1785594.png',
+                      child: SvgPicture.asset(
+                    'assets/section_1.svg',
                     fit: BoxFit.cover,
                   )),
                   Expanded(

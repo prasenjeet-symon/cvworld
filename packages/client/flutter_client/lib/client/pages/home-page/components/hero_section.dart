@@ -98,7 +98,8 @@ class HeroSectionDesktop extends StatelessWidget {
                               mainAxisSize: MainAxisSize.min,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('Button', style: TextStyle(fontSize: 16)),
+                                Text('Start Now',
+                                    style: TextStyle(fontSize: 16)),
                                 Icon(
                                   Icons.arrow_right,
                                   color: Colors.white,
