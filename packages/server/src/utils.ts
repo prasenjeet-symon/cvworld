@@ -360,10 +360,10 @@ export function createServer() {
 
   app.use(cors());
   app.use(express.json());
-  app.use("/auth", routerAuth);
-  app.use("/api", authenticateUser, router);
+  app.use("/server/auth", routerAuth);
+  app.use("/server/api", authenticateUser, router);
 
-  app.get("/", (req, res) => {
+  app.get("/server/", (req, res) => {
     res.send({ message: "Hello World" });
   });
 

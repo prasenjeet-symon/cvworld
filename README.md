@@ -102,7 +102,7 @@ Once the build process is completed which may take some time you start your appl
 docker-compose up -d
 ```
 
->> Awesome you application is up and running
+> Awesome you application is up and running
 
 ## How to stop the running application 
 To stop the running application you can run the following command : 

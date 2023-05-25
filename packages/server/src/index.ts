@@ -1,6 +1,6 @@
 import { createServer, signUpAdmin } from "./utils";
 
-const PORT = 3000;
+const PORT = 80;
 const app = createServer();
 signUpAdmin().finally(() => {
   app.listen(PORT, () => {
