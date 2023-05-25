@@ -167,9 +167,22 @@ class SectionTwoDesktop extends StatelessWidget {
                   ],
                 )),
                 Expanded(
-                    child: SvgPicture.asset(
-                  'assets/section_1.svg',
-                  fit: BoxFit.cover,
+                    child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 300,
+                      height: 300,
+                      child: SvgPicture.asset(
+                        'assets/section_2.svg',
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
+                      ),
+                    )
+                  ],
                 )),
               ],
             ),

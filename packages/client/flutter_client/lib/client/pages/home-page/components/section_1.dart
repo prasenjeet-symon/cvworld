@@ -42,9 +42,22 @@ class SectionOneDesktop extends StatelessWidget {
               child: Row(
                 children: [
                   Expanded(
-                      child: SvgPicture.asset(
-                    'assets/section_1.svg',
-                    fit: BoxFit.cover,
+                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 300,
+                        height: 300,
+                        child: SvgPicture.asset(
+                          'assets/section_1.svg',
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                        ),
+                      )
+                    ],
                   )),
                   Expanded(
                       child: Column(

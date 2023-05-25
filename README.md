@@ -10,7 +10,7 @@ We are using the Express server on top of `node.js` version `16.X.X`.
 To run the server in production environment use the steps discussed below :
 
 ## Connect your Linux Machine to GitHub
-To connect your Linux machine to GitHub, follow these steps:
+To connect your Linux machine to GitHub, follow these steps:    
 - Generate SSH keys on your Linux machine using the command:
     ```PowerShell
       ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
@@ -91,4 +91,47 @@ To pull the latest release of you app use following command
    git pull
 ```
 
+## Build the application
+To build the application all at once just run the following command : 
+```BASH
+docker-compose build
+```
+
+Once the build process is completed which may take some time you start your application using the following command :
+```BASH
+docker-compose up -d
+```
+
+>> Awesome you application is up and running
+
+## How to stop the running application 
+To stop the running application you can run the following command : 
+```BASH
+docker-compose down
+```
+
+## How to run the latest version of application
+Make sure you are in the folder `cvworld` if not then run the following commands :
+```BASH
+cd ~
+```
+Then go to the `cvworld` folder :
+```BASH
+cd cvworld
+```
+
+Then pull the latest version from the `GitHub`
+```BASH
+git pull
+```
+
+Once the latest version is pulled successfully then we need to build the server and client. To build the server run the following command :
+```BASH
+docker-compose up --build server
+```
+
+To build the client run the following command :
+```BASH
+docker-compose up --build client
+```
 

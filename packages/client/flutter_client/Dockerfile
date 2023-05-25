@@ -1,5 +1,9 @@
 # Use a base image with Flutter and Dart SDK installed
-FROM cirrusci/flutter:stable
+FROM ghcr.io/cirruslabs/flutter:3.10.2 AS build-env
+
+# Run flutter doctor and enable web
+RUN flutter doctor
+RUN flutter config --enable-web
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -20,10 +24,10 @@ RUN flutter build web
 FROM nginx:alpine
 
 # Copy the built web files to the nginx HTML directory
-COPY --from=0 /app/build/web /usr/share/nginx/html
+COPY --from=build-env /app/build/web /usr/share/nginx/html
 
 # Expose port 80 for web traffic
-EXPOSE 80
+EXPOSE 8080:80
 
 # Start the nginx server
 CMD ["nginx", "-g", "daemon off;"]

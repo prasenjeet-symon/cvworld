@@ -154,9 +154,7 @@ export async function signUpWithEmailAndPassword(req: Request, res: Response) {
       return;
     }
 
-    const bcrypt = require("bcrypt");
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = hashPassword(password);
 
     // Save the user to the database or perform any desired actions
     const profilePicture = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
@@ -182,19 +180,6 @@ export async function signUpWithEmailAndPassword(req: Request, res: Response) {
     res.status(500).json({ message: "An error occurred during signup" });
   }
 }
-
-/** Compare the password with the hashed password*/
-const comparePasswords = async (password: string, hashedPassword: string) => {
-  try {
-    const bcrypt = require("bcrypt");
-    const match = await bcrypt.compare(password, hashedPassword);
-    return match;
-  } catch (error) {
-    // Handle error
-    console.error("Error comparing passwords:", error);
-    return false;
-  }
-};
 
 /** Sign in the user using email and password */
 export async function signInWithEmailAndPassword(req: Request, res: Response) {
@@ -344,9 +329,8 @@ export async function signUpAdmin() {
     return;
   }
 
-  const bcrypt = require("bcrypt");
   // Hash the password
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = hashPassword(password);
 
   // Save the user to the database or perform any desired actions
   const { PrismaClient } = require("@prisma/client");
@@ -380,8 +364,22 @@ export function createServer() {
   app.use("/api", authenticateUser, router);
 
   app.get("/", (req, res) => {
-    res.send({message: "Hello World"});
+    res.send({ message: "Hello World" });
   });
 
   return app;
 }
+
+/** Hashing password */
+import crypto from "crypto";
+
+const hashPassword = (password: string): string => {
+  const hash = crypto.createHash("sha256");
+  hash.update(password);
+  return hash.digest("hex");
+};
+
+const comparePasswords = (plainPassword: string, hashedPassword: string): boolean => {
+  const hashedInput = hashPassword(plainPassword);
+  return hashedInput === hashedPassword;
+};

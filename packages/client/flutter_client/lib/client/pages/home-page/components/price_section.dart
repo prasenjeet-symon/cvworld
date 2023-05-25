@@ -33,7 +33,7 @@ class PriceSectionDesktop extends StatelessWidget {
     return Container(
       width: double.infinity,
       color: Color(0xFFF6EEE8),
-      margin: EdgeInsets.fromLTRB(0, 100, 0, 100),
+      margin: EdgeInsets.fromLTRB(0, 10, 0, 100),
       padding: EdgeInsets.all(40),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,

@@ -117,9 +117,18 @@ class HeroSectionDesktop extends StatelessWidget {
                 child: Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SvgPicture.asset('assets/hero_1.svg',
-                    fit: BoxFit.cover, width: 400)
+                Container(
+                  width: 400,
+                  height: 400,
+                  child: SvgPicture.asset(
+                    'assets/hero_1.svg',
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
+                )
               ],
             ))
           ],
