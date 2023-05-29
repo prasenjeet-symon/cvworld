@@ -124,14 +124,20 @@ Then pull the latest version from the `GitHub`
 ```BASH
 git pull
 ```
-
-Once the latest version is pulled successfully then we need to build the server and client. To build the server run the following command :
+Once the latest source code is fetched from the `GitHub` run the following commands : 
 ```BASH
-docker-compose up --build server
+docker-compose build client
 ```
-
-To build the client run the following command :
+This command will build the flutter client. To build the express server run the following command:
 ```BASH
-docker-compose up --build client
+docker-compose build server
+```
+After the command finish executing it is time to update the running container. To update the client run this command :
+```BASH
+docker-compose up --no-deps -d client
+```
+To update the server run this command :
+```BASH
+docker-compose up --no-deps -d server
 ```
 
