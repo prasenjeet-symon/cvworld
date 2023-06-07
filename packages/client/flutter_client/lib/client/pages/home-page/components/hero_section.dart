@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -84,7 +85,7 @@ class HeroSectionDesktop extends StatelessWidget {
                           margin: const EdgeInsets.fromLTRB(0, 0, 0, 20),
                           child: ElevatedButton(
                             onPressed: () {
-                              // Button action
+                              context.navigateNamedTo('/cv-maker');
                             },
                             style: ElevatedButton.styleFrom(
                                 primary: Colors.blue,

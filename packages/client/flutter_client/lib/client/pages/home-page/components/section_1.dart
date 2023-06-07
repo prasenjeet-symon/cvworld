@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -163,7 +164,7 @@ class SectionOneDesktop extends StatelessWidget {
                       Container(
                           child: ElevatedButton(
                         onPressed: () {
-                          // Button action
+                          context.navigateNamedTo('/cv-maker');
                         },
                         style: ElevatedButton.styleFrom(
                             primary: Colors.blue,

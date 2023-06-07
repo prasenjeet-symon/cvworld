@@ -10,7 +10,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:auto_route/auto_route.dart' as _i5;
 import 'package:flutter_client/client/pages/home-page/home-page.dart' as _i1;
-import 'package:flutter_client/client/pages/make-cv-pages/add-name-page.dart'
+import 'package:flutter_client/client/pages/make-cv-pages/cv-maker-page.dart'
     as _i4;
 import 'package:flutter_client/client/pages/signin-page/signin-page.dart'
     as _i3;
@@ -40,10 +40,10 @@ abstract class $AppRouter extends _i5.RootStackRouter {
         child: const _i3.SignInScreen(),
       );
     },
-    AddNameRoute.name: (routeData) {
+    CvMakerRoute.name: (routeData) {
       return _i5.AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const _i4.AddNameScreen(),
+        child: const _i4.CvMakerScreen(),
       );
     },
   };
@@ -92,15 +92,15 @@ class SignInRoute extends _i5.PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [_i4.AddNameScreen]
-class AddNameRoute extends _i5.PageRouteInfo<void> {
-  const AddNameRoute({List<_i5.PageRouteInfo>? children})
+/// [_i4.CvMakerScreen]
+class CvMakerRoute extends _i5.PageRouteInfo<void> {
+  const CvMakerRoute({List<_i5.PageRouteInfo>? children})
       : super(
-          AddNameRoute.name,
+          CvMakerRoute.name,
           initialChildren: children,
         );
 
-  static const String name = 'AddNameRoute';
+  static const String name = 'CvMakerRoute';
 
   static const _i5.PageInfo<void> page = _i5.PageInfo<void>(name);
 }

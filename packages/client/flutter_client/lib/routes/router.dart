@@ -9,6 +9,6 @@ class AppRouter extends $AppRouter {
         AutoRoute(path: '/', page: HomeRoute.page, initial: true),
         AutoRoute(path: '/signup', page: SignUpRoute.page),
         AutoRoute(path: '/signin', page: SignInRoute.page),
-        AutoRoute(path: '/make/add-name', page: AddNameRoute.page),
+        AutoRoute(path: '/cv-maker', page: CvMakerRoute.page),
       ];
 }

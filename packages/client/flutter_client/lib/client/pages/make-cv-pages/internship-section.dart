@@ -4,34 +4,31 @@ import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
 
-class EmploymentHistorySection extends StatefulWidget {
+class InternshipSection extends StatefulWidget {
   final String title;
   final String description;
 
-  const EmploymentHistorySection({
-    Key? key,
-    required this.title,
-    required this.description,
-  }) : super(key: key);
+  const InternshipSection(
+      {Key? key, required this.title, required this.description})
+      : super(key: key);
 
   @override
-  State<EmploymentHistorySection> createState() =>
-      _EmploymentHistorySectionState();
+  State<InternshipSection> createState() => _InternshipSectionState();
 }
 
-class _EmploymentHistorySectionState extends State<EmploymentHistorySection> {
+class _InternshipSectionState extends State<InternshipSection> {
   getJSON() {}
 
-  final CustomEmploymentHistory _CustomEmploymentHistory =
-      CustomEmploymentHistory();
+  final CustomInternshipSection _CustomInternshipSection =
+      CustomInternshipSection();
 
   addNewItem() {
-    _CustomEmploymentHistory.addNewItem();
+    _CustomInternshipSection.addNewItem();
     setState(() {});
   }
 
   removeItem(int index) {
-    _CustomEmploymentHistory.removeItem(index);
+    _CustomInternshipSection.removeItem(index);
     setState(() {});
   }
 
@@ -58,32 +55,39 @@ class _EmploymentHistorySectionState extends State<EmploymentHistorySection> {
             ),
           ),
           Container(
-            margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+            margin: _CustomInternshipSection.item.isNotEmpty
+                ? const EdgeInsets.fromLTRB(0, 15, 0, 15)
+                : const EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: Column(
-              children: _CustomEmploymentHistory.item
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: _CustomInternshipSection.item
                   .asMap()
-                  .map((key, e) => MapEntry(
-                      key,
-                      EmploymentHistoryItem(
-                        customEmploymentHistoryItem: e,
-                        onDelete: removeItem,
-                        index: key,
-                      )))
+                  .map(
+                    (i, e) => MapEntry(
+                        i,
+                        InternshipItem(
+                          customInternshipItem: e,
+                          onDelete: removeItem,
+                          index: i,
+                        )),
+                  )
                   .values
                   .toList(),
             ),
           ),
           Container(
-            margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+            margin: const EdgeInsets.fromLTRB(0, 20, 0, 10),
             child: TextButton(
-                onPressed: addNewItem,
+                onPressed: () => addNewItem(),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    _CustomEmploymentHistory.item.isEmpty
-                        ? const Text('Add employment history')
-                        : const Text('Add one more employment history'),
+                    _CustomInternshipSection.item.isNotEmpty
+                        ? const Text('Add one more internship')
+                        : const Text('Add internship'),
                     Container(
                       margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
                       child: const Icon(Icons.add),
@@ -97,33 +101,39 @@ class _EmploymentHistorySectionState extends State<EmploymentHistorySection> {
   }
 }
 
-class EmploymentHistoryItem extends StatefulWidget {
+/** 
+ * 
+ * 
+ * 
+ * 
+ */
+class InternshipItem extends StatefulWidget {
   final DeleteFunction onDelete;
-  final CustomEmploymentHistoryItem customEmploymentHistoryItem;
+  final CustomInternshipItem customInternshipItem;
   final int index;
 
-  const EmploymentHistoryItem(
+  const InternshipItem(
       {super.key,
       required this.onDelete,
-      required this.customEmploymentHistoryItem,
+      required this.customInternshipItem,
       required this.index});
 
   @override
-  State<EmploymentHistoryItem> createState() => _EmploymentHistoryItemState();
+  State<InternshipItem> createState() => _InternshipItemState();
 }
 
-class _EmploymentHistoryItemState extends State<EmploymentHistoryItem> {
+class _InternshipItemState extends State<InternshipItem> {
   @override
   void initState() {
     super.initState();
-    widget.customEmploymentHistoryItem.generateCustomInputFields();
+    widget.customInternshipItem.generateCustomInputFields();
   }
 
   @override
   Widget build(BuildContext context) {
     return ExpandableCard(
       index: widget.index,
-      title: 'Employment History Item',
+      title: 'Internship item',
       onDelete: widget.onDelete,
       children: Container(
         padding: const EdgeInsets.all(10),
@@ -131,24 +141,24 @@ class _EmploymentHistoryItemState extends State<EmploymentHistoryItem> {
           children: [
             SideBySideInputs(
               inputFields: [
-                widget.customEmploymentHistoryItem.jobTitleField,
-                widget.customEmploymentHistoryItem.employerField
+                widget.customInternshipItem.jobTitleField,
+                widget.customInternshipItem.employerField,
               ].toList(),
             ),
             SideBySideInputs(
               inputFields: [
-                widget.customEmploymentHistoryItem.startDateField,
-                widget.customEmploymentHistoryItem.endDateField
+                widget.customInternshipItem.startDateField,
+                widget.customInternshipItem.endDateField,
               ].toList(),
             ),
             SideBySideInputs(
               inputFields: [
-                widget.customEmploymentHistoryItem.cityField,
+                widget.customInternshipItem.cityField,
               ].toList(),
             ),
             SideBySideInputs(
               inputFields: [
-                widget.customEmploymentHistoryItem.descriptionField,
+                widget.customInternshipItem.descriptionField,
               ].toList(),
             ),
           ],
@@ -158,8 +168,12 @@ class _EmploymentHistoryItemState extends State<EmploymentHistoryItem> {
   }
 }
 
-// For the employment history collection
-class CustomEmploymentHistoryItem {
+/** 
+ * 
+ * 
+ * 
+ */
+class CustomInternshipItem {
   final CustomInputType jobTitle;
   final CustomInputType employer;
   final CustomInputType startDate;
@@ -174,7 +188,7 @@ class CustomEmploymentHistoryItem {
   late CustomInputField cityField;
   late CustomInputField descriptionField;
 
-  CustomEmploymentHistoryItem(
+  CustomInternshipItem(
       {required this.jobTitle,
       required this.employer,
       required this.startDate,
@@ -223,13 +237,20 @@ class CustomEmploymentHistoryItem {
       isRequired: description.isRequired,
       controller: description.controller,
       type: description.type,
+      isTextArea: true,
     );
   }
 }
 
-class CustomEmploymentHistory {
-  List<CustomEmploymentHistoryItem> item = [];
+class CustomInternshipSection {
+  List<CustomInternshipItem> item = [];
   final List<TextEditingController> _controllers = [];
+
+  _addController() {
+    final TextEditingController controller = TextEditingController();
+    _controllers.add(controller);
+    return controller;
+  }
 
   dispose() {
     for (var element in _controllers) {
@@ -237,15 +258,8 @@ class CustomEmploymentHistory {
     }
   }
 
-  // add new controller
-  _addController() {
-    final TextEditingController controller = TextEditingController();
-    _controllers.add(controller);
-    return controller;
-  }
-
   addNewItem() {
-    item.add(CustomEmploymentHistoryItem(
+    item.add(CustomInternshipItem(
       jobTitle: CustomInputType(
         'Job Title',
         'jobTitle',

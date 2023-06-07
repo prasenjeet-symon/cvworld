@@ -2,19 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
 
-class ProfessionalSummary extends StatefulWidget {
+class HobbiesSection extends StatefulWidget {
   final String title;
   final String description;
 
-  const ProfessionalSummary(
-      {Key? key, required this.title, required this.description})
-      : super(key: key);
+  const HobbiesSection({
+    Key? key,
+    required this.title,
+    required this.description,
+  }) : super(key: key);
 
   @override
-  State<ProfessionalSummary> createState() => _ProfessionalSummaryState();
+  State<HobbiesSection> createState() => _HobbiesSectionState();
 }
 
-class _ProfessionalSummaryState extends State<ProfessionalSummary> {
+class _HobbiesSectionState extends State<HobbiesSection> {
   getJSON() {}
 
   final TextEditingController _controller = TextEditingController();
@@ -24,8 +26,13 @@ class _ProfessionalSummaryState extends State<ProfessionalSummary> {
   void initState() {
     super.initState();
 
-    final CustomInputType textEditorType = CustomInputType('Summery',
-        'professionalSummery', true, _controller, TextInputType.multiline);
+    final CustomInputType textEditorType = CustomInputType(
+      'Hobbies',
+      'hobbies',
+      true,
+      _controller,
+      TextInputType.multiline,
+    );
 
     textEditor = CustomInputField(
       label: textEditorType.label,
