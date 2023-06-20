@@ -1,14 +1,17 @@
 version: '3'
 services:
   mysql:
-    image: mysql:latest
+    image: mysql:8.0
     restart: always
     ports:
       - 3306:3306
     environment:
-      - MYSQL_ROOT_USER=cvworld
-      - MYSQL_ROOT_PASSWORD=cvworld
-      - MYSQL_DATABASE=cvworld
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: cvworld
+      MYSQL_USER: cvworld
+      MYSQL_PASSWORD: cvworld
+    volumes:
+      - mysql-data:/var/lib/mysql
     networks:
       - mynetwork
 
@@ -18,7 +21,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - 3001:80
+      - 3001:8080
     depends_on:
       - mysql
     environment:
@@ -28,6 +31,8 @@ services:
       - ADMIN_NAME=user
       - JWT_SECRET=secret
     command: sh -c "npx prisma migrate deploy --preview-feature && npm run start"
+    volumes:
+      - ./public:/app/public
     networks:
       - mynetwork
 
@@ -56,3 +61,6 @@ services:
 networks:
   mynetwork:
     driver: bridge
+
+volumes:
+  mysql-data:

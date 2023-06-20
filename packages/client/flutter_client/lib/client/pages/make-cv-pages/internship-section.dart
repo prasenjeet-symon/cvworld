@@ -3,6 +3,7 @@ import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
+import 'package:flutter_client/client/utils.dart';
 
 class InternshipSection extends StatefulWidget {
   final String title;
@@ -13,11 +14,25 @@ class InternshipSection extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<InternshipSection> createState() => _InternshipSectionState();
+  State<InternshipSection> createState() => InternshipSectionState();
 }
 
-class _InternshipSectionState extends State<InternshipSection> {
-  getJSON() {}
+class InternshipSectionState extends State<InternshipSection> {
+  List<Internship> getData() {
+    return _CustomInternshipSection.item
+        .map((element) => {
+              Internship(
+                element.jobTitle.controller.text,
+                element.employer.controller.text,
+                DateTime.parse(element.startDate.controller.text),
+                DateTime.parse(element.endDate.controller.text),
+                element.city.controller.text,
+                element.description.controller.text,
+              )
+            })
+        .expand((element) => element)
+        .toList();
+  }
 
   final CustomInternshipSection _CustomInternshipSection =
       CustomInternshipSection();

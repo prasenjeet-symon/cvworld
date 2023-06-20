@@ -141,3 +141,28 @@ To update the server run this command :
 docker-compose up --no-deps -d server
 ```
 
+## Hard build and run application
+Make sure you are in the folder `cvworld` if not then run the following commands :
+```BASH
+cd ~
+```
+Then go to the `cvworld` folder :
+```BASH
+cd cvworld
+```
+
+Then pull the latest version from the `GitHub`
+```BASH
+git pull
+```
+Once the latest source code is fetched from the `GitHub` run the following commands : 
+```BASH
+docker-compose build
+```
+This command will build the application. After that stop any running container using the following command
+```BASH
+docker-compose down
+```
+After the command finish executing it is time to run container. To run containers run this command :
+```BASH
+docker-compose up -d

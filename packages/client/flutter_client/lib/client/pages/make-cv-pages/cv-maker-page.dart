@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'dart:js_interop';
+
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/courses-section.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/education-section.dart';
@@ -10,6 +14,7 @@ import 'package:flutter_client/client/pages/make-cv-pages/personal-details-secti
 import 'package:flutter_client/client/pages/make-cv-pages/professional-summry-section.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/skills-section.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/website-links-section.dart';
+import 'package:flutter_client/client/utils.dart';
 
 @RoutePage()
 class CvMakerScreen extends StatelessWidget {
@@ -45,6 +50,7 @@ class CvMakerDesktopScreen extends StatefulWidget {
 }
 
 class _CvMakerDesktopScreenState extends State<CvMakerDesktopScreen> {
+  bool isLoading = false;
   final String educationSectionTitle = 'Education';
   final String educationSectionDescription =
       'A varied education on your resume sums up the value that your learnings and background will bring to job.';
@@ -72,6 +78,64 @@ class _CvMakerDesktopScreenState extends State<CvMakerDesktopScreen> {
   bool canShowInternship = false;
   bool canShowLanguage = false;
 
+  // keys
+  final GlobalKey<EducationSectionState> educationSection = GlobalKey();
+  final GlobalKey<CourseSectionState> courseSection = GlobalKey();
+  final GlobalKey<EmploymentHistorySectionState> employmentHis = GlobalKey();
+  final GlobalKey<HobbiesSectionState> hobbiesSection = GlobalKey();
+  final GlobalKey<InternshipSectionState> internshipSection = GlobalKey();
+  final GlobalKey<LanguageSectionState> languageSection = GlobalKey();
+  final GlobalKey<PersonalDetailSectionState> personalDetailSection =
+      GlobalKey();
+  final GlobalKey<ProfessionalSummaryState> professionSection = GlobalKey();
+  final GlobalKey<SkillSectionState> skillsSection = GlobalKey();
+  final GlobalKey<WebsiteLinkSectionState> websiteLinksSection = GlobalKey();
+
+  Resume getData() {
+    var employmentHistoryData = employmentHis.currentState?.getData() ?? [];
+    var educationSectionData = educationSection.currentState?.getData() ?? [];
+    var internshipSectionData = internshipSection.currentState?.getData() ?? [];
+    var coursesSectionData = courseSection.currentState?.getData() ?? [];
+    var linksSectionData = websiteLinksSection.currentState?.getData() ?? [];
+    var languageSectionData = languageSection.currentState?.getData() ?? [];
+    var skillsSectionData = skillsSection.currentState?.getData() ?? [];
+
+    var extraInfo = personalDetailSection.currentState?.getExtraData();
+    var hobbiesSectionData = hobbiesSection.currentState?.getData() ?? '';
+    var professionalData = professionSection.currentState?.getData();
+    var detailsData = personalDetailSection.currentState?.getData();
+
+    return Resume(
+      extraInfo['name'],
+      extraInfo['profession'],
+      professionalData['profile'],
+      employmentHistoryData,
+      educationSectionData,
+      internshipSectionData,
+      coursesSectionData,
+      detailsData,
+      hobbiesSectionData,
+      linksSectionData,
+      languageSectionData,
+      skillsSectionData,
+    );
+  }
+
+  // generate the resume
+  generateResume(BuildContext ctx) async {
+    isLoading = true;
+    setState(() {});
+
+    var payload = getData();
+    var generatedResume = await DatabaseService().generateResume(payload);
+
+    isLoading = false;
+    setState(() {});
+
+    // ignore: use_build_context_synchronously
+    ctx.navigateNamedTo('/dashboard/view-resume/${generatedResume?.id}');
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -79,24 +143,27 @@ class _CvMakerDesktopScreenState extends State<CvMakerDesktopScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     return Stack(
       children: [
         Positioned(
           top: 10,
           left: 10,
-          child: TextButton(
-              style: TextButton.styleFrom(padding: EdgeInsets.all(15)),
-              onPressed: () {
-                context.navigateBack();
-              },
-              child: const Text('Back')),
+          child: BackButtonApp(onPressed: () {
+            context.back();
+          }),
         ),
         Positioned(
             bottom: 30,
             left: 1,
             width: 450,
             child: Image.asset(
-              'add-name-image.png',
+              'assets/add-name-image.png',
               fit: BoxFit.cover,
             )),
         Row(
@@ -128,46 +195,56 @@ class _CvMakerDesktopScreenState extends State<CvMakerDesktopScreen> {
                     ),
                   ),
                   PersonalDetailSection(
+                    key: personalDetailSection,
                     title: personalDetailTitle,
                     description: personalDetailDescription,
                   ),
                   ProfessionalSummary(
+                    key: professionSection,
                     title: professionalSummeryTitle,
                     description: professionalSummeryDescription,
                   ),
                   EmploymentHistorySection(
+                    key: employmentHis,
                     title: employmentHisTitle,
                     description: employmentHisDescription,
                   ),
                   EducationSection(
+                    key: educationSection,
                     title: educationSectionTitle,
                     description: educationSectionDescription,
                   ),
                   WebsiteLinkSection(
+                    key: websiteLinksSection,
                     title: websiteLinkTitle,
                     description: websiteLinkDescription,
                   ),
                   SkillSection(
+                    key: skillsSection,
                     title: skillTitle,
                     description: skillDescription,
                   ),
                   if (canShowInternship)
                     InternshipSection(
+                      key: internshipSection,
                       title: internshipTitle,
                       description: internshipDescription,
                     ),
                   if (canShowCourses)
-                    const CourseSection(
+                    CourseSection(
+                      key: courseSection,
                       title: 'Courses',
                       description: '',
                     ),
                   if (canShowLanguage)
                     LanguageSection(
+                      key: languageSection,
                       title: languageTitle,
                       description: languageDescription,
                     ),
                   if (canShowHobbies)
-                    const HobbiesSection(
+                    HobbiesSection(
+                      key: hobbiesSection,
                       title: 'Hobbies',
                       description: '',
                     ),
@@ -359,6 +436,7 @@ class _CvMakerDesktopScreenState extends State<CvMakerDesktopScreen> {
                       ),
                       onPressed: () {
                         // Handle button press
+                        generateResume(context);
                       },
                       child: const Text(
                         'Generate',

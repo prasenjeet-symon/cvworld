@@ -3,6 +3,7 @@ import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
+import 'package:flutter_client/client/utils.dart';
 
 class EmploymentHistorySection extends StatefulWidget {
   final String title;
@@ -16,11 +17,25 @@ class EmploymentHistorySection extends StatefulWidget {
 
   @override
   State<EmploymentHistorySection> createState() =>
-      _EmploymentHistorySectionState();
+      EmploymentHistorySectionState();
 }
 
-class _EmploymentHistorySectionState extends State<EmploymentHistorySection> {
-  getJSON() {}
+class EmploymentHistorySectionState extends State<EmploymentHistorySection> {
+  List<EmploymentHistory> getData() {
+    return _CustomEmploymentHistory.item
+        .map((e) => {
+              EmploymentHistory(
+                e.jobTitle.controller.text,
+                e.employer.controller.text,
+                DateTime.parse(e.startDate.controller.text),
+                DateTime.parse(e.endDate.controller.text),
+                e.city.controller.text,
+                e.description.controller.text,
+              )
+            })
+        .expand((element) => element)
+        .toList();
+  }
 
   final CustomEmploymentHistory _CustomEmploymentHistory =
       CustomEmploymentHistory();

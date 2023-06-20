@@ -4,8 +4,10 @@ CREATE TABLE `Admin` (
     `email` VARCHAR(191) NOT NULL,
     `fullName` VARCHAR(191) NOT NULL,
     `profilePicture` VARCHAR(191) NULL,
-    `password` VARCHAR(191) NULL,
+    `password` VARCHAR(191) NOT NULL,
     `reference` VARCHAR(191) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     UNIQUE INDEX `Admin_email_key`(`email`),
     PRIMARY KEY (`id`)
@@ -19,6 +21,8 @@ CREATE TABLE `User` (
     `profilePicture` VARCHAR(191) NULL,
     `password` VARCHAR(191) NULL,
     `reference` VARCHAR(191) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     UNIQUE INDEX `User_email_key`(`email`),
     PRIMARY KEY (`id`)
@@ -35,6 +39,8 @@ CREATE TABLE `Subscription` (
     `discount` BIGINT NOT NULL,
     `basePrice` BIGINT NOT NULL,
     `userId` INTEGER NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     UNIQUE INDEX `Subscription_userId_key`(`userId`),
     PRIMARY KEY (`id`)
@@ -43,10 +49,11 @@ CREATE TABLE `Subscription` (
 -- CreateTable
 CREATE TABLE `Resumes` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `data` VARCHAR(191) NOT NULL,
+    `data` JSON NOT NULL,
     `userId` INTEGER NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
-    UNIQUE INDEX `Resumes_userId_key`(`userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

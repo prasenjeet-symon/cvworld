@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap");
+
+      .resume {
+        padding: 50px;
+        font-family: "Rubik", sans-serif;
+        width: 210mm;
+        height: 297mm;
+        margin: 0 auto;
+        background-color: white;
+        border: 1px solid gainsboro;
+      }
+
+      .resume > div:nth-of-type(1) {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+      }
+
+      .resume > div:nth-of-type(1) > div:nth-of-type(1) {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+
+      .resume > div:nth-of-type(1) > div:nth-of-type(2) {
+        font-size: 1rem;
+        font-weight: 400;
+      }
+
+      .lowerBody {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        grid-gap: 10px;
+      }
+
+      .lowerBody .profileSection,
+      .lowerBody .employmentSection,
+      .lowerBody .educationSection,
+      .lowerBody .internshipSection,
+      .lowerBody .coursesSection {
+        display: flex;
+        align-items: flex-start;
+        padding: 10px 10px 10px 0px;
+        margin: 15px 0px;
+      }
+
+      .lowerBody .profileSection > div:nth-of-type(2),
+      .lowerBody .employmentSection > div:nth-of-type(2),
+      .lowerBody .educationSection > div:nth-of-type(2),
+      .lowerBody .internshipSection > div:nth-of-type(2),
+      .lowerBody .coursesSection > div:nth-of-type(2) {
+        flex: 1;
+        margin-left: 10px;
+      }
+
+      .lowerBody .profileSection > div:nth-of-type(2) > div:nth-of-type(1),
+      .lowerBody .employmentSection > div:nth-of-type(2) > div:nth-of-type(1),
+      .lowerBody .educationSection > div:nth-of-type(2) > div:nth-of-type(1),
+      .lowerBody .internshipSection > div:nth-of-type(2) > div:nth-of-type(1),
+      .lowerBody .coursesSection > div:nth-of-type(2) > div:nth-of-type(1) {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+
+      /* Profile section */
+      .lowerBody .profileSection > div:nth-of-type(2) > div:nth-of-type(2) {
+        font-size: 0.9rem;
+        font-weight: 400;
+      }
+
+      /* Employment section */
+      .lowerBody .employmentSection .employmentHistoryItem,
+      .lowerBody .educationSection .educationSectionItem,
+      .lowerBody .internshipSection .internshipSectionItem,
+      .lowerBody .coursesSection .coursesSectionItem {
+        margin: 10px 0px 20px 0px;
+      }
+
+      .lowerBody .employmentSection .employmentHistoryItem > div:nth-of-type(1),
+      .lowerBody .educationSection .educationSectionItem > div:nth-of-type(1),
+      .lowerBody .internshipSection .internshipSectionItem > div:nth-of-type(1),
+      .lowerBody .coursesSection .coursesSectionItem > div:nth-of-type(1) {
+        font-size: 0.95rem;
+        font-weight: 500;
+      }
+
+      .lowerBody .employmentSection .employmentHistoryItem > div:nth-of-type(2),
+      .lowerBody .educationSection .educationSectionItem > div:nth-of-type(2),
+      .lowerBody .internshipSection .internshipSectionItem > div:nth-of-type(2),
+      .lowerBody .coursesSection .coursesSectionItem > div:nth-of-type(2) {
+        font-weight: 200;
+        font-size: 0.85rem;
+        margin: 5px 0px;
+      }
+
+      .lowerBody .employmentSection .employmentHistoryItem > div:nth-of-type(3),
+      .lowerBody .educationSection .educationSectionItem > div:nth-of-type(3),
+      .lowerBody .internshipSection .internshipSectionItem > div:nth-of-type(3),
+      .lowerBody .coursesSection .coursesSectionItem > div:nth-of-type(3) {
+        font-size: 0.9rem;
+        font-weight: 400;
+      }
+
+      /* Right section */
+      .detailsSection > div:nth-of-type(1) {
+        font-weight: 500;
+      }
+      .detailsSection > div:nth-of-type(2) {
+        font-size: 0.9rem;
+        font-weight: 400;
+        margin: 10px 0px;
+        line-height: 1.25rem;
+      }
+
+      .detailsSection > div:nth-of-type(3) {
+        color: darkcyan;
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin: 10px 0px;
+      }
+
+      .detailsSection > div:nth-of-type(4) {
+        font-size: 0.9rem;
+        font-weight: 400;
+        margin: 10px 0px;
+        line-height: 1.25rem;
+      }
+
+      .detailsSection > div:nth-of-type(4) > div:nth-of-type(1) {
+        font-weight: 500;
+      }
+
+      .detailsSection > div:nth-of-type(5) {
+        font-size: 0.9rem;
+        font-weight: 400;
+        margin: 10px 0px;
+        line-height: 1.25rem;
+      }
+
+      .detailsSection > div:nth-of-type(5) > div:nth-of-type(1) {
+        font-weight: 500;
+      }
+
+      .linksSection {
+        margin: 20px 0px;
+      }
+
+      .linksSection > div:nth-of-type(1) {
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 5px;
+      }
+
+      .linksSection .linkItem {
+        color: darkcyan;
+        font-weight: 500;
+        margin: 0px 10px 5px 0px;
+      }
+
+      .linksSection .linkItem a {
+        text-decoration: none;
+        font-size: 0.9rem;
+      }
+
+      .linksSection > div:nth-of-type(2) {
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      /* For the skill section */
+      .skillSection {
+        margin: 20px 0px;
+        font-size: 0.9rem;
+        font-weight: 400;
+      }
+
+      .skillSection > div:nth-of-type(1) {
+        font-weight: 500;
+      }
+
+      .skillSection .skillItem {
+        margin: 10px 0px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+      }
+
+      .skillSection .skillItem div:nth-of-type(2) {
+        display: inline-block;
+        height: 3px;
+        border: 0px;
+        background-color: black;
+        outline: none;
+        margin-top: 5px;
+      }
+
+      /* For the hobbies */
+      .hobbiesSection {
+        margin: 20px 0px;
+        font-size: 0.9rem;
+        font-weight: 400;
+        line-height: 1.25rem;
+      }
+
+      .hobbiesSection > div:nth-child(1) {
+        font-weight: 500;
+        margin-bottom: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="resume">
+      <div class="header">
+        <div>Prasenjeet Kumar</div>
+        <div>English Teacher</div>
+      </div>
+      <div class="lowerBody">
+        <section>
+          <!-- profile section -->
+          <div class="profileSection">
+            <div><span class="material-symbols-outlined"> person </span></div>
+            <div>
+              <div>Profile</div>
+              <div>
+                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Maxime, vero pariatur corrupti rerum sunt quo veniam laudantium! Cupiditate, minima. Consequuntur
+                provident quasi placeat?
+              </div>
+            </div>
+          </div>
+
+          <!-- employment history section -->
+          <div class="employmentSection">
+            <div><span class="material-symbols-outlined"> work </span></div>
+            <div>
+              <div>Employment History</div>
+              <div>
+                <!-- list all the employment history here -->
+                <div class="employmentHistoryItem">
+                  <div>Lorem ipsum dolor sit amet.</div>
+                  <div>January 2023 -- February 2024</div>
+                  <div>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus repudiandae reiciendis ea recusandae, asperiores qui.</div>
+                </div>
+
+                <div class="employmentHistoryItem">
+                  <div>Lorem ipsum dolor sit amet.</div>
+                  <div>January 2023 -- February 2024</div>
+                  <div>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus repudiandae reiciendis ea recusandae, asperiores qui.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="educationSection">
+            <div><span class="material-symbols-outlined"> school </span></div>
+            <div>
+              <div>Education</div>
+              <div>
+                <!-- list all the employment history here -->
+                <div class="educationSectionItem">
+                  <div>Lorem ipsum dolor sit amet.</div>
+                  <div>January 2023 -- February 2024</div>
+                  <div></div>
+                </div>
+
+                <div class="educationSectionItem">
+                  <div>Lorem ipsum dolor sit amet.</div>
+                  <div>January 2023 -- February 2024</div>
+                  <div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Internship -->
+          <div class="internshipSection">
+            <div><span class="material-symbols-outlined"> group </span></div>
+            <div>
+              <div>Internship</div>
+              <div>
+                <!-- list all the employment history here -->
+                <div class="internshipSectionItem">
+                  <div>Lorem ipsum dolor sit amet.</div>
+                  <div>January 2023 -- February 2024</div>
+                  <div>Lorem ipsum dolor sit amet consectetur adipisicing elit. Qui nostrum quas sit.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Courses Section -->
+          <div class="coursesSection">
+            <div><span class="material-symbols-outlined"> book </span></div>
+            <div>
+              <div>Courses</div>
+              <div>
+                <!-- list all the employment history here -->
+                <div class="coursesSectionItem">
+                  <div>Lorem ipsum dolor sit amet.</div>
+                  <div>January 2023 -- February 2024</div>
+                  <div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <!-- details -->
+          <div class="detailsSection">
+            <div>Details</div>
+            <div>
+              Purani amalganj chowki <br />
+              Patna 80007 <br />
+              Bihar, India <br />
+              8083371350
+            </div>
+            <div>prasenjeetsymon@gmail.com</div>
+            <div>
+              <div>Date/Place of birth</div>
+              <div>
+                12/01/202 <br />
+                Hindu
+              </div>
+            </div>
+            <div>
+              <div>Driving license</div>
+              <div>SDFDS234</div>
+            </div>
+          </div>
+
+          <!-- links sections -->
+          <div class="linksSection">
+            <div>Links</div>
+            <div>
+              <div class="linkItem"><a href=""> https://google.com </a></div>
+              <div class="linkItem"><a href=""> https:meta.com </a></div>
+              <div class="linkItem"><a href=""> https:adobe.com </a></div>
+            </div>
+          </div>
+
+          <!-- skills section -->
+          <div class="skillSection">
+            <div>Skills</div>
+            <div>
+              <div class="skillItem">
+                <div>Lorem, ipsum.</div>
+                <div style="width: 40%"></div>
+              </div>
+
+              <div class="skillItem">
+                <div>Lorem, ipsum.</div>
+                <div style="width: 90%"></div>
+              </div>
+
+              <div class="skillItem">
+                <div>Lorem, ipsum.</div>
+                <div style="width: 20%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- hobbies section -->
+          <div class="hobbiesSection">
+            <div>Hobbies</div>
+            <div>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus optio pariatur non ratione adipisci quibusdam. Minima, nobis quaerat! Cum consectetur beatae officia
+              est tenetur veniam corporis optio, recusandae, quos ex, laudantium tempora? Dignissimos, pariatur mollitia.
+            </div>
+          </div>
+
+          <!-- Languages section -->
+          <div class="skillSection">
+            <div>Language</div>
+            <div>
+              <div class="skillItem">
+                <div>Lorem, ipsum.</div>
+                <div style="width: 40%"></div>
+              </div>
+
+              <div class="skillItem">
+                <div>Lorem, ipsum.</div>
+                <div style="width: 90%"></div>
+              </div>
+
+              <div class="skillItem">
+                <div>Lorem, ipsum.</div>
+                <div style="width: 20%"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </body>
+</html>

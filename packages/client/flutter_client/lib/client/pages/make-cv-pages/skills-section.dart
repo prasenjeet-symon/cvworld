@@ -3,6 +3,7 @@ import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
+import 'package:flutter_client/client/utils.dart';
 
 class SkillSection extends StatefulWidget {
   final String title;
@@ -12,11 +13,21 @@ class SkillSection extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<SkillSection> createState() => _SkillSectionState();
+  State<SkillSection> createState() => SkillSectionState();
 }
 
-class _SkillSectionState extends State<SkillSection> {
-  getJSON() {}
+class SkillSectionState extends State<SkillSection> {
+  List<Skills> getData() {
+    return _CustomSkillSection.item
+        .map((e) => {
+              Skills(
+                e.skill.controller.text,
+                double.parse(e.level.controller.text),
+              )
+            })
+        .expand((element) => element)
+        .toList();
+  }
 
   final CustomSkillSection _CustomSkillSection = CustomSkillSection();
 
@@ -211,7 +222,7 @@ class CustomSkillSection {
         'level',
         true,
         _addController(),
-        TextInputType.number,
+        TextInputType.text,
       ),
     ));
   }

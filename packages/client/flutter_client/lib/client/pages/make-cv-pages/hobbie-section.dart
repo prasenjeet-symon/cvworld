@@ -13,11 +13,13 @@ class HobbiesSection extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<HobbiesSection> createState() => _HobbiesSectionState();
+  State<HobbiesSection> createState() => HobbiesSectionState();
 }
 
-class _HobbiesSectionState extends State<HobbiesSection> {
-  getJSON() {}
+class HobbiesSectionState extends State<HobbiesSection> {
+  String getData() {
+    return _controller.text;
+  }
 
   final TextEditingController _controller = TextEditingController();
   late final CustomInputField textEditor;

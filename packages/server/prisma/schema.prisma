@@ -2,8 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
-  binaryTargets = ["debian-openssl-1.1.x","native"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["debian-openssl-1.1.x", "native"]
 }
 
 datasource db {
@@ -13,12 +13,14 @@ datasource db {
 
 // ADMIN Table
 model Admin {
-  id             Int           @id @default(autoincrement())
-  email          String        @unique
+  id             Int      @id @default(autoincrement())
+  email          String   @unique
   fullName       String
   profilePicture String?
-  password       String?
+  password       String
   reference      String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now())
 }
 
 // User Model
@@ -28,9 +30,11 @@ model User {
   fullName       String
   profilePicture String?
   password       String?
-  reference      String
+  reference      String        @unique
   subscription   Subscription?
   resumes        Resumes[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @default(now())
 }
 
 // subscription 
@@ -45,6 +49,8 @@ model Subscription {
   basePrice   BigInt
   user        User              @relation(fields: [userId], references: [id])
   userId      Int               @unique
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @default(now())
 }
 
 enum SubscriptionCycle {
@@ -54,8 +60,10 @@ enum SubscriptionCycle {
 
 // for the resume
 model Resumes {
-  id     Int    @id @default(autoincrement())
-  data   String
-  user   User   @relation(fields: [userId], references: [id])
-  userId Int    @unique
+  id        Int      @id @default(autoincrement())
+  data      Json
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
+import 'package:flutter_client/client/utils.dart';
 
 import 'types.dart';
 
@@ -13,10 +14,10 @@ class PersonalDetailSection extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<PersonalDetailSection> createState() => _PersonalDetailSectionState();
+  State<PersonalDetailSection> createState() => PersonalDetailSectionState();
 }
 
-class _PersonalDetailSectionState extends State<PersonalDetailSection> {
+class PersonalDetailSectionState extends State<PersonalDetailSection> {
   final List<TextEditingController> _controllers = [];
   bool _canShowInputs = false;
 
@@ -25,8 +26,94 @@ class _PersonalDetailSectionState extends State<PersonalDetailSection> {
   late final List<SideBySideInputs> _upperInputsSideBySide = [];
   late final List<CustomInputField> _lowerInputs;
   late final List<SideBySideInputs> _lowerInputsSideBySide = [];
+  late final defaultField;
 
-  getJson() {}
+  getExtraData() {
+    return {
+      'profession': inputs
+          .firstWhere(
+            (element) => element.jsonKey == 'profession',
+          )
+          .controller
+          .text,
+      'name':
+          '${inputs.firstWhere((element) => element.jsonKey == 'firstName').controller.text} ${inputs.firstWhere(
+                (element) => element.jsonKey == 'lastName',
+              ).controller.text}',
+    };
+  }
+
+  getData() {
+    return Details(
+        inputs
+            .firstWhere(
+              (element) => element.jsonKey == 'email',
+            )
+            .controller
+            .text,
+        inputs
+            .firstWhere(
+              (element) => element.jsonKey == 'phone',
+            )
+            .controller
+            .text,
+        inputs
+            .firstWhere(
+              (element) => element.jsonKey == 'country',
+            )
+            .controller
+            .text,
+        inputs
+            .firstWhere(
+              (element) => element.jsonKey == 'city',
+            )
+            .controller
+            .text,
+        inputs
+            .firstWhere(
+              (element) => element.jsonKey == 'address',
+            )
+            .controller
+            .text,
+        inputs
+            .firstWhere(
+              (element) => element.jsonKey == 'postalCode',
+            )
+            .controller
+            .text,
+        inputs
+            .firstWhere(
+              (element) => element.jsonKey == 'drivingLicense',
+            )
+            .controller
+            .text,
+        inputs
+            .firstWhere(
+              (element) => element.jsonKey == 'nationality',
+            )
+            .controller
+            .text,
+        inputs
+            .firstWhere(
+              (element) => element.jsonKey == 'placeOfBirth',
+            )
+            .controller
+            .text,
+        DateTime.parse(inputs
+                .firstWhere(
+                  (element) => element.jsonKey == 'dateOfBirth',
+                )
+                .controller
+                .text
+                .isEmpty
+            ? DateTime.now().toIso8601String()
+            : inputs
+                .firstWhere(
+                  (element) => element.jsonKey == 'dateOfBirth',
+                )
+                .controller
+                .text));
+  }
 
   // Get the controller
   TextEditingController _getController() {
@@ -40,7 +127,7 @@ class _PersonalDetailSectionState extends State<PersonalDetailSection> {
     // Job title
     CustomInputType jobTitle = CustomInputType(
       'Job Title',
-      'jobTitle',
+      'profession',
       true,
       _getController(),
       TextInputType.text,
@@ -160,10 +247,10 @@ class _PersonalDetailSectionState extends State<PersonalDetailSection> {
     // for date of birth
     CustomInputType dateOfBirth = CustomInputType(
       'Date Of Birth',
-      'dateBirthDate',
+      'dateOfBirth',
       true,
       _getController(),
-      TextInputType.text,
+      TextInputType.datetime,
     );
     inputs.add(dateOfBirth);
   }
@@ -179,6 +266,14 @@ class _PersonalDetailSectionState extends State<PersonalDetailSection> {
   @override
   void initState() {
     super.initState();
+    defaultField = CustomInputType(
+      'Default',
+      'default',
+      true,
+      _getController(),
+      TextInputType.text,
+    );
+
     addAllFields();
 
     _upperInputs = inputs

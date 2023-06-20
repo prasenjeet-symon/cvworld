@@ -1,5 +1,5 @@
 import express from "express";
-import { signInAdmin, signInOrSignUpWithGoogle, signInWithEmailAndPassword, signUpWithEmailAndPassword } from "../utils";
+import { authenticateUser, signInAdmin, signInOrSignUpWithGoogle, signInWithEmailAndPassword, signUpWithEmailAndPassword } from "../utils";
 
 const router = express.Router();
 
@@ -25,6 +25,13 @@ router.post("/sign_up_with_email_and_password", async (req, res) => {
 /** Sign the ADMIN */
 router.post("/sign_in_as_admin", async (req, res) => {
   await signInAdmin(req, res);
+});
+
+router.post("/session", (req, res) => {
+  authenticateUser(req, res, () => {
+    const { userId, email, isAdmin } = res.locals;
+    res.send({ userId, email, isAdmin });
+  });
 });
 
 export default router;

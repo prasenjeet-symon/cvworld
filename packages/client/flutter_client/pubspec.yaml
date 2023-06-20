@@ -40,6 +40,11 @@ dependencies:
   auto_route: ^7.2.0
   flutter_svg: ^2.0.6
   font_awesome_flutter: ^10.4.0
+  http: ^1.0.0
+  flutter_secure_storage: ^8.0.0
+  localstorage: ^4.0.1+2
+  fluttertoast: ^8.2.2
+  url_launcher: ^6.1.11
 
 dev_dependencies:
   flutter_test:

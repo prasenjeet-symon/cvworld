@@ -3,6 +3,7 @@ import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
+import 'package:flutter_client/client/utils.dart';
 
 class WebsiteLinkSection extends StatefulWidget {
   final String title;
@@ -13,11 +14,16 @@ class WebsiteLinkSection extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<WebsiteLinkSection> createState() => _WebsiteLinkSectionState();
+  State<WebsiteLinkSection> createState() => WebsiteLinkSectionState();
 }
 
-class _WebsiteLinkSectionState extends State<WebsiteLinkSection> {
-  getJSON() {}
+class WebsiteLinkSectionState extends State<WebsiteLinkSection> {
+  List<Links> getData() {
+    return _CustomWebsiteLinkSection.item
+        .map((e) => {Links(e.label.controller.text, e.link.controller.text)})
+        .expand((element) => element)
+        .toList();
+  }
 
   final CustomWebsiteLinkSection _CustomWebsiteLinkSection =
       CustomWebsiteLinkSection();

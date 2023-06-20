@@ -1,3 +1,4 @@
+import { PrismaClient } from "@prisma/client";
 import express, { NextFunction, Request, Response } from "express";
 import { v4 } from "uuid";
 import router from "./api";
@@ -28,8 +29,7 @@ export async function signInOrSignUpWithGoogle(req: Request, res: Response): Pro
   } else {
     const userId = v4();
     // create new user and sign token and return
-    const { PrismaClient } = require("@prisma/client");
-    const prisma = new PrismaClient();
+    const prisma = PrismaClientSingleton.prisma;
     const newUser = await prisma.user.create({
       data: {
         email: verifiedToken.email,
@@ -75,7 +75,7 @@ export async function createJwt(userId: string, email: string, isAdmin: boolean 
     throw new Error("JWT_SECRET not set");
   }
 
-  return jwt.sign({ userId, email, isAdmin: isAdmin }, JWT_SECRET, { expiresIn: "1h" });
+  return jwt.sign({ userId, email, isAdmin: isAdmin }, JWT_SECRET, { expiresIn: "20h" });
 }
 
 /** Verify the JSON WEB TOKEN */
@@ -88,7 +88,8 @@ export const authenticateUser = (req: Request, res: Response, next: NextFunction
 
   const jwt = require("jsonwebtoken");
   // Get the authentication token from the request headers, query parameters, or cookies
-  const token = req.headers.authorization; // Example: Bearer <token>
+  // Example: Bearer <token>
+  const token = req.headers.authorization ? req.headers.authorization.split(" ")[1] : "";
 
   // Verify and decode the token
   try {
@@ -110,8 +111,7 @@ export const authenticateUser = (req: Request, res: Response, next: NextFunction
 
 /** Do user already exit */
 export async function doUserAlreadyExit(email: string): Promise<any> {
-  const { PrismaClient } = require("@prisma/client");
-  const prisma = new PrismaClient();
+  const prisma = PrismaClientSingleton.prisma;
   const user = await prisma.user.findUnique({
     where: {
       email: email,
@@ -123,8 +123,7 @@ export async function doUserAlreadyExit(email: string): Promise<any> {
 
 /** Do admin user exit */
 export async function doAdminUserExit(email: string): Promise<any> {
-  const { PrismaClient } = require("@prisma/client");
-  const prisma = new PrismaClient();
+  const prisma = PrismaClientSingleton.prisma;
   const user = await prisma.admin.findUnique({
     where: {
       email: email,
@@ -142,7 +141,11 @@ export async function signUpWithEmailAndPassword(req: Request, res: Response) {
     const password = req.body.password;
     const userId = v4();
 
-    // check for the requirement
+    if (!("name" in req.body && "email" in req.body && "password" in req.body)) {
+      res.status(400).json({ message: "All input is required" });
+      return;
+    }
+
     if (!(name && email && password)) {
       res.status(400).json({ message: "All input is required" });
       return;
@@ -150,7 +153,7 @@ export async function signUpWithEmailAndPassword(req: Request, res: Response) {
 
     const userAlreadyExit = await doUserAlreadyExit(req.body.email);
     if (userAlreadyExit) {
-      res.status(400).json({ message: "User already exit" });
+      res.status(500).json({ message: "User already exit" });
       return;
     }
 
@@ -159,8 +162,7 @@ export async function signUpWithEmailAndPassword(req: Request, res: Response) {
     // Save the user to the database or perform any desired actions
     const profilePicture = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
 
-    const { PrismaClient } = require("@prisma/client");
-    const prisma = new PrismaClient();
+    const prisma = PrismaClientSingleton.prisma;
     await prisma.user.create({
       data: {
         email: email,
@@ -168,12 +170,15 @@ export async function signUpWithEmailAndPassword(req: Request, res: Response) {
         profilePicture: profilePicture,
         password: hashedPassword,
         reference: userId,
+        resumes: {
+          create: [],
+        },
       },
     });
 
     // generate JSON Web Token
     const token = await createJwt(userId, email);
-    res.status(201).json({ token });
+    res.status(200).json({ token });
   } catch (error) {
     // Handle any errors that occur during the signup process
     console.error("Error during user signup:", error);
@@ -186,6 +191,11 @@ export async function signInWithEmailAndPassword(req: Request, res: Response) {
   const email = req.body.email;
   const password = req.body.password;
 
+  if (!("email" in req.body && "password" in req.body)) {
+    res.status(400).json({ message: "All input is required" });
+    return;
+  }
+
   if (!(email && password)) {
     res.status(400).json({ message: "All input is required" });
     return;
@@ -193,13 +203,13 @@ export async function signInWithEmailAndPassword(req: Request, res: Response) {
 
   const oldUser = await doUserAlreadyExit(email);
   if (!oldUser) {
-    res.status(400).json({ message: "User does not exit" });
+    res.status(500).json({ message: "User does not exit" });
     return;
   }
 
   const userId = oldUser.reference;
   const passwordOld = oldUser.password;
-  const isPasswordCorrect = await comparePasswords(password, passwordOld);
+  const isPasswordCorrect = comparePasswords(password, passwordOld);
   if (isPasswordCorrect) {
     // create json web token and return
     res.status(200).json({ token: await createJwt(userId, email) });
@@ -212,70 +222,12 @@ export async function signInWithEmailAndPassword(req: Request, res: Response) {
 
 /** Get user by userId */
 export async function getUserByUserId(userId: string) {
-  const { PrismaClient } = require("@prisma/client");
-  const prisma = new PrismaClient();
+  const prisma = PrismaClientSingleton.prisma;
   const user = await prisma.user.findUnique({
-    where: {
-      reference: userId,
-    },
+    where: {},
   });
 
   return user;
-}
-
-/** Configure resume upload */
-export function resumeUploadStorage() {
-  const multer = require("multer");
-  const storage = multer.diskStorage({
-    limits: {
-      fileSize: 20 * 1024 * 1024, // 20MB in bytes
-    },
-    destination: (req: any, file: any, cb: any) => {
-      cb(null, "uploads"); // Specify the directory where uploaded files will be stored
-    },
-    filename: (req: any, file: any, cb: any) => {
-      cb(null, file.originalname); // Use the original file name as the destination file name
-    },
-  });
-
-  const upload = multer({ storage });
-  return upload;
-}
-
-/** Upload the resume on at time */
-export async function uploadResume(req: Request, res: Response) {
-  const userId = res.locals.userId;
-  const email = res.locals.email;
-  const user = await getUserByUserId(userId);
-  if (!user) {
-    res.status(400).json({ message: "User does not exit" });
-    return;
-  }
-
-  // file uploaded using multer
-  // Read the uploaded file as a buffer
-  const fs = require("fs");
-  const fileBuffer = fs.readFileSync((req as any).file.path);
-  // Convert the file buffer to Base64
-  const base64Image = fileBuffer.toString("base64");
-
-  // Update the user with the new resume
-  const { PrismaClient } = require("@prisma/client");
-  const prisma = new PrismaClient();
-  // add new resume
-  await prisma.resumes.create({
-    data: {
-      data: base64Image,
-      userId: userId,
-    },
-  });
-
-  // delete the file uploaded
-  const fsExtra = require("fs-extra");
-  await fsExtra.remove((req as any).file.path);
-  // return the updated user
-  const updatedUser = await getUserByUserId(userId);
-  res.status(200).json({ updatedUser });
 }
 /**
  *
@@ -333,13 +285,12 @@ export async function signUpAdmin() {
   const hashedPassword = hashPassword(password);
 
   // Save the user to the database or perform any desired actions
-  const { PrismaClient } = require("@prisma/client");
-  const prisma = new PrismaClient();
+  const prisma = PrismaClientSingleton.prisma;
   await prisma.admin.create({
     data: {
       email: email,
       password: hashedPassword,
-      fullName: process.env.ADMIN_NAME,
+      fullName: process.env.ADMIN_NAME || "",
       reference: userId,
     },
   });
@@ -349,6 +300,16 @@ export async function signUpAdmin() {
   return token;
 }
 
+export class PrismaClientSingleton {
+  static #instance: PrismaClient;
+
+  static get prisma() {
+    if (!PrismaClientSingleton.#instance) {
+      PrismaClientSingleton.#instance = new PrismaClient();
+    }
+    return PrismaClientSingleton.#instance;
+  }
+}
 /**
  * Create the server
  */
@@ -360,6 +321,8 @@ export function createServer() {
 
   app.use(cors());
   app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+  app.use(express.static(path.join(process.cwd(), "public")));
   app.use("/server/auth", routerAuth);
   app.use("/server/api", authenticateUser, router);
 
@@ -372,6 +335,7 @@ export function createServer() {
 
 /** Hashing password */
 import crypto from "crypto";
+import path from "path";
 
 const hashPassword = (password: string): string => {
   const hash = crypto.createHash("sha256");
@@ -383,3 +347,700 @@ const comparePasswords = (plainPassword: string, hashedPassword: string): boolea
   const hashedInput = hashPassword(plainPassword);
   return hashedInput === hashedPassword;
 };
+
+export interface Resume {
+  name: string;
+  profession: string;
+  profile: string;
+  employmentHistory: {
+    job: string;
+    employer: string;
+    startDate: Date;
+    endDate: Date;
+    city: string;
+    description: string;
+  }[];
+  education: {
+    school: string;
+    startDate: Date;
+    endDate: Date;
+    degree: string;
+    city: string;
+    description: string;
+  }[];
+  internship: {
+    job: string;
+    employer: string;
+    startDate: Date;
+    endDate: Date;
+    city: string;
+    description: string;
+  }[];
+  courses: {
+    course: string;
+    institution: string;
+    startDate: Date;
+    endDate: Date;
+  }[];
+  details: {
+    email: string;
+    phone: string;
+    country: string;
+    city: string;
+    address: string;
+    postalCode: string;
+    drivingLicense: string;
+    nationality: string;
+    placeOfBirth: string;
+    dateOfBirth: Date;
+  };
+  links: { title: string; url: string }[];
+  skills: {
+    skill: string;
+    level: number; // in percentage
+  }[];
+  hobbies: string;
+  languages: {
+    language: string;
+    level: number;
+  }[];
+}
+
+import { faker } from "@faker-js/faker";
+
+// Generate dummy data for the Resume interface
+export function generateDummyResume(): Resume {
+  const resume: Resume = {
+    name: faker.name.fullName(),
+    profession: faker.name.jobTitle(),
+    profile: faker.lorem.paragraph(),
+    employmentHistory: [],
+    education: [],
+    internship: [],
+    courses: [],
+    details: {
+      email: faker.internet.email(),
+      phone: faker.phone.number(),
+      country: faker.location.country(),
+      city: faker.location.city(),
+      address: faker.location.streetAddress(),
+      postalCode: faker.location.zipCode(),
+      drivingLicense: faker.word.words(2),
+      nationality: faker.location.country(),
+      placeOfBirth: faker.location.city(),
+      dateOfBirth: faker.date.past(),
+    },
+    links: [],
+    skills: [],
+    hobbies: faker.lorem.paragraphs(),
+    languages: [],
+  };
+
+  // Generate dummy employment history
+  for (let i = 0; i < 3; i++) {
+    const employment = {
+      job: faker.name.jobTitle(),
+      employer: faker.company.name(),
+      startDate: faker.date.past(),
+      endDate: faker.date.recent(),
+      city: faker.location.city(),
+      description: faker.lorem.paragraph(),
+    };
+    resume.employmentHistory.push(employment);
+  }
+
+  // Generate dummy education
+  for (let i = 0; i < 2; i++) {
+    const education = {
+      school: faker.company.name(),
+      startDate: faker.date.past(),
+      endDate: faker.date.recent(),
+      degree: faker.lorem.words(),
+      city: faker.location.city(),
+      description: faker.lorem.paragraph(),
+    };
+    resume.education.push(education);
+  }
+
+  // Generate dummy internship
+  for (let i = 0; i < 2; i++) {
+    const internship = {
+      job: faker.person.jobTitle(),
+      employer: faker.company.name(),
+      startDate: faker.date.past(),
+      endDate: faker.date.recent(),
+      city: faker.location.city(),
+      description: faker.lorem.paragraph(),
+    };
+    resume.internship.push(internship);
+  }
+
+  // Generate dummy courses
+  for (let i = 0; i < 2; i++) {
+    const course = {
+      course: faker.lorem.words(),
+      institution: faker.company.name(),
+      startDate: faker.date.past(),
+      endDate: faker.date.recent(),
+    };
+    resume.courses.push(course);
+  }
+
+  // Generate dummy links
+  for (let i = 0; i < 2; i++) {
+    const link = {
+      title: faker.lorem.words(),
+      url: faker.internet.url(),
+    };
+    resume.links.push(link);
+  }
+
+  // Generate dummy skills
+  for (let i = 0; i < 3; i++) {
+    const skill = {
+      skill: faker.lorem.word(),
+      level: faker.number.int({ min: 0, max: 100 }),
+    };
+    resume.skills.push(skill);
+  }
+
+  // Generate dummy languages
+  for (let i = 0; i < 2; i++) {
+    const language = {
+      language: faker.lorem.word(),
+      level: faker.number.int({ min: 0, max: 100 }),
+    };
+    resume.languages.push(language);
+  }
+
+  return resume;
+}
+
+/** Format date */
+export function formatDate(date: Date) {
+  const finalDate = new Date(date);
+  // format : day/month/year
+  return finalDate.toLocaleDateString("en-GB", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+/** Generate the resume HTML */
+export function generateResumeHTML(resume: Resume) {
+  return `
+      <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+        <style>
+          @import url("https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap");
+
+          .resume {
+            padding: 50px;
+            font-family: "Rubik", sans-serif;
+            width: 210mm;
+            height: 297mm;
+            margin: 0 auto;
+            background-color: white;
+          }
+
+          .resume > div:nth-of-type(1) {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+          }
+
+          .resume > div:nth-of-type(1) > div:nth-of-type(1) {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+          }
+
+          .resume > div:nth-of-type(1) > div:nth-of-type(2) {
+            font-size: 1rem;
+            font-weight: 400;
+          }
+
+          .lowerBody {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-gap: 10px;
+          }
+
+          .lowerBody .profileSection,
+          .lowerBody .employmentSection,
+          .lowerBody .educationSection,
+          .lowerBody .internshipSection,
+          .lowerBody .coursesSection {
+            display: flex;
+            align-items: flex-start;
+            padding: 10px 10px 10px 0px;
+            margin: 15px 0px;
+          }
+
+          .lowerBody .profileSection > div:nth-of-type(2),
+          .lowerBody .employmentSection > div:nth-of-type(2),
+          .lowerBody .educationSection > div:nth-of-type(2),
+          .lowerBody .internshipSection > div:nth-of-type(2),
+          .lowerBody .coursesSection > div:nth-of-type(2) {
+            flex: 1;
+            margin-left: 10px;
+          }
+
+          .lowerBody .profileSection > div:nth-of-type(2) > div:nth-of-type(1),
+          .lowerBody .employmentSection > div:nth-of-type(2) > div:nth-of-type(1),
+          .lowerBody .educationSection > div:nth-of-type(2) > div:nth-of-type(1),
+          .lowerBody .internshipSection > div:nth-of-type(2) > div:nth-of-type(1),
+          .lowerBody .coursesSection > div:nth-of-type(2) > div:nth-of-type(1) {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+          }
+
+          /* Profile section */
+          .lowerBody .profileSection > div:nth-of-type(2) > div:nth-of-type(2) {
+            font-size: 0.9rem;
+            font-weight: 400;
+          }
+
+          /* Employment section */
+          .lowerBody .employmentSection .employmentHistoryItem,
+          .lowerBody .educationSection .educationSectionItem,
+          .lowerBody .internshipSection .internshipSectionItem,
+          .lowerBody .coursesSection .coursesSectionItem {
+            margin: 10px 0px 20px 0px;
+          }
+
+          .lowerBody .employmentSection .employmentHistoryItem > div:nth-of-type(1),
+          .lowerBody .educationSection .educationSectionItem > div:nth-of-type(1),
+          .lowerBody .internshipSection .internshipSectionItem > div:nth-of-type(1),
+          .lowerBody .coursesSection .coursesSectionItem > div:nth-of-type(1) {
+            font-size: 0.95rem;
+            font-weight: 500;
+          }
+
+          .lowerBody .employmentSection .employmentHistoryItem > div:nth-of-type(2),
+          .lowerBody .educationSection .educationSectionItem > div:nth-of-type(2),
+          .lowerBody .internshipSection .internshipSectionItem > div:nth-of-type(2),
+          .lowerBody .coursesSection .coursesSectionItem > div:nth-of-type(2) {
+            font-weight: 200;
+            font-size: 0.85rem;
+            margin: 5px 0px;
+          }
+
+          .lowerBody .employmentSection .employmentHistoryItem > div:nth-of-type(3),
+          .lowerBody .educationSection .educationSectionItem > div:nth-of-type(3),
+          .lowerBody .internshipSection .internshipSectionItem > div:nth-of-type(3),
+          .lowerBody .coursesSection .coursesSectionItem > div:nth-of-type(3) {
+            font-size: 0.9rem;
+            font-weight: 400;
+          }
+
+          /* Right section */
+          .detailsSection > div:nth-of-type(1) {
+            font-weight: 500;
+          }
+          .detailsSection > div:nth-of-type(2) {
+            font-size: 0.9rem;
+            font-weight: 400;
+            margin: 10px 0px;
+            line-height: 1.25rem;
+          }
+
+          .detailsSection > div:nth-of-type(3) {
+            color: darkcyan;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin: 10px 0px;
+          }
+
+          .detailsSection > div:nth-of-type(4) {
+            font-size: 0.9rem;
+            font-weight: 400;
+            margin: 10px 0px;
+            line-height: 1.25rem;
+          }
+
+          .detailsSection > div:nth-of-type(4) > div:nth-of-type(1) {
+            font-weight: 500;
+          }
+
+          .detailsSection > div:nth-of-type(5) {
+            font-size: 0.9rem;
+            font-weight: 400;
+            margin: 10px 0px;
+            line-height: 1.25rem;
+          }
+
+          .detailsSection > div:nth-of-type(5) > div:nth-of-type(1) {
+            font-weight: 500;
+          }
+
+          .linksSection {
+            margin: 20px 0px;
+          }
+
+          .linksSection > div:nth-of-type(1) {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+          }
+
+          .linksSection .linkItem {
+            color: darkcyan;
+            font-weight: 500;
+            margin: 0px 10px 5px 0px;
+          }
+
+          .linksSection .linkItem a {
+            text-decoration: none;
+            font-size: 0.9rem;
+          }
+
+          .linksSection > div:nth-of-type(2) {
+            display: flex;
+            flex-wrap: wrap;
+          }
+
+          /* For the skill section */
+          .skillSection {
+            margin: 20px 0px;
+            font-size: 0.9rem;
+            font-weight: 400;
+          }
+
+          .skillSection > div:nth-of-type(1) {
+            font-weight: 500;
+          }
+
+          .skillSection .skillItem {
+            margin: 10px 0px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+          }
+
+          .skillSection .skillItem > div:nth-of-type(2), .skillSection .skillItem > hr {
+            display: inline-block;
+            height: 1px;
+            border: 0px;
+            background-color: white;
+            outline: none;
+            margin-top: 5px;
+            border-bottom: 3px solid black;
+          }
+
+          /* For the hobbies */
+          .hobbiesSection {
+            margin: 20px 0px;
+            font-size: 0.9rem;
+            font-weight: 400;
+            line-height: 1.25rem;
+          }
+
+          .hobbiesSection > div:nth-child(1) {
+            font-weight: 500;
+            margin-bottom: 5px;
+          }
+        </style>
+      </head>
+      <body>
+        <section id="resume" class="resume">
+          <div class="header">
+            <div>${resume.name}</div>
+            <div>${resume.profession}</div>
+          </div>
+          <div class="lowerBody">
+            <section>
+              <!-- profile section -->
+              ${
+                resume.profile
+                  ? `
+                <div class="profileSection">
+                <div><span class="material-symbols-outlined"> person </span></div>
+                <div>
+                  <div>Profile</div>
+                  <div>
+                  ${resume.profile}
+                  </div>
+                </div>
+              </div>
+              `
+                  : ""
+              }
+              <!-- employment history section -->
+              ${
+                resume.employmentHistory.length !== 0
+                  ? `
+                  <div class="employmentSection">
+                  <div><span class="material-symbols-outlined"> work </span></div>
+                  <div>
+                    <div>Employment History</div>
+                    <div>
+                      <!-- list all the employment history here -->
+                      ${resume.employmentHistory
+                        .map((p) => {
+                          return `
+                        <div class="employmentHistoryItem">
+                        <div>${p.job} at ${p.employer} , ${p.city}</div>
+                        <div>${formatDate(p.startDate)} -- ${formatDate(p.endDate)}</div>
+                        <div>${p.description}</div>
+                        </div>
+                        `;
+                        })
+                        .join(" ")}
+                    </div>
+                  </div>
+                </div>
+              `
+                  : ""
+              }
+              ${
+                resume.education.length !== 0
+                  ? `
+              <div class="educationSection">
+              <div><span class="material-symbols-outlined"> school </span></div>
+              <div>
+                <div>Education</div>
+                <div>
+                  <!-- list all the employment history here -->
+                  ${resume.education
+                    .map((p) => {
+                      return `
+                    <div class="educationSectionItem">
+                    <div>${p.degree}, ${p.school}, ${p.city}</div>
+                    <div>${formatDate(p.startDate)} -- ${formatDate(p.endDate)}</div>
+                    <div></div>
+                    </div>
+                    `;
+                    })
+                    .join(" ")}
+                </div>
+              </div>
+              </div>
+              `
+                  : ""
+              }
+
+              <!-- Internship -->
+              ${
+                resume.internship.length !== 0
+                  ? `
+              <div class="internshipSection">
+              <div><span class="material-symbols-outlined"> group </span></div>
+              <div>
+                <div>Internship</div>
+                <div>
+                  <!-- list all the employment history here -->
+                  ${resume.internship
+                    .map((p) => {
+                      return `
+                    <div class="internshipSectionItem">
+                    <div>${p.job}, ${p.employer}, ${p.city}</div>
+                    <div>${formatDate(p.startDate)} -- ${formatDate(p.endDate)}</div>
+                    <div>${p.description}</div>
+                    </div>
+                    `;
+                    })
+                    .join(" ")}
+                </div>
+              </div>
+              </div>
+              `
+                  : ""
+              }
+
+              <!-- Courses Section -->
+              ${
+                resume.courses.length !== 0
+                  ? `
+              <div class="coursesSection">
+              <div><span class="material-symbols-outlined"> book </span></div>
+              <div>
+                <div>Courses</div>
+                <div>
+                  <!-- list all the employment history here -->
+                  ${resume.courses
+                    .map((p) => {
+                      return `
+                    <div class="coursesSectionItem">
+                    <div>${p.course}, ${p.institution}</div>
+                    <div>${formatDate(p.startDate)} -- ${formatDate(p.endDate)}</div>
+                    <div></div>
+                    </div>
+                    `;
+                    })
+                    .join(" ")}
+                </div>
+              </div>
+            </div>
+              `
+                  : ""
+              }
+            </section>
+            <section>
+              <!-- details -->
+              <div class="detailsSection">
+                <div>Details</div>
+                <div>
+                  ${resume.details.address} <br />
+                  ${resume.details.city} ${resume.details.postalCode} <br />
+                  ${resume.details.country} <br />
+                  ${resume.details.phone}
+                </div>
+                <div>${resume.details.email}</div>
+                <div>
+                  <div>Date/Place of birth</div>
+                  <div>
+                    ${formatDate(resume.details.dateOfBirth)} <br />
+                    ${resume.details.placeOfBirth}
+                  </div>
+                </div>
+                <div>
+                  <div>Driving license</div>
+                  <div>${resume.details.drivingLicense}</div>
+                </div>
+              </div>
+
+              <!-- links sections -->
+              ${
+                resume.links.length !== 0
+                  ? `
+              <div class="linksSection">
+              <div>Links</div>
+              <div>
+                ${resume.links
+                  .map((p) => {
+                    return `<div class="linkItem"><a href="">${p.url}</a></div>`;
+                  })
+                  .join(" ")}
+              </div>
+              </div>
+              `
+                  : ""
+              }
+
+              <!-- skills section -->
+              ${
+                resume.skills.length !== 0
+                  ? `
+              <div class="skillSection">
+              <div>Skills</div>
+              <div>
+                ${resume.skills
+                  .map((p) => {
+                    return `
+                  <div class="skillItem">
+                  <div>${p.skill}</div>
+                  <div style="width: ${p.level}%"></div>
+                 </div>
+                  `;
+                  })
+                  .join(" ")}
+              </div>
+              </div>
+              `
+                  : ""
+              }
+
+              <!-- hobbies section -->
+              ${
+                resume.hobbies
+                  ? `
+              <div class="hobbiesSection">
+              <div>Hobbies</div>
+              <div>
+                ${resume.hobbies}
+              </div>
+              </div>
+              `
+                  : ""
+              }
+
+              <!-- Languages section -->
+              ${
+                resume.languages.length !== 0
+                  ? `
+              <div class="skillSection">
+              <div>Language</div>
+              <div>
+                ${resume.languages
+                  .map((p) => {
+                    return `
+                  <div class="skillItem">
+                  <div>${p.language}</div>
+                  <div style="width: ${p.level}%"></div>
+                  </div>
+                  `;
+                  })
+                  .join(" ")}
+              </div>
+              </div>
+              `
+                  : ""
+              }
+            </section>
+          </div>
+        </section>
+      </body>
+    </html>
+  `;
+}
+
+/** Generate the PDF */
+export async function generatePDF(resume: Resume) {
+  const browser = (await BrowserPuppeteer.browser()).browserInstance;
+  const page = await browser.newPage();
+  const resumeHTML = generateResumeHTML(resume);
+  await page.setContent(resumeHTML);
+  await page.waitForNetworkIdle({ idleTime: 1000 });
+
+  // upload to the public folder we are inside the src and public folder is one step above
+  const publicFolderPath = path.join(process.cwd(), "public");
+  // create the resume.pdf file in the public folder
+  const resumeName = v4();
+  const resumeFilePath = path.join(publicFolderPath, `${resumeName}.pdf`);
+  await page.pdf({ path: resumeFilePath, format: "A4" });
+  return `${resumeName}.pdf`;
+}
+
+/** Generate the Image of the resume */
+export async function generateImage(resume: Resume) {
+  const browser = (await BrowserPuppeteer.browser()).browserInstance;
+  const page = await browser.newPage();
+  const resumeHTML = generateResumeHTML(resume);
+  await page.setContent(resumeHTML);
+  await page.waitForSelector(".resume");
+  await page.waitForNetworkIdle({ idleTime: 1000 });
+  const elementHandle = await page.$(".resume");
+  // upload to the public folder we are inside the src and public folder is one step above
+  const publicFolderPath = path.join(process.cwd(), "public");
+  // create the resume.pdf file in the public folder
+  const resumeName = v4();
+  const resumeFilePath = path.join(publicFolderPath, `${resumeName}.png`);
+  await elementHandle.screenshot({ path: resumeFilePath });
+  return `${resumeName}.png`;
+}
+
+export class BrowserPuppeteer {
+  static #instance: BrowserPuppeteer;
+  public browserInstance: any;
+
+  private constructor() {}
+
+  public static async browser() {
+    if (!BrowserPuppeteer.#instance) {
+      BrowserPuppeteer.#instance = new BrowserPuppeteer();
+      const puppeteer = require("puppeteer");
+      BrowserPuppeteer.#instance.browserInstance = await puppeteer.launch({headless: true, args: ['--no-sandbox'],});
+    }
+
+    return BrowserPuppeteer.#instance;
+  }
+}

@@ -3,6 +3,7 @@ import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
+import 'package:flutter_client/client/utils.dart';
 
 class EducationSection extends StatefulWidget {
   final String title;
@@ -13,11 +14,25 @@ class EducationSection extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<EducationSection> createState() => _EducationSectionState();
+  State<EducationSection> createState() => EducationSectionState();
 }
 
-class _EducationSectionState extends State<EducationSection> {
-  getJSON() {}
+class EducationSectionState extends State<EducationSection> {
+  List<Education> getData() {
+    return _CustomEducationSection.item
+        .map((e) => {
+              Education(
+                e.school.controller.text,
+                DateTime.parse(e.startDate.controller.text),
+                DateTime.parse(e.endDate.controller.text),
+                e.degree.controller.text,
+                e.city.controller.text,
+                e.description.controller.text,
+              )
+            })
+        .expand((element) => element)
+        .toList();
+  }
 
   final CustomEducationSection _CustomEducationSection =
       CustomEducationSection();

@@ -3,6 +3,7 @@ import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
+import 'package:flutter_client/client/utils.dart';
 
 class LanguageSection extends StatefulWidget {
   final String title;
@@ -13,11 +14,21 @@ class LanguageSection extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<LanguageSection> createState() => _LanguageSectionState();
+  State<LanguageSection> createState() => LanguageSectionState();
 }
 
-class _LanguageSectionState extends State<LanguageSection> {
-  getJSON() {}
+class LanguageSectionState extends State<LanguageSection> {
+  List<Languages> getData() {
+    return _CustomLanguageSection.item
+        .map((e) => {
+              Languages(
+                e.language.controller.text,
+                double.parse(e.level.controller.text),
+              )
+            })
+        .expand((element) => element)
+        .toList();
+  }
 
   final CustomLanguageSection _CustomLanguageSection = CustomLanguageSection();
 

@@ -11,11 +11,13 @@ class ProfessionalSummary extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<ProfessionalSummary> createState() => _ProfessionalSummaryState();
+  State<ProfessionalSummary> createState() => ProfessionalSummaryState();
 }
 
-class _ProfessionalSummaryState extends State<ProfessionalSummary> {
-  getJSON() {}
+class ProfessionalSummaryState extends State<ProfessionalSummary> {
+  getData() {
+    return {'profile': _controller.text};
+  }
 
   final TextEditingController _controller = TextEditingController();
   late final CustomInputField textEditor;

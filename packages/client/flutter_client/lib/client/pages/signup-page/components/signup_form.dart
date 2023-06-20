@@ -1,6 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_client/client/utils.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SignUpForm extends StatefulWidget {
@@ -13,10 +15,45 @@ class SignUpForm extends StatefulWidget {
 class _SignUpFormState extends State<SignUpForm> {
   // Create controller instances for name, email, and password
   TextEditingController nameController = TextEditingController();
-
   TextEditingController emailController = TextEditingController();
-
   TextEditingController passwordController = TextEditingController();
+
+  Future<void> signUp(BuildContext ctx) async {
+    var name = nameController.text;
+    var email = emailController.text;
+    var password = passwordController.text;
+
+    if (!(name.isNotEmpty && email.isNotEmpty && password.isNotEmpty)) {
+      return;
+    }
+
+    try {
+      await DatabaseService()
+          .signUpUserWithEmailAndPassword(email, password, name);
+    } catch (e) {
+      await Fluttertoast.showToast(
+        msg: 'Something went wrong...',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red.withOpacity(0.8),
+        textColor: Colors.white,
+      );
+
+      // ignore: use_build_context_synchronously
+      ctx.navigateNamedTo('/signin');
+      return;
+    }
+
+    await Fluttertoast.showToast(
+      msg: 'Welcome $name',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.red.withOpacity(0.8),
+      textColor: Colors.white,
+    );
+    // ignore: use_build_context_synchronously
+    ctx.navigateNamedTo('/dashboard');
+  }
 
   @override
   void dispose() {
@@ -110,7 +147,7 @@ class _SignUpFormState extends State<SignUpForm> {
                               width: double.infinity,
                               margin: const EdgeInsets.fromLTRB(0, 15, 0, 0),
                               child: ElevatedButton(
-                                  onPressed: () => {},
+                                  onPressed: () => {signUp(context)},
                                   style: ElevatedButton.styleFrom(
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(50),
@@ -181,7 +218,7 @@ class _SignUpFormState extends State<SignUpForm> {
             width: double.infinity,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              child: Image.asset('signup_cover.webp'),
+              child: Image.asset('assets/signup_cover.webp'),
             ),
           ))
         ],
