@@ -155,14 +155,15 @@ Then pull the latest version from the `GitHub`
 ```BASH
 git pull
 ```
-Once the latest source code is fetched from the `GitHub` run the following commands : 
-```BASH
-docker-compose build
-```
-This command will build the application. After that stop any running container using the following command
+Stop any running container
 ```BASH
 docker-compose down
 ```
+Once the latest source code is fetched and containers are sopped run the following commands : 
+```BASH
+docker-compose build
+```
+
 After the command finish executing it is time to run container. To run containers run this command :
 ```BASH
 docker-compose up -d
