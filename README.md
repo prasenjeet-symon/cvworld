@@ -142,18 +142,21 @@ docker-compose up --no-deps -d server
 ```
 
 ## Hard build and run application
-Make sure you are in the folder `cvworld` if not then run the following commands :
+First of all we need to delete the `cvworld` folder. To delete that use the following command
 ```BASH
 cd ~
 ```
-Then go to the `cvworld` folder :
 ```BASH
-cd cvworld
+rm -rf cvworld
 ```
 
 Then pull the latest version from the `GitHub`
 ```BASH
-git pull
+git clone git@github.com:iAmPawanBhatia/cvworld.me.git cvworld
+```
+Then goto the cloned folder using following command
+```BASH
+cd cvworld
 ```
 Stop any running container
 ```BASH
