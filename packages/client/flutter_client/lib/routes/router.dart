@@ -11,6 +11,8 @@ class AppRouter extends $AppRouter {
         AutoRoute(path: '/signup', page: SignUpRoute.page),
         AutoRoute(path: '/signin', page: SignInRoute.page),
         AutoRoute(
+            path: '/dashboard/account-setting', page: AccountSettingPage.page),
+        AutoRoute(
             path: '/dashboard', page: Dashboard.page, guards: [AuthGuard()]),
         AutoRoute(
             path: '/dashboard/view-resume/:resumeID',

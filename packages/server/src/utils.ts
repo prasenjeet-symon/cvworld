@@ -110,7 +110,7 @@ export const authenticateUser = (req: Request, res: Response, next: NextFunction
 };
 
 /** Do user already exit */
-export async function doUserAlreadyExit(email: string): Promise<any> {
+export async function doUserAlreadyExit(email: string) {
   const prisma = PrismaClientSingleton.prisma;
   const user = await prisma.user.findUnique({
     where: {
