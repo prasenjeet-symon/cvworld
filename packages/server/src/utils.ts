@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import express, { NextFunction, Request, Response } from "express";
 import { v4 } from "uuid";
 import router from "./api";
+import routerMedia from "./api/media";
 import routerAuth from "./auth";
 
 interface IGoogleAuthTokenResponse {
@@ -10,6 +11,188 @@ interface IGoogleAuthTokenResponse {
   name: string;
   profile: string;
   success: boolean;
+}
+
+export namespace DatabaseType {
+  export interface Subscription {
+    id: number;
+    planName: string;
+    isActive: boolean;
+    expireOn: Date;
+    activatedOn: Date;
+    cycle: SubscriptionCycle;
+    discount: bigint;
+    basePrice: bigint;
+    userId: number;
+    createdAt: Date;
+    updatedAt: Date;
+  }
+
+  type SubscriptionCycle = "MONTHLY" | "YEARLY";
+
+  export interface Hobby {
+    id: number;
+    hobby: string;
+    userId: number;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }
+
+  export interface ProfessionalSummary {
+    id: number;
+    profile: string;
+    userId: number;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }
+
+  export interface Resumes {
+    id: number;
+    resume: Resume;
+    imageUrl: string;
+    pdfUrl: string;
+    userId: number;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }
+
+  export interface PersonalDetails {
+    id: number;
+    profession: string;
+    name: string;
+    email: string;
+    phone: string;
+    country: string;
+    city: string;
+    address: string;
+    postalCode: string;
+    drivingLicense: string;
+    nationality: string;
+    placeOfBirth: string;
+    dateOfBirth: Date;
+    userId: number;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }
+
+  export interface Languages {
+    id: number;
+    language: string;
+    level: number;
+    userId: number;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }
+
+  export interface Skills {
+    id: number;
+    skill: string;
+    level: number;
+    userId: number;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }
+
+  export interface Courses {
+    id: number;
+    course: string;
+    institution: string;
+    startDate: Date;
+    endDate: Date;
+    userId: number;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }
+
+  export interface Educations {
+    id: number;
+    school: string;
+    startDate: Date;
+    endDate: Date;
+    degree: string;
+    city: string;
+    description: string;
+    userId: number;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }
+
+  export interface EmploymentHistories {
+    id: number;
+    job: string;
+    employer: string;
+    startDate: Date;
+    endDate: Date;
+    city: string;
+    description: string;
+    userId: number;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }
+
+  export interface Internships {
+    id: number;
+    job: string;
+    employer: string;
+    startDate: Date;
+    endDate: Date;
+    city: string;
+    description: string;
+    userId: number;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }
+
+  export interface ProfessionalSummary {
+    id: number;
+    profile: string;
+    userId: number;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }
+
+  export interface Links {
+    id: number;
+    title: string;
+    url: string;
+    userId: number;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }
+
+  export interface Admin {
+    id: number;
+    email: string;
+    fullName: string;
+    profilePicture?: string;
+    password: string;
+    reference: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }
+
+  export interface User {
+    id: number;
+    email: string;
+    fullName: string;
+    profilePicture?: string;
+    password?: string;
+    reference: string;
+    subscription?: Subscription;
+    personalDetails?: PersonalDetails;
+    hobby?: Hobby;
+    professionalSummary?: ProfessionalSummary;
+    resumes: Resumes[];
+    skills: Skills[];
+    languages: Languages[];
+    courses: Courses[];
+    educations: Educations[];
+    employmentHistories: EmploymentHistories[];
+    internships: Internships[];
+    links: Links[];
+    createdAt?: Date;
+    updatedAt?: Date;
+  }
 }
 
 /** Sign in/ Sign up with google */
@@ -188,18 +371,13 @@ export async function signUpWithEmailAndPassword(req: Request, res: Response) {
 
 /** Sign in the user using email and password */
 export async function signInWithEmailAndPassword(req: Request, res: Response) {
+  if (!("email" in req.body && "password" in req.body)) {
+    res.status(400).json({ message: "Email and password are required" });
+    return;
+  }
+
   const email = req.body.email;
   const password = req.body.password;
-
-  if (!("email" in req.body && "password" in req.body)) {
-    res.status(400).json({ message: "All input is required" });
-    return;
-  }
-
-  if (!(email && password)) {
-    res.status(400).json({ message: "All input is required" });
-    return;
-  }
 
   const oldUser = await doUserAlreadyExit(email);
   if (!oldUser) {
@@ -208,7 +386,7 @@ export async function signInWithEmailAndPassword(req: Request, res: Response) {
   }
 
   const userId = oldUser.reference;
-  const passwordOld = oldUser.password;
+  const passwordOld = oldUser.password || "";
   const isPasswordCorrect = comparePasswords(password, passwordOld);
   if (isPasswordCorrect) {
     // create json web token and return
@@ -325,6 +503,7 @@ export function createServer() {
   app.use(express.static(path.join(process.cwd(), "public")));
   app.use("/server/auth", routerAuth);
   app.use("/server/api", authenticateUser, router);
+  app.use("/server/api/media", authenticateUser, routerMedia);
 
   app.get("/server/", (req, res) => {
     res.send({ message: "Hello World" });
@@ -1038,7 +1217,7 @@ export class BrowserPuppeteer {
     if (!BrowserPuppeteer.#instance) {
       BrowserPuppeteer.#instance = new BrowserPuppeteer();
       const puppeteer = require("puppeteer");
-      BrowserPuppeteer.#instance.browserInstance = await puppeteer.launch({headless: true, args: ['--no-sandbox'],});
+      BrowserPuppeteer.#instance.browserInstance = await puppeteer.launch({ headless: true, args: ["--no-sandbox"] });
     }
 
     return BrowserPuppeteer.#instance;

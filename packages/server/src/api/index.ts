@@ -1,5 +1,5 @@
 import express from "express";
-import { PrismaClientSingleton, generateDummyResume, generateImage, generatePDF } from "../utils";
+import { PrismaClientSingleton, Resume, generateDummyResume, generateImage, generatePDF } from "../utils";
 const router = express.Router();
 
 router.get("/", (req, res) => res.send("Hello World!"));
@@ -11,7 +11,7 @@ router.post("/generate", async (req, res) => {
     return;
   }
 
-  let { resume, isDummy } = req.body;
+  let { resume, isDummy }: { resume: Resume; isDummy: string } = req.body;
 
   if (isDummy === "yes") {
     const dummyResume = generateDummyResume();
@@ -41,7 +41,7 @@ router.post("/generate", async (req, res) => {
         create: {
           imageUrl: imageUrl,
           pdfUrl: pdfUrl,
-          resume: resume,
+          resume: JSON.parse(JSON.stringify(resume)),
         },
       },
     },
