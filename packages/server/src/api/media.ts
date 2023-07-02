@@ -1,9 +1,15 @@
 import express from "express";
+import fs from "fs";
 import multer, { diskStorage } from "multer";
 import { PrismaClientSingleton } from "../utils";
 
 const profilePictureUpload = diskStorage({
   destination: (req, file, cb) => {
+    // if folder doesn't exist create it
+    if (!fs.existsSync("public/profilePictures")) {
+      fs.mkdirSync("public/profilePictures");
+    }
+
     cb(null, "public/profilePictures");
   },
   filename: (req, file, cb) => {
@@ -35,7 +41,7 @@ router.post("/update_user_profile_picture", profileUpload.single("profilePicture
   const prisma = PrismaClientSingleton.prisma;
 
   if ("file" in req && req.file) {
-    const filePath = req.file.destination.replace("public", "") + req.file.filename;
+    const filePath = req.file.destination.replace("public", "") + "/" + req.file.filename;
     await prisma.user.update({
       where: {
         email: email,

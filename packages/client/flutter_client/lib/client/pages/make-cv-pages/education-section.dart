@@ -1,17 +1,26 @@
+// ignore: file_names
+import 'dart:js_interop';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
-import 'package:flutter_client/client/utils.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:rxdart/rxdart.dart';
 
 class EducationSection extends StatefulWidget {
   final String title;
   final String description;
+  final Resume? resume;
 
-  const EducationSection(
-      {Key? key, required this.title, required this.description})
-      : super(key: key);
+  const EducationSection({
+    Key? key,
+    required this.title,
+    required this.description,
+    this.resume,
+  }) : super(key: key);
 
   @override
   State<EducationSection> createState() => EducationSectionState();
@@ -19,7 +28,7 @@ class EducationSection extends StatefulWidget {
 
 class EducationSectionState extends State<EducationSection> {
   List<Education> getData() {
-    return _CustomEducationSection.item
+    return _customEducationSection.item
         .map((e) => {
               Education(
                 e.school.controller.text,
@@ -34,23 +43,23 @@ class EducationSectionState extends State<EducationSection> {
         .toList();
   }
 
-  final CustomEducationSection _CustomEducationSection =
+  final CustomEducationSection _customEducationSection =
       CustomEducationSection();
 
   addNewItem() {
-    _CustomEducationSection.addNewItem();
+    _customEducationSection.addNewItem();
     setState(() {});
   }
 
   removeItem(int index) {
-    _CustomEducationSection.removeItem(index);
+    _customEducationSection.removeItem(index);
     setState(() {});
   }
 
   @override
   void dispose() {
     super.dispose();
-    _CustomEducationSection.dispose();
+    _customEducationSection.dispose();
   }
 
   @override
@@ -76,14 +85,14 @@ class EducationSectionState extends State<EducationSection> {
             ),
           ),
           Container(
-            margin: _CustomEducationSection.item.isNotEmpty
+            margin: _customEducationSection.item.isNotEmpty
                 ? const EdgeInsets.fromLTRB(0, 15, 0, 15)
                 : const EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
-              children: _CustomEducationSection.item
+              children: _customEducationSection.item
                   .asMap()
                   .map(
                     (i, e) => MapEntry(
@@ -106,7 +115,7 @@ class EducationSectionState extends State<EducationSection> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    _CustomEducationSection.item.isNotEmpty
+                    _customEducationSection.item.isNotEmpty
                         ? const Text('Add one more education')
                         : const Text('Add education'),
                     Container(
@@ -122,12 +131,12 @@ class EducationSectionState extends State<EducationSection> {
   }
 }
 
-/** 
- * 
- * 
- * 
- * 
- */
+///
+///
+///
+///
+///
+///
 class EducationItem extends StatefulWidget {
   final DeleteFunction onDelete;
   final CustomEducationItem customEducationItem;
@@ -219,12 +228,14 @@ class _EducationItemState extends State<EducationItem> {
   }
 }
 
-/** 
- * 
- * 
- * 
- */
+///
+///
+///
+///
+///
+///
 class CustomEducationItem {
+  final int id;
   final CustomInputType school;
   final CustomInputType degree;
   final CustomInputType startDate;
@@ -239,13 +250,66 @@ class CustomEducationItem {
   late CustomInputField cityField;
   late CustomInputField descriptionField;
 
-  CustomEducationItem(
-      {required this.school,
-      required this.degree,
-      required this.startDate,
-      required this.endDate,
-      required this.city,
-      required this.description});
+  BehaviorSubject<int> controller = BehaviorSubject();
+
+  CustomEducationItem({
+    required this.id,
+    required this.school,
+    required this.degree,
+    required this.startDate,
+    required this.endDate,
+    required this.city,
+    required this.description,
+  });
+
+  // listen for the changes
+  Stream<int> listenForChanges() {
+    school.controller.addListener(() {
+      controller.add(id);
+    });
+
+    degree.controller.addListener(() {
+      controller.add(id);
+    });
+
+    startDate.controller.addListener(() {
+      controller.add(id);
+    });
+
+    endDate.controller.addListener(() {
+      controller.add(id);
+    });
+
+    city.controller.addListener(() {
+      controller.add(id);
+    });
+
+    description.controller.addListener(() {
+      controller.add(id);
+    });
+
+    return controller.debounceTime(const Duration(milliseconds: 500));
+  }
+
+  // dispose
+  dispose() {
+    controller.close();
+
+    // remove the listener
+    school.controller.removeListener(() {});
+    degree.controller.removeListener(() {});
+    startDate.controller.removeListener(() {});
+    endDate.controller.removeListener(() {});
+    city.controller.removeListener(() {});
+    description.controller.removeListener(() {});
+
+    school.controller.dispose();
+    degree.controller.dispose();
+    startDate.controller.dispose();
+    endDate.controller.dispose();
+    city.controller.dispose();
+    description.controller.dispose();
+  }
 
   generateCustomInputFields() {
     schoolField = CustomInputField(
@@ -286,9 +350,17 @@ class CustomEducationItem {
   }
 }
 
+///
+///
+///
+///
+///
+///
 class CustomEducationSection {
   List<CustomEducationItem> item = [];
   final List<TextEditingController> _controllers = [];
+  List<UserEducation> education = [];
+  Resume? resume;
 
   TextEditingController _addController() {
     final TextEditingController controller = TextEditingController();
@@ -296,14 +368,111 @@ class CustomEducationSection {
     return controller;
   }
 
+  // fetch education
+  fetchEducation() async {
+    var educationFetched = await DatabaseService().fetchUserEducations();
+    if (educationFetched.isNull) return;
+    education = educationFetched!;
+
+    for (var element in education) {
+      var schoolController = _addController();
+      schoolController.text = element.school;
+
+      var degreeController = _addController();
+      degreeController.text = element.degree;
+
+      var startDateController = _addController();
+      startDateController.text = element.startDate.toIso8601String();
+
+      var endDateController = _addController();
+      endDateController.text = element.endDate.toIso8601String();
+
+      var cityController = _addController();
+      cityController.text = element.city;
+
+      var descriptionController = _addController();
+      descriptionController.text = element.description;
+
+      var customEducationItem = CustomEducationItem(
+        id: element.id,
+        school: CustomInputType(
+          'School',
+          'school',
+          true,
+          schoolController,
+          TextInputType.text,
+        ),
+        degree: CustomInputType(
+          'Degree',
+          'degree',
+          true,
+          degreeController,
+          TextInputType.text,
+        ),
+        startDate: CustomInputType(
+          'Start Date',
+          'startDate',
+          true,
+          startDateController,
+          TextInputType.datetime,
+        ),
+        endDate: CustomInputType(
+          'End Date',
+          'endDate',
+          true,
+          endDateController,
+          TextInputType.datetime,
+        ),
+        city: CustomInputType(
+          'City',
+          'city',
+          true,
+          cityController,
+          TextInputType.text,
+        ),
+        description: CustomInputType(
+          'Description',
+          'description',
+          true,
+          descriptionController,
+          TextInputType.text,
+        ),
+      );
+
+      item.add(customEducationItem);
+
+      if (resume.isNull) {
+        // listen for the changes and update the item
+        customEducationItem.listenForChanges().listen((event) {
+          updateItem(event);
+        });
+      }
+    }
+  }
+
   dispose() {
-    for (var element in _controllers) {
+    for (var element in item) {
       element.dispose();
     }
   }
 
-  addNewItem() {
-    item.add(CustomEducationItem(
+  // get the latest id
+  int getId() {
+    var id = 0;
+    for (var element in education) {
+      if (element.id > id) {
+        id = element.id;
+      }
+    }
+
+    return id + 1;
+  }
+
+  Future<void> addNewItem() async {
+    var id = getId();
+
+    var customEducationItem = CustomEducationItem(
+      id: id,
       school: CustomInputType(
         'School',
         'school',
@@ -346,10 +515,112 @@ class CustomEducationSection {
         _addController(),
         TextInputType.text,
       ),
-    ));
+    );
+
+    item.add(customEducationItem);
+
+    if (resume.isNull) {
+      // listen for the changes and update the item
+      customEducationItem.listenForChanges().listen((event) {
+        updateItem(event);
+      });
+
+      // add to the database
+      var educationItemToAdd = UserEducation(
+        customEducationItem.id,
+        customEducationItem.school.controller.text,
+        customEducationItem.startDate.controller.text.isEmpty
+            ? DateTime.now()
+            : DateTime.parse(customEducationItem.startDate.controller.text),
+        customEducationItem.endDate.controller.text.isEmpty
+            ? DateTime.now()
+            : DateTime.parse(customEducationItem.endDate.controller.text),
+        customEducationItem.degree.controller.text,
+        customEducationItem.city.controller.text,
+        customEducationItem.description.controller.text,
+        DateTime.now(),
+        DateTime.now(),
+      );
+
+      await DatabaseService().addUpdateUserEducation(educationItemToAdd);
+      education.add(educationItemToAdd);
+
+      Fluttertoast.showToast(
+        msg: 'Added education',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    }
   }
 
-  void removeItem(int index) {
+  void removeItem(int index) async {
+    // remove locally
+    var targetItem = item[index];
+    targetItem.dispose();
     item.removeAt(index);
+
+    if (resume.isNull) {
+      var savedItemIndex =
+          education.indexWhere((element) => element.id == targetItem.id);
+
+      if (savedItemIndex != -1) {
+        var savedItem = education[savedItemIndex];
+        education.removeAt(savedItemIndex);
+
+        await DatabaseService()
+            .deleteUserEducation(DeleteDocuments(savedItem.id));
+
+        Fluttertoast.showToast(
+          msg: 'Removed education',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      }
+    }
+  }
+
+  // update the item
+  Future<void> updateItem(int id) async {
+    var changedItemIndex = item.indexWhere((element) => element.id == id);
+    if (changedItemIndex == -1) {
+      return;
+    }
+
+    var changedItem = item[changedItemIndex];
+    var itemForUpdate = UserEducation(
+      changedItem.id,
+      changedItem.school.controller.text,
+      changedItem.startDate.controller.text.isEmpty
+          ? DateTime.now()
+          : DateTime.parse(changedItem.startDate.controller.text),
+      changedItem.endDate.controller.text.isEmpty
+          ? DateTime.now()
+          : DateTime.parse(changedItem.endDate.controller.text),
+      changedItem.degree.controller.text,
+      changedItem.city.controller.text,
+      changedItem.description.controller.text,
+      DateTime.now(),
+      DateTime.now(),
+    );
+
+    await DatabaseService().addUpdateUserEducation(itemForUpdate);
+
+    Fluttertoast.showToast(
+      msg: 'Updated education',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.green,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
   }
 }

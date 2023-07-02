@@ -186,9 +186,40 @@ router.post("/add_update_user_details", async (req, res) => {
 });
 
 /**
- * Add user skills
+ *
+ * Get user skills
+ *
  */
-router.post("/add_user_skill", async (req, res) => {
+router.post("/user_skills", async (req, res) => {
+  const email = res.locals.email;
+  const prisma = PrismaClientSingleton.prisma;
+
+  const userSkills = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+    select: {
+      skills: true,
+    },
+  });
+
+  if (!userSkills) {
+    res.status(500).json({ message: "user not found" });
+    return;
+  }
+
+  if (!userSkills.skills) {
+    res.status(500).json({ message: "skills not found" });
+    return;
+  }
+
+  res.json(userSkills.skills);
+  return;
+});
+/**
+ * Add update user skill
+ */
+router.post("/add_update_user_skill", async (req, res) => {
   const email = res.locals.email;
   const prisma = PrismaClientSingleton.prisma;
 
@@ -199,13 +230,10 @@ router.post("/add_user_skill", async (req, res) => {
       },
       data: {
         skills: {
-          create: req.body.skill,
-        },
-      },
-      select: {
-        skills: {
-          select: {
-            id: true,
+          upsert: {
+            where: { id: req.body.skill.id },
+            create: req.body.skill,
+            update: req.body.skill,
           },
         },
       },
@@ -249,38 +277,6 @@ router.post("/delete_user_skill", async (req, res) => {
 });
 
 /**
- * Update the skill of the user
- */
-router.post("/update_user_skill", async (req, res) => {
-  const email = res.locals.email;
-  const prisma = PrismaClientSingleton.prisma;
-
-  if ("skill" in req.body) {
-    await prisma.user.update({
-      where: {
-        email: email,
-      },
-      data: {
-        skills: {
-          update: {
-            where: { id: req.body.skill.id },
-            data: {
-              ...req.body.skill,
-            },
-          },
-        },
-      },
-    });
-
-    res.json({ ...req.body });
-    return;
-  } else {
-    res.status(400).json({ message: "skill field is missing" });
-    return;
-  }
-});
-
-/**
  *
  * Get hobby of the user
  *
@@ -299,6 +295,11 @@ router.post("/get_user_hobby", async (req, res) => {
   });
 
   if (!hobby) {
+    res.status(500).json({ message: "user not found" });
+    return;
+  }
+
+  if (!hobby.hobby) {
     res.status(500).json({ message: "hobby not found" });
     return;
   }
@@ -1099,6 +1100,52 @@ router.post("/delete_user_subscription", async (req, res) => {
     res.status(400).json({ message: "id field is missing" });
     return;
   }
+});
+
+/**
+ *
+ * Get user
+ *
+ */
+router.post("/get_user", async (req, res) => {
+  const email = res.locals.email;
+  const prisma = PrismaClientSingleton.prisma;
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+    select: {
+      courses: false,
+      educations: false,
+      employmentHistories: false,
+      internships: false,
+      links: false,
+      subscription: true,
+      createdAt: true,
+      email: true,
+      fullName: true,
+      hobby: false,
+      id: true,
+      languages: false,
+      password: false,
+      personalDetails: false,
+      professionalSummary: false,
+      profilePicture: true,
+      reference: true,
+      resumes: false,
+      skills: false,
+      updatedAt: true,
+    },
+  });
+
+  if (!user) {
+    res.status(500).json({ message: "user not found" });
+    return;
+  }
+
+  res.json(user);
+  return;
 });
 
 export default router;

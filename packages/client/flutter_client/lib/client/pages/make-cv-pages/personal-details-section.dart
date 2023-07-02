@@ -1,16 +1,20 @@
+// ignore: file_names
+import 'dart:js_interop';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
-import 'package:flutter_client/client/utils.dart';
 
 import 'types.dart';
 
 class PersonalDetailSection extends StatefulWidget {
   final String title;
   final String description;
+  final Resume? resume;
 
   const PersonalDetailSection(
-      {Key? key, required this.title, required this.description})
+      {Key? key, required this.title, required this.description, this.resume})
       : super(key: key);
 
   @override
@@ -20,15 +24,16 @@ class PersonalDetailSection extends StatefulWidget {
 class PersonalDetailSectionState extends State<PersonalDetailSection> {
   final List<TextEditingController> _controllers = [];
   bool _canShowInputs = false;
+  UserDetails? _userDetails;
 
   final List<CustomInputType> inputs = [];
   late final List<CustomInputField> _upperInputs;
   late final List<SideBySideInputs> _upperInputsSideBySide = [];
   late final List<CustomInputField> _lowerInputs;
   late final List<SideBySideInputs> _lowerInputsSideBySide = [];
-  late final defaultField;
+  late final CustomInputType defaultField;
 
-  getExtraData() {
+  Map<String, dynamic> getExtraData() {
     return {
       'profession': inputs
           .firstWhere(
@@ -43,7 +48,7 @@ class PersonalDetailSectionState extends State<PersonalDetailSection> {
     };
   }
 
-  getData() {
+  Details getData() {
     return Details(
         inputs
             .firstWhere(
@@ -115,14 +120,12 @@ class PersonalDetailSectionState extends State<PersonalDetailSection> {
                 .text));
   }
 
-  // Get the controller
   TextEditingController _getController() {
     TextEditingController controller = TextEditingController();
     _controllers.add(controller);
     return controller;
   }
 
-  /// Add all fields
   addAllFields() {
     // Job title
     CustomInputType jobTitle = CustomInputType(
@@ -294,31 +297,181 @@ class PersonalDetailSectionState extends State<PersonalDetailSection> {
             type: e.type))
         .toList();
 
-    int _upperInputsHelperIndex = -1;
+    int upperInputsHelperIndex = -1;
     for (int i = 0; i < _upperInputs.length; i++) {
-      if (_upperInputsHelperIndex == i) continue;
+      if (upperInputsHelperIndex == i) continue;
       if (i < _upperInputs.length - 1) {
         _upperInputsSideBySide.add(SideBySideInputs(
             inputFields: [_upperInputs[i], _upperInputs[i + 1]]));
-        _upperInputsHelperIndex = i + 1;
+        upperInputsHelperIndex = i + 1;
       } else {
         _upperInputsSideBySide
             .add(SideBySideInputs(inputFields: [_upperInputs[i]]));
       }
     }
 
-    int _lowerInputsHelperIndex = -1;
+    int lowerInputsHelperIndex = -1;
     for (int i = 0; i < _lowerInputs.length; i++) {
-      if (_lowerInputsHelperIndex == i) continue;
+      if (lowerInputsHelperIndex == i) continue;
       if (i < _lowerInputs.length - 1) {
         _lowerInputsSideBySide.add(SideBySideInputs(
             inputFields: [_lowerInputs[i], _lowerInputs[i + 1]]));
-        _lowerInputsHelperIndex = i + 1;
+        lowerInputsHelperIndex = i + 1;
       } else {
         _lowerInputsSideBySide
             .add(SideBySideInputs(inputFields: [_lowerInputs[i]]));
       }
     }
+
+    // Fetch the old data if the resume id is provided
+    // if resume id is not provided then fetch the user details from the server and patch it
+    if (widget.resume.isNull) {
+      _fetchPersonalDetails();
+    }
+  }
+
+  // Fetch the personal details from the server
+  _fetchPersonalDetails() async {
+    // Fetch the personal details from the server
+    var userDetail = await DatabaseService().fetchUserDetails();
+    if (userDetail.isNull) {
+      return;
+    }
+
+    _userDetails = userDetail;
+
+    // Patch the personal details by updating the controller
+    // for the first name
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'firstName',
+        )
+        .controller
+        .text = userDetail!.name.split(' ')[0];
+
+    // for the last name
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'lastName',
+        )
+        .controller
+        .text = userDetail.name.split(' ')[1];
+
+    // for the profession
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'profession',
+        )
+        .controller
+        .text = userDetail.profession;
+
+    // for the email
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'email',
+        )
+        .controller
+        .text = userDetail.email;
+
+    // for the phone
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'phone',
+        )
+        .controller
+        .text = userDetail.phone;
+
+    // for the Country
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'country',
+        )
+        .controller
+        .text = userDetail.country;
+
+    // for the City
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'city',
+        )
+        .controller
+        .text = userDetail.city;
+
+    // for the Address
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'address',
+        )
+        .controller
+        .text = userDetail.address;
+
+    // for the postal code
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'postalCode',
+        )
+        .controller
+        .text = userDetail.postalCode;
+
+    // for the Driving License
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'drivingLicense',
+        )
+        .controller
+        .text = userDetail.drivingLicense;
+
+    // for the Nationality
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'nationality',
+        )
+        .controller
+        .text = userDetail.nationality;
+
+    // for the place of birth
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'placeOfBirth',
+        )
+        .controller
+        .text = userDetail.placeOfBirth;
+
+    // for the date of birth
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'dateOfBirth',
+        )
+        .controller
+        .text = userDetail.dateOfBirth.toIso8601String();
+
+    setState(() {});
+  }
+
+  // add update personal details
+  Future<void> updatePersonalDetails() async {
+    var userDetail = getData();
+    var extraData = getExtraData();
+
+    UserDetails userDetailFinal = UserDetails(
+      _userDetails.isNull ? 0 : _userDetails!.id,
+      extraData['profession'],
+      extraData['name'],
+      userDetail.email,
+      userDetail.phone,
+      userDetail.country,
+      userDetail.city,
+      userDetail.address,
+      userDetail.postalCode,
+      userDetail.drivingLicense,
+      userDetail.nationality,
+      userDetail.placeOfBirth,
+      userDetail.dateOfBirth,
+      DateTime.now(),
+      DateTime.now(),
+    );
+
+    await DatabaseService().addUpdateUserDetails(userDetailFinal);
   }
 
   @override

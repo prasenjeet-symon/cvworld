@@ -15,6 +15,7 @@ import 'package:flutter_client/client/pages/make-cv-pages/professional-summry-se
 import 'package:flutter_client/client/pages/make-cv-pages/skills-section.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/website-links-section.dart';
 import 'package:flutter_client/client/utils.dart';
+import 'package:flutter_client/client/datasource.dart';
 
 @RoutePage()
 class CvMakerScreen extends StatelessWidget {
@@ -106,14 +107,14 @@ class _CvMakerDesktopScreenState extends State<CvMakerDesktopScreen> {
     var detailsData = personalDetailSection.currentState?.getData();
 
     return Resume(
-      extraInfo['name'],
-      extraInfo['profession'],
+      extraInfo?['name'],
+      extraInfo?['profession'],
       professionalData['profile'],
       employmentHistoryData,
       educationSectionData,
       internshipSectionData,
       coursesSectionData,
-      detailsData,
+      detailsData!,
       hobbiesSectionData,
       linksSectionData,
       languageSectionData,

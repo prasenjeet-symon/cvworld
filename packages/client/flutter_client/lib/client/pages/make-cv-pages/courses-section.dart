@@ -1,25 +1,36 @@
+// ignore: file_names
+import 'dart:js_interop';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
-import 'package:flutter_client/client/utils.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:rxdart/rxdart.dart';
 
 class CourseSection extends StatefulWidget {
   final String title;
   final String description;
+  final Resume? resume;
 
-  const CourseSection(
-      {Key? key, required this.title, required this.description})
-      : super(key: key);
+  const CourseSection({
+    Key? key,
+    required this.title,
+    required this.description,
+    this.resume,
+  }) : super(key: key);
 
   @override
   State<CourseSection> createState() => CourseSectionState();
 }
 
 class CourseSectionState extends State<CourseSection> {
+  final CustomCourseSection _customCourseSection = CustomCourseSection();
+
   List<Courses> getData() {
-    return _CustomCourseSection.item
+    return _customCourseSection.item
         .map((e) => {
               Courses(
                 e.course.controller.text,
@@ -32,22 +43,30 @@ class CourseSectionState extends State<CourseSection> {
         .toList();
   }
 
-  final CustomCourseSection _CustomCourseSection = CustomCourseSection();
-
   addNewItem() {
-    _CustomCourseSection.addNewItem();
+    _customCourseSection.addNewItem();
     setState(() {});
   }
 
   removeItem(int index) {
-    _CustomCourseSection.removeItem(index);
+    _customCourseSection.removeItem(index);
     setState(() {});
   }
 
   @override
   void dispose() {
     super.dispose();
-    _CustomCourseSection.dispose();
+    _customCourseSection.dispose();
+  }
+
+  @override
+  void initState() {
+    _customCourseSection.resume = widget.resume;
+    _customCourseSection.fetchCourses().then((value) => {
+          setState(() {}),
+        });
+
+    super.initState();
   }
 
   @override
@@ -73,14 +92,14 @@ class CourseSectionState extends State<CourseSection> {
             ),
           ),
           Container(
-            margin: _CustomCourseSection.item.isNotEmpty
+            margin: _customCourseSection.item.isNotEmpty
                 ? const EdgeInsets.fromLTRB(0, 15, 0, 15)
                 : const EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
-              children: _CustomCourseSection.item
+              children: _customCourseSection.item
                   .asMap()
                   .map(
                     (i, e) => MapEntry(
@@ -103,7 +122,7 @@ class CourseSectionState extends State<CourseSection> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    _CustomCourseSection.item.isNotEmpty
+                    _customCourseSection.item.isNotEmpty
                         ? const Text('Add one more course')
                         : const Text('Add course'),
                     Container(
@@ -119,12 +138,15 @@ class CourseSectionState extends State<CourseSection> {
   }
 }
 
-/** 
- * 
- * 
- * 
- * 
- */
+///
+///
+///
+///
+///
+///
+///
+///
+///
 class CourseItem extends StatefulWidget {
   final DeleteFunction onDelete;
   final CustomCoursesItem customCoursesItem;
@@ -141,6 +163,12 @@ class CourseItem extends StatefulWidget {
   State<CourseItem> createState() => _CourseItemState();
 }
 
+///
+///
+///
+///
+///
+///
 class _CourseItemState extends State<CourseItem> {
   bool isExpanded = true;
   String heading = 'Language Item';
@@ -193,12 +221,14 @@ class _CourseItemState extends State<CourseItem> {
   }
 }
 
-/** 
- * 
- * 
- * 
- */
+///
+///
+///
+///
+///
+///
 class CustomCoursesItem {
+  final int id;
   final CustomInputType course;
   final CustomInputType institution;
   final CustomInputType startDate;
@@ -209,12 +239,52 @@ class CustomCoursesItem {
   late CustomInputField startDateField;
   late CustomInputField endDateField;
 
+  BehaviorSubject<int> controller = BehaviorSubject();
+
   CustomCoursesItem({
     required this.course,
     required this.institution,
     required this.startDate,
     required this.endDate,
+    required this.id,
   });
+
+  // listen for any control changes
+  Stream<int> listenForChanges() {
+    course.controller.addListener(() {
+      controller.add(id);
+    });
+
+    institution.controller.addListener(() {
+      controller.add(id);
+    });
+
+    startDate.controller.addListener(() {
+      controller.add(id);
+    });
+
+    endDate.controller.addListener(() {
+      controller.add(id);
+    });
+
+    return controller.debounceTime(const Duration(milliseconds: 1000));
+  }
+
+  // dispose
+  dispose() {
+    // remove listener
+    course.controller.removeListener(() {});
+    institution.controller.removeListener(() {});
+    startDate.controller.removeListener(() {});
+    endDate.controller.removeListener(() {});
+
+    course.controller.dispose();
+    institution.controller.dispose();
+    startDate.controller.dispose();
+    endDate.controller.dispose();
+
+    controller.close();
+  }
 
   generateCustomInputFields() {
     courseField = CustomInputField(
@@ -247,14 +317,112 @@ class CustomCoursesItem {
   }
 }
 
+///
+///
+///
+///
+///
+///
 class CustomCourseSection {
   List<CustomCoursesItem> item = [];
   final List<TextEditingController> _controllers = [];
+  List<UserCourse> courses = [];
+  Resume? resume;
 
   TextEditingController _addController() {
     final TextEditingController controller = TextEditingController();
     _controllers.add(controller);
     return controller;
+  }
+
+  // Fetch already created courses by the user
+  Future<void> fetchCourses() async {
+    if (!resume.isNull) return;
+
+    var createdCourses = await DatabaseService().fetchUserCourses();
+    if (createdCourses.isNull) return;
+    courses = createdCourses!;
+
+    for (var element in courses) {
+      var courseController = _addController();
+      courseController.text = element.course;
+
+      var institutionController = _addController();
+      institutionController.text = element.institution;
+
+      var startDateController = _addController();
+      startDateController.text = element.startDate.toIso8601String();
+
+      var endDateController = _addController();
+      endDateController.text = element.endDate.toIso8601String();
+
+      var courseItem = CustomCoursesItem(
+        id: element.id,
+        course: CustomInputType(
+          'Course',
+          'course',
+          true,
+          courseController,
+          TextInputType.text,
+        ),
+        institution: CustomInputType(
+          'Institution',
+          'institution',
+          true,
+          institutionController,
+          TextInputType.text,
+        ),
+        startDate: CustomInputType(
+          'Start Date',
+          'startDate',
+          true,
+          startDateController,
+          TextInputType.datetime,
+        ),
+        endDate: CustomInputType(
+          'End Date',
+          'endDate',
+          true,
+          endDateController,
+          TextInputType.datetime,
+        ),
+      );
+
+      if (resume.isNull) {
+        courseItem.listenForChanges().listen((event) {
+          // save the updated value here
+          updateItem(event);
+        });
+      }
+
+      item.add(courseItem);
+    }
+  }
+
+  // add new courses and save
+  addNewCourse(UserCourse userCourse) async {
+    await DatabaseService().addUpdateUserCourse(userCourse);
+
+    // display flutter toast
+    Fluttertoast.showToast(
+      msg: 'Course added',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.green,
+      textColor: Colors.white,
+    );
+  }
+
+  // Get the latest id of the course
+  getId() {
+    var maxId = 0;
+    for (var element in item) {
+      if (element.id > maxId) {
+        maxId = element.id;
+      }
+    }
+    return maxId + 1;
   }
 
   dispose() {
@@ -263,8 +431,11 @@ class CustomCourseSection {
     }
   }
 
-  addNewItem() {
-    item.add(CustomCoursesItem(
+  addNewItem() async {
+    var id = getId();
+
+    var courseItem = CustomCoursesItem(
+      id: id,
       course: CustomInputType(
         'Course',
         'course',
@@ -293,10 +464,95 @@ class CustomCourseSection {
         _addController(),
         TextInputType.datetime,
       ),
-    ));
+    );
+
+    item.add(courseItem);
+
+    if (resume.isNull) {
+      // listen for the changes and update the item
+      courseItem.listenForChanges().listen((event) {
+        // save the updated value here
+        updateItem(event);
+      });
+
+      // after adding get the added course
+      var addedCourse = item[item.length - 1];
+
+      UserCourse userCourse = UserCourse(
+          addedCourse.id,
+          addedCourse.course.controller.text,
+          addedCourse.institution.controller.text,
+          addedCourse.startDate.controller.text.isEmpty
+              ? DateTime.now()
+              : DateTime.parse(addedCourse.startDate.controller.text),
+          addedCourse.endDate.controller.text.isEmpty
+              ? DateTime.now()
+              : DateTime.parse(addedCourse.endDate.controller.text),
+          DateTime.now(),
+          DateTime.now());
+
+      await addNewCourse(userCourse);
+      courses.add(userCourse);
+    }
   }
 
-  void removeItem(int index) {
+  void removeItem(int index) async {
+    // find the course in the list
+    var course = item[index];
+    course.dispose();
     item.removeAt(index);
+
+    if (resume.isNull) {
+      var indexCourse =
+          courses.indexWhere((element) => element.id == course.id);
+      if (indexCourse != -1) {
+        courses.removeAt(indexCourse);
+        // remove the course from the database
+        await DatabaseService().deleteUserCourse(DeleteDocuments(course.id));
+      }
+    }
+
+    Fluttertoast.showToast(
+      msg: 'Course removed',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+    );
+  }
+
+  // update the item
+  updateItem(int id) async {
+    var courseIndex = item.indexWhere((element) => element.id == id);
+    if (courseIndex == -1) {
+      return;
+    }
+
+    var course = item[courseIndex];
+
+    var updatedCourse = UserCourse(
+        course.id,
+        course.course.controller.text,
+        course.institution.controller.text,
+        course.startDate.controller.text.isEmpty
+            ? DateTime.now()
+            : DateTime.parse(course.startDate.controller.text),
+        course.endDate.controller.text.isEmpty
+            ? DateTime.now()
+            : DateTime.parse(course.endDate.controller.text),
+        DateTime.now(),
+        DateTime.now());
+
+    await DatabaseService().addUpdateUserCourse(updatedCourse);
+
+    Fluttertoast.showToast(
+      msg: 'Course updated',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.green,
+      textColor: Colors.white,
+    );
   }
 }

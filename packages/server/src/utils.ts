@@ -13,7 +13,7 @@ interface IGoogleAuthTokenResponse {
   success: boolean;
 }
 
-export namespace DatabaseType {
+export namespace DatabaseType { 
   export interface Subscription {
     id: number;
     planName: string;
@@ -70,7 +70,6 @@ export namespace DatabaseType {
     nationality: string;
     placeOfBirth: string;
     dateOfBirth: Date;
-    userId: number;
     createdAt?: Date;
     updatedAt?: Date;
   }
@@ -88,7 +87,6 @@ export namespace DatabaseType {
     id: number;
     skill: string;
     level: number;
-    userId: number;
     createdAt?: Date;
     updatedAt?: Date;
   }
