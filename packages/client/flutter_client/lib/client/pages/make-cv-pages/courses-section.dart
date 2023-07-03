@@ -7,6 +7,7 @@ import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
+import 'package:flutter_client/client/utils.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -61,12 +62,10 @@ class CourseSectionState extends State<CourseSection> {
 
   @override
   void initState() {
-    _customCourseSection.resume = widget.resume;
-    _customCourseSection.fetchCourses().then((value) => {
-          setState(() {}),
-        });
-
     super.initState();
+
+    _customCourseSection.resume = widget.resume;
+    _customCourseSection.fetchCourses().then((value) => {setState(() {})});
   }
 
   @override
@@ -267,7 +266,8 @@ class CustomCoursesItem {
       controller.add(id);
     });
 
-    return controller.debounceTime(const Duration(milliseconds: 1000));
+    return controller
+        .debounceTime(const Duration(milliseconds: Constants.debounceTime));
   }
 
   // dispose
@@ -388,30 +388,13 @@ class CustomCourseSection {
         ),
       );
 
-      if (resume.isNull) {
-        courseItem.listenForChanges().listen((event) {
-          // save the updated value here
-          updateItem(event);
-        });
-      }
-
       item.add(courseItem);
+
+      courseItem.listenForChanges().listen((event) {
+        // save the updated value here
+        updateItem(event);
+      });
     }
-  }
-
-  // add new courses and save
-  addNewCourse(UserCourse userCourse) async {
-    await DatabaseService().addUpdateUserCourse(userCourse);
-
-    // display flutter toast
-    Fluttertoast.showToast(
-      msg: 'Course added',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.green,
-      textColor: Colors.white,
-    );
   }
 
   // Get the latest id of the course
@@ -426,7 +409,7 @@ class CustomCourseSection {
   }
 
   dispose() {
-    for (var element in _controllers) {
+    for (var element in item) {
       element.dispose();
     }
   }
@@ -476,39 +459,51 @@ class CustomCourseSection {
       });
 
       // after adding get the added course
-      var addedCourse = item[item.length - 1];
 
       UserCourse userCourse = UserCourse(
-          addedCourse.id,
-          addedCourse.course.controller.text,
-          addedCourse.institution.controller.text,
-          addedCourse.startDate.controller.text.isEmpty
-              ? DateTime.now()
-              : DateTime.parse(addedCourse.startDate.controller.text),
-          addedCourse.endDate.controller.text.isEmpty
-              ? DateTime.now()
-              : DateTime.parse(addedCourse.endDate.controller.text),
-          DateTime.now(),
-          DateTime.now());
+        courseItem.id,
+        courseItem.course.controller.text,
+        courseItem.institution.controller.text,
+        courseItem.startDate.controller.text.isEmpty
+            ? DateTime.now()
+            : DateTime.parse(courseItem.startDate.controller.text),
+        courseItem.endDate.controller.text.isEmpty
+            ? DateTime.now()
+            : DateTime.parse(courseItem.endDate.controller.text),
+        DateTime.now(),
+        DateTime.now(),
+      );
 
-      await addNewCourse(userCourse);
+      await DatabaseService().addUpdateUserCourse(userCourse);
+
+      // display flutter toast
+      Fluttertoast.showToast(
+        msg: 'Course added',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
+
       courses.add(userCourse);
     }
   }
 
   void removeItem(int index) async {
     // find the course in the list
-    var course = item[index];
-    course.dispose();
+    var courseToDelete = item[index];
+    courseToDelete.dispose();
     item.removeAt(index);
 
     if (resume.isNull) {
-      var indexCourse =
-          courses.indexWhere((element) => element.id == course.id);
-      if (indexCourse != -1) {
-        courses.removeAt(indexCourse);
+      var courseToDeleteDatabaseIndex =
+          courses.indexWhere((element) => element.id == courseToDelete.id);
+      if (courseToDeleteDatabaseIndex != -1) {
+        courses.removeAt(courseToDeleteDatabaseIndex);
         // remove the course from the database
-        await DatabaseService().deleteUserCourse(DeleteDocuments(course.id));
+        await DatabaseService()
+            .deleteUserCourse(DeleteDocuments(courseToDelete.id));
       }
     }
 
@@ -519,6 +514,7 @@ class CustomCourseSection {
       timeInSecForIosWeb: 1,
       backgroundColor: Colors.red,
       textColor: Colors.white,
+      fontSize: 16.0,
     );
   }
 
@@ -532,19 +528,25 @@ class CustomCourseSection {
     var course = item[courseIndex];
 
     var updatedCourse = UserCourse(
-        course.id,
-        course.course.controller.text,
-        course.institution.controller.text,
-        course.startDate.controller.text.isEmpty
-            ? DateTime.now()
-            : DateTime.parse(course.startDate.controller.text),
-        course.endDate.controller.text.isEmpty
-            ? DateTime.now()
-            : DateTime.parse(course.endDate.controller.text),
-        DateTime.now(),
-        DateTime.now());
+      course.id,
+      course.course.controller.text,
+      course.institution.controller.text,
+      course.startDate.controller.text.isEmpty
+          ? DateTime.now()
+          : DateTime.parse(course.startDate.controller.text),
+      course.endDate.controller.text.isEmpty
+          ? DateTime.now()
+          : DateTime.parse(course.endDate.controller.text),
+      DateTime.now(),
+      DateTime.now(),
+    );
 
     await DatabaseService().addUpdateUserCourse(updatedCourse);
+    var savedItemIndexChanged =
+        courses.indexWhere((element) => element.id == updatedCourse.id);
+    if (savedItemIndexChanged != -1) {
+      courses[savedItemIndexChanged] = updatedCourse;
+    }
 
     Fluttertoast.showToast(
       msg: 'Course updated',

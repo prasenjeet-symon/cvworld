@@ -7,6 +7,7 @@ import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
+import 'package:flutter_client/client/utils.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -27,6 +28,9 @@ class EducationSection extends StatefulWidget {
 }
 
 class EducationSectionState extends State<EducationSection> {
+  final CustomEducationSection _customEducationSection =
+      CustomEducationSection();
+
   List<Education> getData() {
     return _customEducationSection.item
         .map((e) => {
@@ -43,9 +47,6 @@ class EducationSectionState extends State<EducationSection> {
         .toList();
   }
 
-  final CustomEducationSection _customEducationSection =
-      CustomEducationSection();
-
   addNewItem() {
     _customEducationSection.addNewItem();
     setState(() {});
@@ -54,6 +55,13 @@ class EducationSectionState extends State<EducationSection> {
   removeItem(int index) {
     _customEducationSection.removeItem(index);
     setState(() {});
+  }
+
+  @override
+  void initState() {
+    _customEducationSection.resume = widget.resume;
+    _customEducationSection.fetchEducation().then((value) => {setState(() {})});
+    super.initState();
   }
 
   @override
@@ -288,7 +296,8 @@ class CustomEducationItem {
       controller.add(id);
     });
 
-    return controller.debounceTime(const Duration(milliseconds: 500));
+    return controller
+        .debounceTime(const Duration(milliseconds: Constants.debounceTime));
   }
 
   // dispose
@@ -370,6 +379,8 @@ class CustomEducationSection {
 
   // fetch education
   fetchEducation() async {
+    if (!resume.isNull) return;
+
     var educationFetched = await DatabaseService().fetchUserEducations();
     if (educationFetched.isNull) return;
     education = educationFetched!;
@@ -441,12 +452,10 @@ class CustomEducationSection {
 
       item.add(customEducationItem);
 
-      if (resume.isNull) {
-        // listen for the changes and update the item
-        customEducationItem.listenForChanges().listen((event) {
-          updateItem(event);
-        });
-      }
+      // listen for the changes and update the item
+      customEducationItem.listenForChanges().listen((event) {
+        updateItem(event);
+      });
     }
   }
 
@@ -559,32 +568,30 @@ class CustomEducationSection {
 
   void removeItem(int index) async {
     // remove locally
-    var targetItem = item[index];
-    targetItem.dispose();
+    var itemToRemove = item[index];
+    itemToRemove.dispose();
     item.removeAt(index);
 
     if (resume.isNull) {
       var savedItemIndex =
-          education.indexWhere((element) => element.id == targetItem.id);
+          education.indexWhere((element) => element.id == itemToRemove.id);
 
       if (savedItemIndex != -1) {
-        var savedItem = education[savedItemIndex];
         education.removeAt(savedItemIndex);
-
         await DatabaseService()
-            .deleteUserEducation(DeleteDocuments(savedItem.id));
-
-        Fluttertoast.showToast(
-          msg: 'Removed education',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
+            .deleteUserEducation(DeleteDocuments(itemToRemove.id));
       }
     }
+
+    Fluttertoast.showToast(
+      msg: 'Removed education',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
   }
 
   // update the item
@@ -595,6 +602,7 @@ class CustomEducationSection {
     }
 
     var changedItem = item[changedItemIndex];
+
     var itemForUpdate = UserEducation(
       changedItem.id,
       changedItem.school.controller.text,
@@ -612,6 +620,12 @@ class CustomEducationSection {
     );
 
     await DatabaseService().addUpdateUserEducation(itemForUpdate);
+    var savedItemIndexChanged =
+        education.indexWhere((element) => element.id == changedItem.id);
+
+    if (savedItemIndexChanged != -1) {
+      education[savedItemIndexChanged] = itemForUpdate;
+    }
 
     Fluttertoast.showToast(
       msg: 'Updated education',

@@ -332,7 +332,7 @@ router.post("/add_update_user_hobby", async (req, res) => {
       },
     });
 
-    res.json(req.body);
+    res.json(req.body.hobby);
     return;
   } else {
     res.status(400).json({ message: "hobby field is missing" });
@@ -419,7 +419,7 @@ router.post("/add_update_user_professional_summary", async (req, res) => {
       },
     });
 
-    res.json(req.body);
+    res.json(req.body.professionalSummary);
     return;
   } else {
     res.status(400).json({ message: "professionalSummary field is missing" });
@@ -507,7 +507,7 @@ router.post("/add_update_user_language", async (req, res) => {
       },
     });
 
-    res.json(req.body);
+    res.json(req.body.language);
     return;
   } else {
     res.status(400).json({ message: "language field is missing" });
@@ -601,7 +601,7 @@ router.post("/add_update_user_course", async (req, res) => {
       },
     });
 
-    res.json(req.body);
+    res.json(req.body.course);
     return;
   } else {
     res.status(400).json({ message: "course field is missing" });
@@ -694,7 +694,7 @@ router.post("/add_update_user_education", async (req, res) => {
       },
     });
 
-    res.json(req.body);
+    res.json(req.body.education);
     return;
   } else {
     res.status(400).json({ message: "education field is missing" });
@@ -786,7 +786,7 @@ router.post("/add_update_user_employment_history", async (req, res) => {
       },
     });
 
-    res.json(req.body);
+    res.json(req.body.employmentHistory);
     return;
   } else {
     res.status(400).json({ message: "employmentHistory field is missing" });
@@ -879,7 +879,7 @@ router.post("/add_update_user_internship", async (req, res) => {
       },
     });
 
-    res.json(req.body);
+    res.json(req.body.internship);
     return;
   } else {
     res.status(400).json({ message: "internship field is missing" });
@@ -973,7 +973,7 @@ router.post("/add_update_user_link", async (req, res) => {
       },
     });
 
-    res.json(req.body);
+    res.json(req.body.link);
     return;
   } else {
     res.status(400).json({ message: "link field is missing" });
@@ -1065,7 +1065,7 @@ router.post("/add_update_user_subscription", async (req, res) => {
       },
     });
 
-    res.json(req.body);
+    res.json(req.body.subscription);
     return;
   } else {
     res.status(400).json({ message: "subscription field is missing" });

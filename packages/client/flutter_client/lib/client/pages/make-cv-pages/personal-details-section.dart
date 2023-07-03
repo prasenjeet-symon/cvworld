@@ -13,9 +13,12 @@ class PersonalDetailSection extends StatefulWidget {
   final String description;
   final Resume? resume;
 
-  const PersonalDetailSection(
-      {Key? key, required this.title, required this.description, this.resume})
-      : super(key: key);
+  const PersonalDetailSection({
+    Key? key,
+    required this.title,
+    required this.description,
+    this.resume,
+  }) : super(key: key);
 
   @override
   State<PersonalDetailSection> createState() => PersonalDetailSectionState();
@@ -50,74 +53,75 @@ class PersonalDetailSectionState extends State<PersonalDetailSection> {
 
   Details getData() {
     return Details(
-        inputs
-            .firstWhere(
-              (element) => element.jsonKey == 'email',
-            )
-            .controller
-            .text,
-        inputs
-            .firstWhere(
-              (element) => element.jsonKey == 'phone',
-            )
-            .controller
-            .text,
-        inputs
-            .firstWhere(
-              (element) => element.jsonKey == 'country',
-            )
-            .controller
-            .text,
-        inputs
-            .firstWhere(
-              (element) => element.jsonKey == 'city',
-            )
-            .controller
-            .text,
-        inputs
-            .firstWhere(
-              (element) => element.jsonKey == 'address',
-            )
-            .controller
-            .text,
-        inputs
-            .firstWhere(
-              (element) => element.jsonKey == 'postalCode',
-            )
-            .controller
-            .text,
-        inputs
-            .firstWhere(
-              (element) => element.jsonKey == 'drivingLicense',
-            )
-            .controller
-            .text,
-        inputs
-            .firstWhere(
-              (element) => element.jsonKey == 'nationality',
-            )
-            .controller
-            .text,
-        inputs
-            .firstWhere(
-              (element) => element.jsonKey == 'placeOfBirth',
-            )
-            .controller
-            .text,
-        DateTime.parse(inputs
-                .firstWhere(
-                  (element) => element.jsonKey == 'dateOfBirth',
-                )
-                .controller
-                .text
-                .isEmpty
-            ? DateTime.now().toIso8601String()
-            : inputs
-                .firstWhere(
-                  (element) => element.jsonKey == 'dateOfBirth',
-                )
-                .controller
-                .text));
+      inputs
+          .firstWhere(
+            (element) => element.jsonKey == 'email',
+          )
+          .controller
+          .text,
+      inputs
+          .firstWhere(
+            (element) => element.jsonKey == 'phone',
+          )
+          .controller
+          .text,
+      inputs
+          .firstWhere(
+            (element) => element.jsonKey == 'country',
+          )
+          .controller
+          .text,
+      inputs
+          .firstWhere(
+            (element) => element.jsonKey == 'city',
+          )
+          .controller
+          .text,
+      inputs
+          .firstWhere(
+            (element) => element.jsonKey == 'address',
+          )
+          .controller
+          .text,
+      inputs
+          .firstWhere(
+            (element) => element.jsonKey == 'postalCode',
+          )
+          .controller
+          .text,
+      inputs
+          .firstWhere(
+            (element) => element.jsonKey == 'drivingLicense',
+          )
+          .controller
+          .text,
+      inputs
+          .firstWhere(
+            (element) => element.jsonKey == 'nationality',
+          )
+          .controller
+          .text,
+      inputs
+          .firstWhere(
+            (element) => element.jsonKey == 'placeOfBirth',
+          )
+          .controller
+          .text,
+      DateTime.parse(inputs
+              .firstWhere(
+                (element) => element.jsonKey == 'dateOfBirth',
+              )
+              .controller
+              .text
+              .isEmpty
+          ? DateTime.now().toIso8601String()
+          : inputs
+              .firstWhere(
+                (element) => element.jsonKey == 'dateOfBirth',
+              )
+              .controller
+              .text),
+    );
   }
 
   TextEditingController _getController() {

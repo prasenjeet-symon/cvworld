@@ -201,6 +201,9 @@ class _AccountCardState extends State<AccountCard> {
             ),
             const Column(
               children: [CourseSection(title: 'Courses', description: '')],
+            ),
+            const Column(
+              children: [],
             )
           ],
         )

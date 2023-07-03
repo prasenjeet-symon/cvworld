@@ -6,6 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+// SOME APPLICATION CONSTANTS
+class Constants {
+  static const String appName = 'CV World';
+  static const String appVersion = '1.0';
+  static const int debounceTime = 1000;
+}
+
 double pageWidth(BuildContext context) {
   return MediaQuery.of(context).size.width >= 600
       ? MediaQuery.of(context).size.width * 0.7

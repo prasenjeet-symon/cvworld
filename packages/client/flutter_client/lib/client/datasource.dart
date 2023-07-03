@@ -28,8 +28,8 @@ class EmploymentHistory {
     var jsonData = {
       'job': job,
       'employer': employer,
-      'startDate': startDate.toIso8601String(),
-      'endDate': endDate.toIso8601String(),
+      'startDate': startDate.toUtc().toIso8601String(),
+      'endDate': endDate.toUtc().toIso8601String(),
       'city': city,
       'description': description
     };
@@ -70,8 +70,8 @@ class Education {
   toJson() {
     var jsonData = {
       'school': school,
-      'startDate': startDate.toIso8601String(),
-      'endDate': endDate.toIso8601String(),
+      'startDate': startDate.toUtc().toIso8601String(),
+      'endDate': endDate.toUtc().toIso8601String(),
       'degree': degree,
       'city': city,
       'description': description,
@@ -113,8 +113,8 @@ class Internship {
     var jsonData = {
       'job': job,
       'employer': employer,
-      'startDate': startDate.toIso8601String(),
-      'endDate': endDate.toIso8601String(),
+      'startDate': startDate.toUtc().toIso8601String(),
+      'endDate': endDate.toUtc().toIso8601String(),
       'city': city,
       'description': description
     };
@@ -151,8 +151,8 @@ class Courses {
     var jsonData = {
       'course': course,
       'institution': institution,
-      'startDate': startDate.toIso8601String(),
-      'endDate': endDate.toIso8601String()
+      'startDate': startDate.toUtc().toIso8601String(),
+      'endDate': endDate.toUtc().toIso8601String()
     };
 
     return jsonData;
@@ -204,7 +204,7 @@ class Details {
       'drivingLicense': drivingLicense,
       'nationality': nationality,
       'placeOfBirth': placeOfBirth,
-      'dateOfBirth': dateOfBirth.toIso8601String()
+      'dateOfBirth': dateOfBirth.toUtc().toIso8601String()
     };
 
     return jsonData;
@@ -463,8 +463,8 @@ class GeneratedResume {
     var jsonData = {
       'id': id,
       'userId': userId,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
       'resumeRow': resumeRow.toJson(),
       'resume': resume.toJson(),
     };
@@ -627,7 +627,7 @@ class UserSkill {
   // skill
   final String skill;
   // level
-  final String level;
+  final double level;
   // createdAt
   final DateTime createdAt;
   // updatedAt
@@ -645,7 +645,7 @@ class UserSkill {
     return UserSkill(
       json['id'],
       json['skill'],
-      json['level'],
+      double.parse(json['level'].toString()),
       DateTime.parse(json['createdAt']),
       DateTime.parse(json['updatedAt']),
     );
@@ -656,8 +656,8 @@ class UserSkill {
       'id': id,
       'skill': skill,
       'level': level,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
     };
 
     return jsonData;
@@ -695,8 +695,8 @@ class UserHobby {
     var jsonData = {
       'id': id,
       'hobby': hobby,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
     };
 
     return jsonData;
@@ -734,8 +734,8 @@ class UserProfessionalSummary {
     var jsonData = {
       'id': id,
       'profile': profile,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
     };
 
     return jsonData;
@@ -749,7 +749,7 @@ class UserLanguage {
   // language
   final String language;
   // level
-  final String level;
+  final double level;
   // createdAt
   final DateTime createdAt;
   // updatedAt
@@ -767,7 +767,7 @@ class UserLanguage {
     return UserLanguage(
       json['id'],
       json['language'],
-      json['level'],
+      double.parse(json['level'].toString()),
       DateTime.parse(json['createdAt']),
       DateTime.parse(json['updatedAt']),
     );
@@ -778,8 +778,8 @@ class UserLanguage {
       'id': id,
       'language': language,
       'level': level,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
     };
 
     return jsonData;
@@ -891,13 +891,13 @@ class UserEducation {
     var jsonData = {
       'id': id,
       'school': school,
-      'startDate': startDate.toIso8601String(),
-      'endDate': endDate.toIso8601String(),
+      'startDate': startDate.toUtc().toIso8601String(),
+      'endDate': endDate.toUtc().toIso8601String(),
       'degree': degree,
       'city': city,
       'description': description,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
     };
 
     return jsonData;
@@ -956,12 +956,12 @@ class UserEmployment {
       'id': id,
       'job': job,
       'employer': employer,
-      'startDate': startDate.toIso8601String(),
-      'endDate': endDate.toIso8601String(),
+      'startDate': startDate.toUtc().toIso8601String(),
+      'endDate': endDate.toUtc().toIso8601String(),
       'city': city,
       'description': description,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
     };
 
     return jsonData;
@@ -1020,12 +1020,12 @@ class UserInternship {
       'id': id,
       'job': job,
       'employer': employer,
-      'startDate': startDate.toIso8601String(),
-      'endDate': endDate.toIso8601String(),
+      'startDate': startDate.toUtc().toIso8601String(),
+      'endDate': endDate.toUtc().toIso8601String(),
       'city': city,
       'description': description,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
     };
 
     return jsonData;
@@ -1068,8 +1068,8 @@ class UserLink {
       'id': id,
       'title': title,
       'url': url,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
     };
 
     return jsonData;
@@ -1132,13 +1132,13 @@ class UserSubscription {
       'id': id,
       'planName': planName,
       'isActive': isActive,
-      'expireOn': expireOn.toIso8601String(),
-      'activatedOn': activatedOn.toIso8601String(),
+      'expireOn': expireOn.toUtc().toIso8601String(),
+      'activatedOn': activatedOn.toUtc().toIso8601String(),
       'cycle': cycle,
       'discount': discount,
       'basePrice': basePrice,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
     };
 
     return jsonData;
@@ -1191,12 +1191,12 @@ class User {
   toJson() {
     var jsonData = {
       'id': id,
-      'createdAt': createdAt.toIso8601String(),
+      'createdAt': createdAt.toUtc().toIso8601String(),
       'email': email,
       'fullName': fullName,
       'profilePicture': profilePicture,
       'reference': reference,
-      'updatedAt': updatedAt.toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
       'subscription': subscription.toJson(),
     };
 
@@ -1627,8 +1627,8 @@ class DatabaseService {
     var payload = userSkill.toJson();
     var client = JwtClient();
 
-    var response =
-        await client.post(addUpdateUserSkillRoute, body: json.encode(payload));
+    var response = await client.post(addUpdateUserSkillRoute,
+        body: json.encode({"skill": payload}));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -1707,8 +1707,8 @@ class DatabaseService {
     var payload = userHobby.toJson();
     var client = JwtClient();
 
-    var response =
-        await client.post(addUpdateUserHobbyRoute, body: json.encode(payload));
+    var response = await client.post(addUpdateUserHobbyRoute,
+        body: json.encode({"hobby": payload}));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -1757,6 +1757,7 @@ class DatabaseService {
       client.dispose();
       return responseData;
     } else {
+      print(response.body);
       if (kDebugMode) {
         print('Something went wrong while fetching user professional summary');
       }
@@ -1773,7 +1774,7 @@ class DatabaseService {
     var client = JwtClient();
 
     var response = await client.post(addUpdateUserProfessionalSummaryRoute,
-        body: json.encode(payload));
+        body: json.encode({"professionalSummary": payload}));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -1841,7 +1842,7 @@ class DatabaseService {
     var client = JwtClient();
 
     var response = await client.post(addUpdateUserLanguageRoute,
-        body: json.encode(payload));
+        body: json.encode({"language": payload}));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -1971,7 +1972,7 @@ class DatabaseService {
     var client = JwtClient();
 
     var response = await client.post(addUpdateUserEducationRoute,
-        body: json.encode(payload));
+        body: json.encode({"education": payload}));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -2038,7 +2039,7 @@ class DatabaseService {
     var client = JwtClient();
 
     var response = await client.post(addUpdateUserEmploymentHistoryRoute,
-        body: json.encode(payload));
+        body: json.encode({"employmentHistory": payload}));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -2108,7 +2109,7 @@ class DatabaseService {
     var client = JwtClient();
 
     var response = await client.post(addUpdateUserInternshipRoute,
-        body: json.encode(payload));
+        body: json.encode({"internship": payload}));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -2172,8 +2173,8 @@ class DatabaseService {
     var payload = userLink.toJson();
     var client = JwtClient();
 
-    var response =
-        await client.post(addUpdateUserLinkRoute, body: json.encode(payload));
+    var response = await client.post(addUpdateUserLinkRoute,
+        body: json.encode({"link": payload}));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -2236,7 +2237,7 @@ class DatabaseService {
     var client = JwtClient();
 
     var response = await client.post(addUpdateUserSubscriptionRoute,
-        body: json.encode(payload));
+        body: json.encode({"subscription": payload}));
 
     if (response.statusCode == 200) {
       client.dispose();
