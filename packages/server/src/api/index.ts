@@ -4,6 +4,80 @@ const router = express.Router();
 
 router.get("/", (req, res) => res.send("Hello World!"));
 
+/** Update the resume */
+router.post("/update_resume", async (req, res) => {
+  if (!("resume" in req.body && "id" in req.body)) {
+    res.status(400).send("resume field is missing");
+    return;
+  }
+
+  const email = res.locals.email;
+  const resume = req.body.resume;
+  const resumeID = req.body.id;
+
+  // fetched old resume
+  const prisma = PrismaClientSingleton.prisma;
+  const oldResume = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+    select: {
+      resumes: {
+        where: {
+          id: resumeID,
+        },
+      },
+    },
+  });
+
+  if (!oldResume) {
+    res.status(500).send("resume not found");
+    return;
+  }
+
+  // we need to maintain the UUID of the file name
+  const imageUrlOld = oldResume.resumes[0].imageUrl;
+  const pdfUrlOld = oldResume.resumes[0].pdfUrl;
+  // extract the UUID ( e4102060-6754-4e78-8126-06c47af04c44.png )
+  const uuidImageUrl = imageUrlOld.split(".")[0];
+  const uuidPdfUrl = pdfUrlOld.split(".")[0];
+
+  const [imageUrl, pdfUrl] = await Promise.all([generateImage(resume, uuidImageUrl), generatePDF(resume, uuidPdfUrl)]);
+
+  if (!imageUrl || !pdfUrl) {
+    res.status(500).send("Something went wrong");
+    return;
+  }
+
+  // add this generated resume to the user
+  await prisma.user.update({
+    where: { email: email },
+    data: {
+      resumes: {
+        update: {
+          where: {
+            id: resumeID,
+          },
+          data: {
+            imageUrl: imageUrl,
+            pdfUrl: pdfUrl,
+            resume: JSON.parse(JSON.stringify(resume)),
+          },
+        },
+      },
+    },
+  });
+
+  res.send({
+    imageUrl: imageUrl,
+    pdfUrl: pdfUrl,
+    userId: oldResume.resumes[0].userId,
+    createdAt: oldResume.resumes[0].createdAt,
+    updatedAt: oldResume.resumes[0].updatedAt,
+    id: oldResume.resumes[0].id,
+  });
+});
+
 /** Generate new resume */
 router.post("/generate", async (req, res) => {
   if (!("resume" in req.body && "isDummy" in req.body)) {

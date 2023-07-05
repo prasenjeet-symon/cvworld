@@ -334,6 +334,115 @@ class PersonalDetailSectionState extends State<PersonalDetailSection> {
     }
   }
 
+  // patch the resume
+  Future<void> patchResume() async {
+    if (widget.resume.isNull) return;
+
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'firstName',
+        )
+        .controller
+        .text = widget.resume!.name.split(' ')[0];
+
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'lastName',
+        )
+        .controller
+        .text = widget.resume!.name.split(' ')[1];
+
+    // for the profession
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'profession',
+        )
+        .controller
+        .text = widget.resume!.profession;
+
+    // for the email
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'email',
+        )
+        .controller
+        .text = widget.resume!.details.email;
+
+    // for the phone
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'phone',
+        )
+        .controller
+        .text = widget.resume!.details.phone;
+
+    // for the Country
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'country',
+        )
+        .controller
+        .text = widget.resume!.details.country;
+
+    // for the City
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'city',
+        )
+        .controller
+        .text = widget.resume!.details.city;
+
+    // for the Address
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'address',
+        )
+        .controller
+        .text = widget.resume!.details.address;
+
+    // for the postal code
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'postalCode',
+        )
+        .controller
+        .text = widget.resume!.details.postalCode;
+
+    // for the Driving License
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'drivingLicense',
+        )
+        .controller
+        .text = widget.resume!.details.drivingLicense;
+
+    // for the Nationality
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'nationality',
+        )
+        .controller
+        .text = widget.resume!.details.nationality;
+
+    // for the place of birth
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'placeOfBirth',
+        )
+        .controller
+        .text = widget.resume!.details.placeOfBirth;
+
+    // for the date of birth
+    inputs
+        .firstWhere(
+          (element) => element.jsonKey == 'dateOfBirth',
+        )
+        .controller
+        .text = widget.resume!.details.dateOfBirth.toIso8601String();
+
+    setState(() {});
+  }
+
   // Fetch the personal details from the server
   _fetchPersonalDetails() async {
     // Fetch the personal details from the server

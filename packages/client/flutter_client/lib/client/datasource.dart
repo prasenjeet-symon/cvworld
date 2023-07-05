@@ -1353,6 +1353,9 @@ class DatabaseService {
   late Uri updateUserProfilePictureRoute;
   // get_user
   late Uri getUserRoute;
+  // update_resume
+  late Uri updateResumeRoute;
+  // delete_resume
 
   DatabaseService() {
     authRoute = Uri.parse('$origin/server/auth');
@@ -1422,6 +1425,7 @@ class DatabaseService {
     updateUserProfilePictureRoute =
         Uri.parse('$origin/server/api/media/update_user_profile_picture');
     getUserRoute = Uri.parse('$origin/server/api/get_user');
+    updateResumeRoute = Uri.parse('$origin/server/api/update_resume');
   }
 
   publicResource(String path) {
@@ -1503,8 +1507,8 @@ class DatabaseService {
     var response = await client.post(allResumeRoute);
 
     if (response.statusCode == 200) {
-      var decodedJson = json.decode(response.body);
-      var responseData = ((decodedJson['generatedResumes']) as List<dynamic>);
+      var decodedJson = json.decode(response.body) as List<dynamic>;
+      var responseData = decodedJson;
       var finalData =
           responseData.map((e) => GeneratedResume.fromJson(e)).toList();
       client.dispose();
@@ -1528,9 +1532,7 @@ class DatabaseService {
 
     if (response.statusCode == 200) {
       var decodedData = json.decode(response.body);
-
-      var responseData =
-          GeneratedResume.fromJson(decodedData['generatedResume']);
+      var responseData = GeneratedResume.fromJson(decodedData);
 
       client.dispose();
       return responseData;
@@ -1757,7 +1759,6 @@ class DatabaseService {
       client.dispose();
       return responseData;
     } else {
-      print(response.body);
       if (kDebugMode) {
         print('Something went wrong while fetching user professional summary');
       }
@@ -2316,6 +2317,27 @@ class DatabaseService {
         print('Something went wrong while updating user profile picture');
       }
 
+      return null;
+    }
+  }
+
+  // update_resume
+  Future<GeneratedResume?> updateResume(Resume resume, int id) async {
+    var payload = resume.toJson();
+    var client = JwtClient();
+    var finalPayload = json.encode({id: id, resume: payload});
+
+    var response = await client.post(updateResumeRoute, body: finalPayload);
+    if (response.statusCode == 200) {
+      client.dispose();
+      var responseData = GeneratedResume.fromJson(json.decode(response.body));
+      return responseData;
+    } else {
+      if (kDebugMode) {
+        print('Something went wrong while updating resume');
+      }
+
+      client.dispose();
       return null;
     }
   }

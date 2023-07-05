@@ -1171,7 +1171,7 @@ export function generateResumeHTML(resume: Resume) {
 }
 
 /** Generate the PDF */
-export async function generatePDF(resume: Resume) {
+export async function generatePDF(resume: Resume, resumeUUID?: string) {
   const browser = (await BrowserPuppeteer.browser()).browserInstance;
   const page = await browser.newPage();
   const resumeHTML = generateResumeHTML(resume);
@@ -1181,14 +1181,14 @@ export async function generatePDF(resume: Resume) {
   // upload to the public folder we are inside the src and public folder is one step above
   const publicFolderPath = path.join(process.cwd(), "public");
   // create the resume.pdf file in the public folder
-  const resumeName = v4();
+  const resumeName = resumeUUID ? resumeUUID :  v4();
   const resumeFilePath = path.join(publicFolderPath, `${resumeName}.pdf`);
   await page.pdf({ path: resumeFilePath, format: "A4" });
   return `${resumeName}.pdf`;
 }
 
 /** Generate the Image of the resume */
-export async function generateImage(resume: Resume) {
+export async function generateImage(resume: Resume, resumeUUID?: string) {
   const browser = (await BrowserPuppeteer.browser()).browserInstance;
   const page = await browser.newPage();
   const resumeHTML = generateResumeHTML(resume);
@@ -1199,7 +1199,7 @@ export async function generateImage(resume: Resume) {
   // upload to the public folder we are inside the src and public folder is one step above
   const publicFolderPath = path.join(process.cwd(), "public");
   // create the resume.pdf file in the public folder
-  const resumeName = v4();
+  const resumeName = resumeUUID ? resumeUUID : v4();
   const resumeFilePath = path.join(publicFolderPath, `${resumeName}.png`);
   await elementHandle.screenshot({ path: resumeFilePath });
   return `${resumeName}.png`;

@@ -57,6 +57,7 @@ class SkillSectionState extends State<SkillSection> {
   void initState() {
     _customSkillSection.resume = widget.resume;
     _customSkillSection.fetchUserSkills().then((value) => {setState(() {})});
+    _customSkillSection.patchResume().then((value) => {setState(() {})});
     super.initState();
   }
 
@@ -275,6 +276,39 @@ class CustomSkillSection {
     }
 
     return id + 1;
+  }
+
+  // patch the resume
+  Future<void> patchResume() async {
+    if (resume.isNull) return;
+    var skillsToPatch = resume!.skills;
+    for (var element in skillsToPatch) {
+      var skillController = _addController();
+      skillController.text = element.skill;
+
+      var levelController = _addController();
+      levelController.text = element.level.toString();
+
+      var itemToAdd = CustomSkillItem(
+        id: getLatestId(),
+        skill: CustomInputType(
+          'Skill',
+          'skill',
+          true,
+          skillController,
+          TextInputType.text,
+        ),
+        level: CustomInputType(
+          'Level',
+          'level',
+          true,
+          levelController,
+          TextInputType.text,
+        ),
+      );
+
+      item.add(itemToAdd);
+    }
   }
 
   // fetch user skills

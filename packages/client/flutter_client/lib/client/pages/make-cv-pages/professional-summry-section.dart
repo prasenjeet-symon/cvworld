@@ -55,6 +55,9 @@ class ProfessionalSummaryState extends State<ProfessionalSummary> {
 
     // fetch professional summary
     fetchProfessionalSummary().then((value) => {setState(() {})});
+    // patch the resume
+    patchResume().then((value) => {setState(() {})});
+
     // listen for the changes and update professional summary
     if (widget.resume.isNull) {
       textEditor?.controller.addListener(() {
@@ -67,6 +70,12 @@ class ProfessionalSummaryState extends State<ProfessionalSummary> {
         },
       );
     }
+  }
+
+  // patch the resume
+  Future<void> patchResume() async {
+    if (widget.resume.isNull) return;
+    _controller.text = widget.resume!.profession;
   }
 
   // fetch professional summary

@@ -63,6 +63,7 @@ class LanguageSectionState extends State<LanguageSection> {
     _customLanguageSection
         .fetchUserLanguages()
         .then((value) => {setState(() {})});
+    _customLanguageSection.patchResume().then((value) => {setState(() {})});
 
     super.initState();
   }
@@ -279,6 +280,39 @@ class CustomLanguageSection {
     final TextEditingController controller = TextEditingController();
     _controllers.add(controller);
     return controller;
+  }
+
+  // patch the resume
+  Future<void> patchResume() async {
+    if (resume.isNull) return;
+    var resumeToPatch = resume!.languages;
+    for (var language in resumeToPatch) {
+      var languageController = _addController();
+      languageController.text = language.language;
+
+      var levelController = _addController();
+      levelController.text = language.level.toString();
+
+      var itemToAdd = CustomLanguageItem(
+        id: getLatestId(),
+        language: CustomInputType(
+          'Language',
+          'language',
+          true,
+          languageController,
+          TextInputType.text,
+        ),
+        level: CustomInputType(
+          'Level',
+          'level',
+          true,
+          levelController,
+          TextInputType.number,
+        ),
+      );
+
+      item.add(itemToAdd);
+    }
   }
 
   dispose() {

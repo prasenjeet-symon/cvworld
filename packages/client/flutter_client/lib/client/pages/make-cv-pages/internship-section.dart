@@ -62,6 +62,8 @@ class InternshipSectionState extends State<InternshipSection> {
     _customInternshipSection
         .fetchInternships()
         .then((value) => {setState(() {})});
+    _customInternshipSection.patchResume().then((value) => {setState(() {})});
+
     super.initState();
   }
 
@@ -356,6 +358,80 @@ class CustomInternshipSection {
     final TextEditingController controller = TextEditingController();
     _controllers.add(controller);
     return controller;
+  }
+
+  // patch the resume
+  Future<void> patchResume() async {
+    if (resume.isNull) return;
+
+    var internshipToPatch = resume!.internship;
+    for (var internship in internshipToPatch) {
+      var jobController = _addController();
+      jobController.text = internship.job;
+
+      var employerController = _addController();
+      employerController.text = internship.employer;
+
+      var startDateController = _addController();
+      startDateController.text = internship.startDate.toIso8601String();
+
+      var endDateController = _addController();
+      endDateController.text = internship.endDate.toIso8601String();
+
+      var cityController = _addController();
+      cityController.text = internship.city;
+
+      var descriptionController = _addController();
+      descriptionController.text = internship.description;
+
+      var itemToAdd = CustomInternshipItem(
+        id: getLatestId(),
+        jobTitle: CustomInputType(
+          'Job Title',
+          'jobTitle',
+          true,
+          jobController,
+          TextInputType.text,
+        ),
+        employer: CustomInputType(
+          'Employer',
+          'employer',
+          true,
+          employerController,
+          TextInputType.text,
+        ),
+        startDate: CustomInputType(
+          'Start Date',
+          'startDate',
+          true,
+          startDateController,
+          TextInputType.datetime,
+        ),
+        endDate: CustomInputType(
+          'End Date',
+          'endDate',
+          true,
+          endDateController,
+          TextInputType.datetime,
+        ),
+        city: CustomInputType(
+          'City',
+          'city',
+          true,
+          cityController,
+          TextInputType.text,
+        ),
+        description: CustomInputType(
+          'Description',
+          'description',
+          true,
+          descriptionController,
+          TextInputType.text,
+        ),
+      );
+
+      item.add(itemToAdd);
+    }
   }
 
   // fetch the internship from the server and path it

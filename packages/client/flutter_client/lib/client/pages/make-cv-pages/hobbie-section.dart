@@ -35,6 +35,14 @@ class HobbiesSectionState extends State<HobbiesSection> {
     return _controller.text;
   }
 
+  // patch the resume
+  Future<void> patchResume() async {
+    if (widget.resume.isNull) return;
+
+    var hobbyToPatch = widget.resume!.hobbies;
+    _controller.text = hobbyToPatch;
+  }
+
   // fetch the hobby
   Future<void> fetchHobby() async {
     if (!widget.resume.isNull) {
@@ -106,6 +114,8 @@ class HobbiesSectionState extends State<HobbiesSection> {
 
     // fetch the hobby
     fetchHobby().then((value) => {setState(() {})});
+    // patch the resume
+    patchResume().then((value) => {setState(() {})});
   }
 
   @override

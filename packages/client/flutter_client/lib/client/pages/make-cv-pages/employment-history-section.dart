@@ -65,6 +65,8 @@ class EmploymentHistorySectionState extends State<EmploymentHistorySection> {
         .fetchEmploymentHistory()
         .then((value) => {setState(() {})});
 
+    _customEmploymentHistory.patchResume().then((value) => {setState(() {})});
+
     super.initState();
   }
 
@@ -326,6 +328,80 @@ class CustomEmploymentHistory {
   final List<TextEditingController> _controllers = [];
   List<UserEmployment> employment = [];
   Resume? resume;
+
+  // patch the resume
+  Future<void> patchResume() async {
+    if (resume.isNull) return;
+
+    var employmentHistoryToPatch = resume!.employmentHistory;
+    for (var element in employmentHistoryToPatch) {
+      var jobController = _addController();
+      jobController.text = element.job;
+
+      var employerController = _addController();
+      employerController.text = element.employer;
+
+      var startDateController = _addController();
+      startDateController.text = element.startDate.toIso8601String();
+
+      var endDateController = _addController();
+      endDateController.text = element.endDate.toIso8601String();
+
+      var cityController = _addController();
+      cityController.text = element.city;
+
+      var descriptionController = _addController();
+      descriptionController.text = element.description;
+
+      var itemToAdd = CustomEmploymentHistoryItem(
+        id: getLatestId(),
+        jobTitle: CustomInputType(
+          'Job Title',
+          'jobTitle',
+          true,
+          jobController,
+          TextInputType.text,
+        ),
+        employer: CustomInputType(
+          'Employer',
+          'employer',
+          true,
+          employerController,
+          TextInputType.text,
+        ),
+        startDate: CustomInputType(
+          'Start Date',
+          'startDate',
+          true,
+          startDateController,
+          TextInputType.text,
+        ),
+        endDate: CustomInputType(
+          'End Date',
+          'endDate',
+          true,
+          endDateController,
+          TextInputType.text,
+        ),
+        city: CustomInputType(
+          'City',
+          'city',
+          true,
+          cityController,
+          TextInputType.text,
+        ),
+        description: CustomInputType(
+          'Description',
+          'description',
+          true,
+          descriptionController,
+          TextInputType.text,
+        ),
+      );
+
+      item.add(itemToAdd);
+    }
+  }
 
   // fetch employment history
   Future<void> fetchEmploymentHistory() async {

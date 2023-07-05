@@ -66,6 +66,7 @@ class CourseSectionState extends State<CourseSection> {
 
     _customCourseSection.resume = widget.resume;
     _customCourseSection.fetchCourses().then((value) => {setState(() {})});
+    _customCourseSection.patchResume().then((value) => {setState(() {})});
   }
 
   @override
@@ -333,6 +334,60 @@ class CustomCourseSection {
     final TextEditingController controller = TextEditingController();
     _controllers.add(controller);
     return controller;
+  }
+
+  // patch the resume if applicable
+  Future<void> patchResume() async {
+    if (resume.isNull) return;
+    var coursesToPatch = resume!.courses;
+
+    for (var element in coursesToPatch) {
+      var courseController = _addController();
+      courseController.text = element.course;
+
+      var institutionController = _addController();
+      institutionController.text = element.institution;
+
+      var startDateController = _addController();
+      startDateController.text = element.startDate.toIso8601String();
+
+      var endDateController = _addController();
+      endDateController.text = element.endDate.toIso8601String();
+
+      var courseItem = CustomCoursesItem(
+        id: getId(),
+        course: CustomInputType(
+          'Course',
+          'course',
+          true,
+          courseController,
+          TextInputType.text,
+        ),
+        institution: CustomInputType(
+          'Institution',
+          'institution',
+          true,
+          institutionController,
+          TextInputType.text,
+        ),
+        startDate: CustomInputType(
+          'Start Date',
+          'startDate',
+          true,
+          startDateController,
+          TextInputType.datetime,
+        ),
+        endDate: CustomInputType(
+          'End Date',
+          'endDate',
+          true,
+          endDateController,
+          TextInputType.datetime,
+        ),
+      );
+
+      item.add(courseItem);
+    }
   }
 
   // Fetch already created courses by the user

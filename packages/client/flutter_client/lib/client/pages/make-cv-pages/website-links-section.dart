@@ -54,6 +54,7 @@ class WebsiteLinkSectionState extends State<WebsiteLinkSection> {
     _customWebsiteLinkSection
         .fetchWebsiteLinks()
         .then((value) => {setState(() {})});
+    _customWebsiteLinkSection.patchResume().then((value) => {setState(() {})});
 
     super.initState();
   }
@@ -261,6 +262,39 @@ class CustomWebsiteLinkSection {
   dispose() {
     for (var element in item) {
       element.dispose();
+    }
+  }
+
+  // patch the resume
+  Future<void> patchResume() async {
+    if (resume.isNull) return;
+    var websiteLinksToPatch = resume!.links;
+    for (var websiteLink in websiteLinksToPatch) {
+      var linkController = _addController();
+      linkController.text = websiteLink.url;
+
+      var labelController = _addController();
+      labelController.text = websiteLink.title;
+
+      var itemToAdd = CustomWebsiteLinkItem(
+        id: getLatestId(),
+        label: CustomInputType(
+          'Label',
+          'label',
+          true,
+          labelController,
+          TextInputType.text,
+        ),
+        link: CustomInputType(
+          'Link',
+          'link',
+          true,
+          linkController,
+          TextInputType.text,
+        ),
+      );
+
+      item.add(itemToAdd);
     }
   }
 

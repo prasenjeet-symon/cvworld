@@ -61,6 +61,7 @@ class EducationSectionState extends State<EducationSection> {
   void initState() {
     _customEducationSection.resume = widget.resume;
     _customEducationSection.fetchEducation().then((value) => {setState(() {})});
+    _customEducationSection.patchResume().then((value) => {setState(() {})});
     super.initState();
   }
 
@@ -375,6 +376,79 @@ class CustomEducationSection {
     final TextEditingController controller = TextEditingController();
     _controllers.add(controller);
     return controller;
+  }
+
+  // patch the educations
+  Future<void> patchResume() async {
+    if (resume.isNull) return;
+    var educationToPatch = resume!.education;
+    for (var element in educationToPatch) {
+      var schoolController = _addController();
+      schoolController.text = element.school;
+
+      var degreeController = _addController();
+      degreeController.text = element.degree;
+
+      var startDateController = _addController();
+      startDateController.text = element.startDate.toIso8601String();
+
+      var endDateController = _addController();
+      endDateController.text = element.endDate.toIso8601String();
+
+      var cityController = _addController();
+      cityController.text = element.city;
+
+      var descriptionController = _addController();
+      descriptionController.text = element.description;
+
+      var customEducationItem = CustomEducationItem(
+        id: getId(),
+        school: CustomInputType(
+          'School',
+          'school',
+          true,
+          schoolController,
+          TextInputType.text,
+        ),
+        degree: CustomInputType(
+          'Degree',
+          'degree',
+          true,
+          degreeController,
+          TextInputType.text,
+        ),
+        startDate: CustomInputType(
+          'Start Date',
+          'startDate',
+          true,
+          startDateController,
+          TextInputType.text,
+        ),
+        endDate: CustomInputType(
+          'End Date',
+          'endDate',
+          true,
+          endDateController,
+          TextInputType.text,
+        ),
+        city: CustomInputType(
+          'City',
+          'city',
+          true,
+          cityController,
+          TextInputType.text,
+        ),
+        description: CustomInputType(
+          'Description',
+          'description',
+          true,
+          descriptionController,
+          TextInputType.text,
+        ),
+      );
+
+      item.add(customEducationItem);
+    }
   }
 
   // fetch education
