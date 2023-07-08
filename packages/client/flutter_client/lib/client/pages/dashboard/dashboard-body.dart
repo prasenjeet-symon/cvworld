@@ -1,8 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/utils.dart';
 import 'package:flutter_client/client/datasource.dart';
+import 'package:flutter_client/client/utils.dart';
+import 'package:flutter_client/routes/router.gr.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class DashboardBody extends StatelessWidget {
@@ -21,33 +22,12 @@ class DashboardBody extends StatelessWidget {
             child: Column(
               children: [
                 Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.black.withOpacity(0.4),
-                        width: 0.4,
-                      ),
-                    ),
-                  ),
+                  decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.4), width: 0.4))),
                   margin: const EdgeInsets.fromLTRB(0, 45, 0, 0),
                   child: Row(
                     children: [
-                      const Expanded(
-                          child: Text(
-                        'Resumes',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 27),
-                      )),
-                      TextButton(
-                          style: TextButton.styleFrom(
-                              padding:
-                                  const EdgeInsets.fromLTRB(40, 20, 40, 20)),
-                          onPressed: () {
-                            context.navigateNamedTo('/cv-maker');
-                          },
-                          child: const Row(
-                            children: [Icon(Icons.add), Text('Create')],
-                          ))
+                      const Expanded(child: Text('Resumes', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 27))),
+                      TextButton(style: TextButton.styleFrom(padding: const EdgeInsets.fromLTRB(40, 20, 40, 20)), onPressed: () => context.pushRoute(CvMakerRoute(resumeID: 0)), child: const Row(children: [Icon(Icons.add), Text('Create')]))
                     ],
                   ),
                 ),
@@ -71,7 +51,7 @@ class DashboardBodyContent extends StatefulWidget {
 
 class _DashboardBodyContentState extends State<DashboardBodyContent> {
   List<GeneratedResume> resumes = [];
-  bool isLoading = false;
+  bool isLoading = true;
   bool isError = false;
 
   fetchAllCreatedResume() async {
@@ -79,8 +59,7 @@ class _DashboardBodyContentState extends State<DashboardBodyContent> {
     setState(() {});
 
     try {
-      var resumesFetched =
-          await DatabaseService().fetchAllGeneratedResumeOfUser();
+      var resumesFetched = await DatabaseService().fetchAllGeneratedResumeOfUser();
       resumes = resumesFetched ?? [];
     } catch (e) {
       if (kDebugMode) {
@@ -92,19 +71,31 @@ class _DashboardBodyContentState extends State<DashboardBodyContent> {
     setState(() {});
   }
 
-  deleteResume(int id) {}
+  Future<void> deleteResume(int id) async {
+    // delete resume
+    var index = resumes.indexWhere((element) => element.id == id);
+    if (index != -1) {
+      resumes.removeAt(index);
+      setState(() {});
+
+      await DatabaseService().deleteResume(id);
+    }
+  }
 
   downloadResume(int id) {
     var targetResume = resumes.firstWhere((element) => element.id == id);
-    downloadFile(targetResume.resume.pdfUrl, targetResume.resume.pdfUrl);
+    downloadFile(targetResume.resumeLink.pdfUrl, targetResume.resumeLink.pdfUrl);
   }
 
-  editResume(int id) {}
+  editResume(BuildContext ctx, int id) {
+    // ignore: use_build_context_synchronously
+    ctx.pushRoute(CvMakerRoute(resumeID: id));
+  }
 
   @override
   void initState() {
-    fetchAllCreatedResume();
     super.initState();
+    fetchAllCreatedResume();
   }
 
   @override
@@ -143,9 +134,8 @@ class _DashboardBodyContentState extends State<DashboardBodyContent> {
             Container(
               margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
               child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.fromLTRB(20, 15, 20, 15)),
-                  onPressed: () => {context.navigateNamedTo('/cv-maker')},
+                  style: ElevatedButton.styleFrom(padding: const EdgeInsets.fromLTRB(20, 15, 20, 15)),
+                  onPressed: () => {context.pushRoute(CvMakerRoute(resumeID: 0))},
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -169,7 +159,7 @@ class _DashboardBodyContentState extends State<DashboardBodyContent> {
             ...resumes.map((e) => CreatedResumeItem(
                   deleteFunction: deleteResume,
                   downloadFunction: downloadResume,
-                  editFunction: editResume,
+                  editFunction: (int id) => editResume(context, id),
                   resume: e,
                 ))
           ],
@@ -177,7 +167,7 @@ class _DashboardBodyContentState extends State<DashboardBodyContent> {
       );
     } else {
       return const Center(
-        child: CircularProgressIndicator(),
+        child: Padding(padding: EdgeInsets.all(50), child: CircularProgressIndicator()),
       );
     }
   }
@@ -189,12 +179,7 @@ class CreatedResumeItem extends StatefulWidget {
   void Function(int id) downloadFunction;
   GeneratedResume resume;
 
-  CreatedResumeItem(
-      {super.key,
-      required this.deleteFunction,
-      required this.downloadFunction,
-      required this.editFunction,
-      required this.resume});
+  CreatedResumeItem({super.key, required this.deleteFunction, required this.downloadFunction, required this.editFunction, required this.resume});
 
   @override
   State<CreatedResumeItem> createState() => _CreatedResumeItemState();
@@ -210,9 +195,14 @@ class _CreatedResumeItemState extends State<CreatedResumeItem> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(1),
-              child: Image.network(widget.resume.resume.imageUrl),
+            child: GestureDetector(
+              onTap: () {
+                context.pushRoute(ViewResume(resumeID: widget.resume.id));
+              },
+              child: Container(
+                padding: const EdgeInsets.all(1),
+                child: Image.network(widget.resume.resumeLink.imageUrl),
+              ),
             ),
           ),
           Expanded(
@@ -221,17 +211,13 @@ class _CreatedResumeItemState extends State<CreatedResumeItem> {
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
-                child: Text(
-                  '${widget.resume.resumeRow.profession}.pdf',
-                  style: const TextStyle(fontSize: 20),
-                ),
+                child: Text('${widget.resume.resume.profession}.pdf', style: const TextStyle(fontSize: 20)),
               ),
               Container(
                 margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                 child: TextButton.icon(
                   onPressed: () {
-                    context.navigateNamedTo(
-                        '/dashboard/view-resume/${widget.resume.id}');
+                    context.pushRoute(ViewResume(resumeID: widget.resume.id));
                   },
                   icon: const Icon(Icons.remove_red_eye_sharp),
                   label: const Text('View Resume'),
@@ -240,28 +226,18 @@ class _CreatedResumeItemState extends State<CreatedResumeItem> {
               Container(
                 margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                 child: TextButton.icon(
-                  onPressed: () {
-                    widget.downloadFunction(widget.resume.id);
-                  },
+                  onPressed: () => widget.downloadFunction(widget.resume.id),
                   icon: const Icon(Icons.download),
                   label: const Text('Download Resume'),
                 ),
               ),
               Container(
                 margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-                child: TextButton.icon(
-                  onPressed: null,
-                  icon: const Icon(Icons.delete),
-                  label: const Text('Delete Resume'),
-                ),
+                child: TextButton.icon(onPressed: () => widget.deleteFunction(widget.resume.id), icon: const Icon(Icons.delete), label: const Text('Delete Resume')),
               ),
               Container(
                 margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-                child: TextButton.icon(
-                  onPressed: null,
-                  icon: const Icon(Icons.edit),
-                  label: const Text('Edit Resume'),
-                ),
+                child: TextButton.icon(onPressed: () => widget.editFunction(widget.resume.id), icon: const Icon(Icons.edit), label: const Text('Edit Resume')),
               ),
             ],
           ))

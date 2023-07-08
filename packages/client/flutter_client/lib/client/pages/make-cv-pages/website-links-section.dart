@@ -16,47 +16,34 @@ class WebsiteLinkSection extends StatefulWidget {
   final String description;
   final Resume? resume;
 
-  const WebsiteLinkSection({
-    Key? key,
-    required this.title,
-    required this.description,
-    this.resume,
-  }) : super(key: key);
+  const WebsiteLinkSection({Key? key, required this.title, required this.description, this.resume}) : super(key: key);
 
   @override
   State<WebsiteLinkSection> createState() => WebsiteLinkSectionState();
 }
 
 class WebsiteLinkSectionState extends State<WebsiteLinkSection> {
-  final CustomWebsiteLinkSection _customWebsiteLinkSection =
-      CustomWebsiteLinkSection();
+  final CustomWebsiteLinkSection _customWebsiteLinkSection = CustomWebsiteLinkSection();
 
   List<Links> getData() {
-    return _customWebsiteLinkSection.item
-        .map((e) => {Links(e.label.controller.text, e.link.controller.text)})
-        .expand((element) => element)
-        .toList();
+    return _customWebsiteLinkSection.item.map((e) => {Links(e.label.controller.text, e.link.controller.text)}).expand((element) => element).toList();
   }
 
   addNewItem() {
-    _customWebsiteLinkSection.addNewItem();
-    setState(() {});
+    _customWebsiteLinkSection.addNewItem().then((value) => {setState(() {})});
   }
 
   removeItem(int index) {
-    _customWebsiteLinkSection.removeItem(index);
-    setState(() {});
+    _customWebsiteLinkSection.removeItem(index).then((value) => {setState(() {})});
   }
 
   @override
   void initState() {
-    _customWebsiteLinkSection.resume = widget.resume;
-    _customWebsiteLinkSection
-        .fetchWebsiteLinks()
-        .then((value) => {setState(() {})});
-    _customWebsiteLinkSection.patchResume().then((value) => {setState(() {})});
-
     super.initState();
+
+    _customWebsiteLinkSection.resume = widget.resume;
+    _customWebsiteLinkSection.fetchWebsiteLinks().then((value) => {setState(() {})});
+    _customWebsiteLinkSection.patchResume().then((value) => {setState(() {})});
   }
 
   @override
@@ -68,10 +55,12 @@ class WebsiteLinkSectionState extends State<WebsiteLinkSection> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       margin: const EdgeInsets.fromLTRB(0, 25, 0, 25),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
             margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
@@ -88,9 +77,7 @@ class WebsiteLinkSectionState extends State<WebsiteLinkSection> {
             ),
           ),
           Container(
-            margin: _customWebsiteLinkSection.item.isNotEmpty
-                ? const EdgeInsets.fromLTRB(0, 15, 0, 15)
-                : const EdgeInsets.fromLTRB(0, 0, 0, 0),
+            margin: _customWebsiteLinkSection.item.isNotEmpty ? const EdgeInsets.fromLTRB(0, 15, 0, 15) : const EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: Column(
               children: _customWebsiteLinkSection.item
                   .asMap()
@@ -115,9 +102,7 @@ class WebsiteLinkSectionState extends State<WebsiteLinkSection> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    _customWebsiteLinkSection.item.isNotEmpty
-                        ? const Text('Add one more link')
-                        : const Text('Add link'),
+                    _customWebsiteLinkSection.item.isNotEmpty ? const Text('Add one more link') : const Text('Add link'),
                     Container(
                       margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
                       child: const Icon(Icons.add),
@@ -142,11 +127,7 @@ class WebsiteLinkItem extends StatefulWidget {
   final CustomWebsiteLinkItem websiteLinkItem;
   final int index;
 
-  const WebsiteLinkItem(
-      {super.key,
-      required this.onDelete,
-      required this.websiteLinkItem,
-      required this.index});
+  const WebsiteLinkItem({super.key, required this.onDelete, required this.websiteLinkItem, required this.index});
 
   @override
   State<WebsiteLinkItem> createState() => _WebsiteLinkItemState();
@@ -157,6 +138,11 @@ class _WebsiteLinkItemState extends State<WebsiteLinkItem> {
   void initState() {
     super.initState();
     widget.websiteLinkItem.generateCustomInputFields();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -189,7 +175,7 @@ class _WebsiteLinkItemState extends State<WebsiteLinkItem> {
 ///
 ///
 class CustomWebsiteLinkItem {
-  final int id;
+  int id;
   final CustomInputType label;
   final CustomInputType link;
 
@@ -214,8 +200,7 @@ class CustomWebsiteLinkItem {
       controller.add(id);
     });
 
-    return controller
-        .debounceTime(const Duration(milliseconds: Constants.debounceTime));
+    return controller.debounceTime(const Duration(milliseconds: Constants.debounceTime));
   }
 
   // dispose
@@ -269,6 +254,7 @@ class CustomWebsiteLinkSection {
   Future<void> patchResume() async {
     if (resume.isNull) return;
     var websiteLinksToPatch = resume!.links;
+
     for (var websiteLink in websiteLinksToPatch) {
       var linkController = _addController();
       linkController.text = websiteLink.url;
@@ -278,20 +264,8 @@ class CustomWebsiteLinkSection {
 
       var itemToAdd = CustomWebsiteLinkItem(
         id: getLatestId(),
-        label: CustomInputType(
-          'Label',
-          'label',
-          true,
-          labelController,
-          TextInputType.text,
-        ),
-        link: CustomInputType(
-          'Link',
-          'link',
-          true,
-          linkController,
-          TextInputType.text,
-        ),
+        label: CustomInputType('Label', 'label', true, labelController, TextInputType.text),
+        link: CustomInputType('Link', 'link', true, linkController, TextInputType.text),
       );
 
       item.add(itemToAdd);
@@ -314,20 +288,8 @@ class CustomWebsiteLinkSection {
 
         var itemToAdd = CustomWebsiteLinkItem(
           id: element.id,
-          label: CustomInputType(
-            'Label',
-            'label',
-            true,
-            labelController,
-            TextInputType.text,
-          ),
-          link: CustomInputType(
-            'Link',
-            'link',
-            true,
-            linkController,
-            TextInputType.text,
-          ),
+          label: CustomInputType('Label', 'label', true, labelController, TextInputType.text),
+          link: CustomInputType('Link', 'link', true, linkController, TextInputType.text),
         );
 
         item.add(itemToAdd);
@@ -356,23 +318,9 @@ class CustomWebsiteLinkSection {
 
     var itemToAdd = CustomWebsiteLinkItem(
       id: id,
-      label: CustomInputType(
-        'Label',
-        'label',
-        true,
-        _addController(),
-        TextInputType.text,
-      ),
-      link: CustomInputType(
-        'Link',
-        'link',
-        true,
-        _addController(),
-        TextInputType.text,
-      ),
+      label: CustomInputType('Label', 'label', true, _addController(), TextInputType.text),
+      link: CustomInputType('Link', 'link', true, _addController(), TextInputType.text),
     );
-
-    item.add(itemToAdd);
 
     if (resume.isNull) {
       // add to the database
@@ -382,25 +330,21 @@ class CustomWebsiteLinkSection {
 
       var itemForDatabase = UserLink(
         itemToAdd.id,
-        itemToAdd.labelField.controller.text,
-        itemToAdd.linkField.controller.text,
+        itemToAdd.label.controller.text,
+        itemToAdd.link.controller.text,
         DateTime.now(),
         DateTime.now(),
       );
 
-      await DatabaseService().addUpdateUserLink(itemForDatabase);
-      _userLinks.add(itemForDatabase);
+      var addedItem = await DatabaseService().addUpdateUserLink(itemForDatabase);
+      _userLinks.add(addedItem!);
+      itemToAdd.id = addedItem.id;
+      item.add(itemToAdd);
+    } else {
+      item.add(itemToAdd);
     }
 
-    Fluttertoast.showToast(
-      msg: 'Added a new link',
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.green,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
+    Fluttertoast.showToast(msg: 'Added a new link', toastLength: Toast.LENGTH_LONG, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
   }
 
   // update the website link
@@ -423,15 +367,7 @@ class CustomWebsiteLinkSection {
       _userLinks[savedItemIndex] = itemForDatabase;
     }
 
-    Fluttertoast.showToast(
-      msg: 'Link updated',
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.green,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
+    Fluttertoast.showToast(msg: 'Link updated', toastLength: Toast.LENGTH_LONG, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
   }
 
   Future<void> removeItem(int index) async {
@@ -440,24 +376,14 @@ class CustomWebsiteLinkSection {
     item.removeAt(index);
 
     if (resume.isNull) {
-      var itemToRemoveDatabaseIndex =
-          _userLinks.indexWhere((element) => element.id == itemToRemove.id);
+      var itemToRemoveDatabaseIndex = _userLinks.indexWhere((element) => element.id == itemToRemove.id);
       if (itemToRemoveDatabaseIndex != -1) {
         _userLinks.removeAt(itemToRemoveDatabaseIndex);
 
-        await DatabaseService()
-            .deleteUserLink(DeleteDocuments(itemToRemove.id));
+        await DatabaseService().deleteUserLink(DeleteDocuments(itemToRemove.id));
       }
     }
 
-    Fluttertoast.showToast(
-      msg: 'Removed a link',
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.red,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
+    Fluttertoast.showToast(msg: 'Removed a link', toastLength: Toast.LENGTH_LONG, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white, fontSize: 16.0);
   }
 }

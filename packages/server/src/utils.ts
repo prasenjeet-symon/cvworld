@@ -4,6 +4,7 @@ import { v4 } from "uuid";
 import router from "./api";
 import routerMedia from "./api/media";
 import routerAuth from "./auth";
+import routerPublic from "./api-public";
 
 interface IGoogleAuthTokenResponse {
   userId: string;
@@ -13,7 +14,7 @@ interface IGoogleAuthTokenResponse {
   success: boolean;
 }
 
-export namespace DatabaseType { 
+export namespace DatabaseType {
   export interface Subscription {
     id: number;
     planName: string;
@@ -195,7 +196,7 @@ export namespace DatabaseType {
 
 /** Sign in/ Sign up with google */
 export async function signInOrSignUpWithGoogle(req: Request, res: Response): Promise<void> {
-  const token = req.headers.google_token as string;
+  const token = req.body.google_token as string;
   if (!token) {
     res.status(400).json({ error: "Missing google_token" });
     return;
@@ -227,24 +228,25 @@ export async function signInOrSignUpWithGoogle(req: Request, res: Response): Pro
 
 /** Verify the Google Auth Token */
 export async function verifyGoogleAuthToken(token: string): Promise<IGoogleAuthTokenResponse> {
-  const GOOGLE_CLIENT_TOKEN = process.env.GOOGLE_CLIENT_TOKEN;
-  if (!GOOGLE_CLIENT_TOKEN) {
-    throw new Error("GOOGLE_CLIENT_TOKEN not set");
-  }
-
-  const { OAuth2Client } = require("google-auth-library");
-  const client = new OAuth2Client(GOOGLE_CLIENT_TOKEN);
-  const ticket = await client.verifyIdToken({
-    idToken: token,
-    audience: GOOGLE_CLIENT_TOKEN,
+  const response = await axios.get("https://oauth2.googleapis.com/tokeninfo", {
+    params: {
+      access_token: token,
+    },
   });
 
-  const payload = ticket.getPayload();
+  const userInfoEndpoint = "https://www.googleapis.com/oauth2/v1/userinfo";
+  const userInfoResponse = await axios.get(userInfoEndpoint, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const userProfile = userInfoResponse.data;
+
+  const payload = response.data;
   const userId = payload.sub;
   const email = payload.email;
-  const name = payload.name;
-  const picture = payload.picture;
-
+  const name = userProfile.name;
+  const picture = userProfile.picture;
   return { success: true, userId, email, name, profile: picture };
 }
 
@@ -334,7 +336,13 @@ export async function signUpWithEmailAndPassword(req: Request, res: Response) {
 
     const userAlreadyExit = await doUserAlreadyExit(req.body.email);
     if (userAlreadyExit) {
-      res.status(500).json({ message: "User already exit" });
+      res.status(402).json({ message: "User already exit" });
+      return;
+    }
+
+    // if the password is week or less than 8 characters, return
+    if (isWeakPassword(password)) {
+      res.status(403).json({ message: "Password is weak" });
       return;
     }
 
@@ -379,7 +387,7 @@ export async function signInWithEmailAndPassword(req: Request, res: Response) {
 
   const oldUser = await doUserAlreadyExit(email);
   if (!oldUser) {
-    res.status(500).json({ message: "User does not exit" });
+    res.status(402).json({ message: "User does not exit" });
     return;
   }
 
@@ -392,7 +400,7 @@ export async function signInWithEmailAndPassword(req: Request, res: Response) {
     return;
   } else {
     // incorrect password
-    res.status(400).json({ message: "Incorrect password" });
+    res.status(403).json({ message: "Incorrect password" });
   }
 }
 
@@ -500,6 +508,7 @@ export function createServer() {
   app.use(express.urlencoded({ extended: true }));
   app.use(express.static(path.join(process.cwd(), "public")));
   app.use("/server/auth", routerAuth);
+  app.use("/server/api_public", routerPublic);
   app.use("/server/api", authenticateUser, router);
   app.use("/server/api/media", authenticateUser, routerMedia);
 
@@ -584,6 +593,7 @@ export interface Resume {
 }
 
 import { faker } from "@faker-js/faker";
+import axios from "axios";
 
 // Generate dummy data for the Resume interface
 export function generateDummyResume(): Resume {
@@ -1181,7 +1191,7 @@ export async function generatePDF(resume: Resume, resumeUUID?: string) {
   // upload to the public folder we are inside the src and public folder is one step above
   const publicFolderPath = path.join(process.cwd(), "public");
   // create the resume.pdf file in the public folder
-  const resumeName = resumeUUID ? resumeUUID :  v4();
+  const resumeName = resumeUUID ? resumeUUID : v4();
   const resumeFilePath = path.join(publicFolderPath, `${resumeName}.pdf`);
   await page.pdf({ path: resumeFilePath, format: "A4" });
   return `${resumeName}.pdf`;
@@ -1220,4 +1230,45 @@ export class BrowserPuppeteer {
 
     return BrowserPuppeteer.#instance;
   }
+}
+
+/** Sanitize the prisma data */
+export function sanitizePrismaData(data: any): any {
+  if (typeof data === "object" && data !== null) {
+    const sanitizedData: any = {};
+
+    Object.keys(data).forEach((key) => {
+      if (key !== "createdAt" && key !== "updatedAt" && key !== "id") {
+        sanitizedData[key] = sanitizePrismaData(data[key]);
+      }
+    });
+
+    return sanitizedData;
+  }
+
+  return data;
+}
+
+function isWeakPassword(password: string): boolean {
+  // Criteria for a weak password
+  const minLength = 8; // Minimum password length
+  const maxRepeatedCharacters = 2; // Maximum number of repeated characters allowed
+
+  // Check password length
+  if (password.length < minLength) {
+    return true; // Password is too short
+  }
+
+  // Check for repeated characters
+  const repeatedCharacters = new Map<string, number>();
+  for (const char of password) {
+    const count = repeatedCharacters.get(char) || 0;
+    repeatedCharacters.set(char, count + 1);
+    if (count + 1 > maxRepeatedCharacters) {
+      return true; // Password has too many repeated characters
+    }
+  }
+
+  // Password is considered strong
+  return false;
 }

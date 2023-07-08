@@ -1,5 +1,7 @@
 import express from "express";
-import { PrismaClientSingleton, Resume, generateDummyResume, generateImage, generatePDF } from "../utils";
+import { rmSync } from "fs";
+import path from "path";
+import { PrismaClientSingleton, Resume, generateDummyResume, generateImage, generatePDF, sanitizePrismaData } from "../utils";
 const router = express.Router();
 
 router.get("/", (req, res) => res.send("Hello World!"));
@@ -7,7 +9,7 @@ router.get("/", (req, res) => res.send("Hello World!"));
 /** Update the resume */
 router.post("/update_resume", async (req, res) => {
   if (!("resume" in req.body && "id" in req.body)) {
-    res.status(400).send("resume field is missing");
+    res.status(400).send("resume field and id field is missing");
     return;
   }
 
@@ -38,11 +40,18 @@ router.post("/update_resume", async (req, res) => {
   // we need to maintain the UUID of the file name
   const imageUrlOld = oldResume.resumes[0].imageUrl;
   const pdfUrlOld = oldResume.resumes[0].pdfUrl;
-  // extract the UUID ( e4102060-6754-4e78-8126-06c47af04c44.png )
+
   const uuidImageUrl = imageUrlOld.split(".")[0];
   const uuidPdfUrl = pdfUrlOld.split(".")[0];
 
-  const [imageUrl, pdfUrl] = await Promise.all([generateImage(resume, uuidImageUrl), generatePDF(resume, uuidPdfUrl)]);
+  // delete this file located in the public folder
+  const publicFolderPath = path.join(process.cwd(), "public");
+  const oldImageFilePath = path.join(publicFolderPath, `${uuidImageUrl}.png`);
+  const oldPdfFilePath = path.join(publicFolderPath, `${uuidPdfUrl}.pdf`);
+  rmSync(oldImageFilePath);
+  rmSync(oldPdfFilePath);
+
+  const [imageUrl, pdfUrl] = await Promise.all([generateImage(resume), generatePDF(resume)]);
 
   if (!imageUrl || !pdfUrl) {
     res.status(500).send("Something went wrong");
@@ -74,7 +83,8 @@ router.post("/update_resume", async (req, res) => {
     userId: oldResume.resumes[0].userId,
     createdAt: oldResume.resumes[0].createdAt,
     updatedAt: oldResume.resumes[0].updatedAt,
-    id: oldResume.resumes[0].id,
+    id: resumeID,
+    resume: resume,
   });
 });
 
@@ -165,6 +175,11 @@ router.post("/generated_resumes", async (req, res) => {
  *
  */
 router.post("/generated_resume", async (req, res) => {
+  if (!("resumeId" in req.body)) {
+    res.status(400).send("resumeId field is missing");
+    return;
+  }
+
   const email = res.locals.email;
   const resumeId = req.body.resumeId;
   const prisma = PrismaClientSingleton.prisma;
@@ -192,6 +207,64 @@ router.post("/generated_resume", async (req, res) => {
 
   res.json(resume.resumes[0]);
   return;
+});
+
+/**
+ *
+ *
+ * Delete the resume
+ */
+router.post("/delete_resume", async (req, res) => {
+  if (!("id" in req.body)) {
+    res.status(400).send("id field is missing");
+    return;
+  }
+
+  const email = res.locals.email;
+  const resumeID = req.body.id;
+
+  // fetch old resume
+  const prisma = PrismaClientSingleton.prisma;
+  const oldResume = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+    select: {
+      resumes: {
+        where: {
+          id: resumeID,
+        },
+      },
+    },
+  });
+
+  if (!oldResume) {
+    res.status(500).send("resume not found");
+    return;
+  }
+
+  // delete this file located in the public folder
+  const publicFolderPath = path.join(process.cwd(), "public");
+  const oldImageFilePath = path.join(publicFolderPath, `${oldResume.resumes[0].imageUrl}`);
+  const oldPdfFilePath = path.join(publicFolderPath, `${oldResume.resumes[0].pdfUrl}`);
+  rmSync(oldImageFilePath);
+  rmSync(oldPdfFilePath);
+
+  // delete the resume from database
+  await prisma.user.update({
+    where: { email: email },
+    data: {
+      resumes: {
+        delete: {
+          id: resumeID,
+        },
+      },
+    },
+  });
+
+  res.send({
+    id: resumeID,
+  });
 });
 
 /**
@@ -243,8 +316,8 @@ router.post("/add_update_user_details", async (req, res) => {
       data: {
         personalDetails: {
           upsert: {
-            create: req.body.personalDetails,
-            update: req.body.personalDetails,
+            create: sanitizePrismaData(req.body.personalDetails),
+            update: sanitizePrismaData(req.body.personalDetails),
           },
         },
       },
@@ -298,23 +371,47 @@ router.post("/add_update_user_skill", async (req, res) => {
   const prisma = PrismaClientSingleton.prisma;
 
   if ("skill" in req.body) {
-    await prisma.user.update({
+    const oldSkills = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+      select: {
+        skills: true,
+      },
+    });
+
+    const newSkills = await prisma.user.update({
       where: {
         email: email,
       },
       data: {
         skills: {
           upsert: {
-            where: { id: req.body.skill.id },
-            create: req.body.skill,
-            update: req.body.skill,
+            where: { id: +req.body.skill.id },
+            create: sanitizePrismaData(req.body.skill),
+            update: sanitizePrismaData(req.body.skill),
+          },
+        },
+      },
+      select: {
+        skills: {
+          orderBy: {
+            id: "desc",
           },
         },
       },
     });
 
-    res.json(req.body.skill);
-    return;
+    if (oldSkills?.skills.length !== newSkills.skills.length) {
+      // we have created new skills
+      const createdSkill = newSkills.skills[0];
+      res.json(createdSkill);
+      return;
+    } else {
+      // we have updated existing skills
+      res.json(req.body.skill);
+      return;
+    }
   } else {
     res.status(400).json({ message: "skill field is missing" });
     return;
@@ -336,13 +433,13 @@ router.post("/delete_user_skill", async (req, res) => {
       data: {
         skills: {
           delete: {
-            id: req.body.id,
+            id: +req.body.id,
           },
         },
       },
     });
 
-    res.json({ id: req.body.id });
+    res.json({ id: +req.body.id });
     return;
   } else {
     res.status(400).json({ message: "id field is missing" });
@@ -399,8 +496,8 @@ router.post("/add_update_user_hobby", async (req, res) => {
       data: {
         hobby: {
           upsert: {
-            create: req.body.hobby,
-            update: req.body.hobby,
+            create: sanitizePrismaData(req.body.hobby),
+            update: sanitizePrismaData(req.body.hobby),
           },
         },
       },
@@ -433,7 +530,7 @@ router.post("/delete_user_hobby", async (req, res) => {
     },
   });
 
-  res.json({ id: req.body });
+  res.json({ id: 0 });
   return;
 });
 
@@ -477,28 +574,27 @@ router.post("/get_user_professional_summary", async (req, res) => {
 router.post("/add_update_user_professional_summary", async (req, res) => {
   const email = res.locals.email;
   const prisma = PrismaClientSingleton.prisma;
-
-  if ("professionalSummary" in req.body) {
-    await prisma.user.update({
-      where: {
-        email: email,
-      },
-      data: {
-        professionalSummary: {
-          upsert: {
-            create: req.body.professionalSummary,
-            update: req.body.professionalSummary,
-          },
-        },
-      },
-    });
-
-    res.json(req.body.professionalSummary);
-    return;
-  } else {
+  if (!("professionalSummary" in req.body)) {
     res.status(400).json({ message: "professionalSummary field is missing" });
     return;
   }
+
+  await prisma.user.update({
+    where: {
+      email: email,
+    },
+    data: {
+      professionalSummary: {
+        upsert: {
+          create: sanitizePrismaData(req.body.professionalSummary),
+          update: sanitizePrismaData(req.body.professionalSummary),
+        },
+      },
+    },
+  });
+
+  res.json(req.body.professionalSummary);
+  return;
 });
 
 /**
@@ -521,7 +617,7 @@ router.post("/delete_user_professional_summary", async (req, res) => {
     },
   });
 
-  res.json({});
+  res.json({ id: 0 });
   return;
 });
 /**
@@ -566,23 +662,47 @@ router.post("/add_update_user_language", async (req, res) => {
   const prisma = PrismaClientSingleton.prisma;
 
   if ("language" in req.body) {
-    await prisma.user.update({
+    const oldLanguages = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+      select: {
+        languages: true,
+      },
+    });
+
+    const newLanguages = await prisma.user.update({
       where: {
         email: email,
       },
       data: {
         languages: {
           upsert: {
-            where: { id: req.body.language.id },
-            create: req.body.language,
-            update: req.body.language,
+            where: { id: +req.body.language.id },
+            create: sanitizePrismaData(req.body.language),
+            update: sanitizePrismaData(req.body.language),
+          },
+        },
+      },
+      select: {
+        languages: {
+          orderBy: {
+            id: "desc",
           },
         },
       },
     });
 
-    res.json(req.body.language);
-    return;
+    if (oldLanguages?.languages.length !== newLanguages.languages.length) {
+      // we have created new languages
+      const createdLanguage = newLanguages.languages[0];
+      res.json(createdLanguage);
+      return;
+    } else {
+      // we have updated existing languages
+      res.json(req.body.language);
+      return;
+    }
   } else {
     res.status(400).json({ message: "language field is missing" });
     return;
@@ -605,12 +725,12 @@ router.post("/delete_user_language", async (req, res) => {
       },
       data: {
         languages: {
-          delete: { id: req.body.id },
+          delete: { id: +req.body.id },
         },
       },
     });
 
-    res.json({ id: req.body.id });
+    res.json({ id: +req.body.id });
     return;
   } else {
     res.status(400).json({ message: "id field is missing" });
@@ -660,23 +780,47 @@ router.post("/add_update_user_course", async (req, res) => {
   const prisma = PrismaClientSingleton.prisma;
 
   if ("course" in req.body) {
-    await prisma.user.update({
+    const oldCourses = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+      select: {
+        courses: true,
+      },
+    });
+
+    const newCourses = await prisma.user.update({
       where: {
         email: email,
       },
       data: {
         courses: {
           upsert: {
-            where: { id: req.body.course.id },
-            create: req.body.course,
-            update: req.body.course,
+            where: { id: +req.body.course.id },
+            create: sanitizePrismaData(req.body.course),
+            update: sanitizePrismaData(req.body.course),
+          },
+        },
+      },
+      select: {
+        courses: {
+          orderBy: {
+            id: "desc",
           },
         },
       },
     });
 
-    res.json(req.body.course);
-    return;
+    if (oldCourses?.courses.length !== newCourses.courses.length) {
+      // we have created new courses
+      const createdCourse = newCourses.courses[0];
+      res.json(createdCourse);
+      return;
+    } else {
+      // we have updated existing courses
+      res.json(req.body.course);
+      return;
+    }
   } else {
     res.status(400).json({ message: "course field is missing" });
     return;
@@ -699,12 +843,12 @@ router.post("/delete_user_course", async (req, res) => {
       },
       data: {
         courses: {
-          delete: { id: req.body.id },
+          delete: { id: +req.body.id },
         },
       },
     });
 
-    res.json({ id: req.body.id });
+    res.json({ id: +req.body.id });
     return;
   } else {
     res.status(400).json({ message: "id field is missing" });
@@ -753,23 +897,47 @@ router.post("/add_update_user_education", async (req, res) => {
   const prisma = PrismaClientSingleton.prisma;
 
   if ("education" in req.body) {
-    await prisma.user.update({
+    const oldEducations = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+      select: {
+        educations: true,
+      },
+    });
+
+    const newEducations = await prisma.user.update({
       where: {
         email: email,
       },
       data: {
         educations: {
           upsert: {
-            where: { id: req.body.education.id },
-            create: req.body.education,
-            update: req.body.education,
+            where: { id: +req.body.education.id },
+            create: sanitizePrismaData(req.body.education),
+            update: sanitizePrismaData(req.body.education),
+          },
+        },
+      },
+      select: {
+        educations: {
+          orderBy: {
+            id: "desc",
           },
         },
       },
     });
 
-    res.json(req.body.education);
-    return;
+    if (oldEducations?.educations.length !== newEducations.educations.length) {
+      // we have created new educations
+      const createdEducation = newEducations.educations[0];
+      res.json(createdEducation);
+      return;
+    } else {
+      // we have updated existing educations
+      res.json(req.body.education);
+      return;
+    }
   } else {
     res.status(400).json({ message: "education field is missing" });
     return;
@@ -791,12 +959,12 @@ router.post("/delete_user_education", async (req, res) => {
       },
       data: {
         educations: {
-          delete: { id: req.body.id },
+          delete: { id: +req.body.id },
         },
       },
     });
 
-    res.json({ id: req.body.id });
+    res.json({ id: +req.body.id });
     return;
   } else {
     res.status(400).json({ message: "id field is missing" });
@@ -845,23 +1013,47 @@ router.post("/add_update_user_employment_history", async (req, res) => {
   const prisma = PrismaClientSingleton.prisma;
 
   if ("employmentHistory" in req.body) {
-    await prisma.user.update({
+    const oldEmploymentHistories = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+      select: {
+        employmentHistories: true,
+      },
+    });
+
+    const newEmploymentHistories = await prisma.user.update({
       where: {
         email: email,
       },
       data: {
         employmentHistories: {
           upsert: {
-            where: { id: req.body.employmentHistory.id },
-            create: req.body.employmentHistory,
-            update: req.body.employmentHistory,
+            where: { id: +req.body.employmentHistory.id },
+            create: sanitizePrismaData(req.body.employmentHistory),
+            update: sanitizePrismaData(req.body.employmentHistory),
+          },
+        },
+      },
+      select: {
+        employmentHistories: {
+          orderBy: {
+            id: "desc",
           },
         },
       },
     });
 
-    res.json(req.body.employmentHistory);
-    return;
+    if (oldEmploymentHistories?.employmentHistories.length !== newEmploymentHistories.employmentHistories.length) {
+      // we have created new employmentHistories
+      const createdEmploymentHistory = newEmploymentHistories.employmentHistories[0];
+      res.json(createdEmploymentHistory);
+      return;
+    } else {
+      // we have updated existing employmentHistories
+      res.json(req.body.employmentHistory);
+      return;
+    }
   } else {
     res.status(400).json({ message: "employmentHistory field is missing" });
     return;
@@ -883,12 +1075,12 @@ router.post("/delete_user_employment_history", async (req, res) => {
       },
       data: {
         employmentHistories: {
-          delete: { id: req.body.id },
+          delete: { id: +req.body.id },
         },
       },
     });
 
-    res.json({ id: req.body.id });
+    res.json({ id: +req.body.id });
     return;
   } else {
     res.status(400).json({ message: "id field is missing" });
@@ -938,23 +1130,47 @@ router.post("/add_update_user_internship", async (req, res) => {
   const prisma = PrismaClientSingleton.prisma;
 
   if ("internship" in req.body) {
-    await prisma.user.update({
+    const oldInternships = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+      select: {
+        internships: true,
+      },
+    });
+
+    const newInternships = await prisma.user.update({
       where: {
         email: email,
       },
       data: {
         internships: {
           upsert: {
-            where: { id: req.body.internship.id },
-            create: req.body.internship,
-            update: req.body.internship,
+            where: { id: +req.body.internship.id },
+            create: sanitizePrismaData(req.body.internship),
+            update: sanitizePrismaData(req.body.internship),
+          },
+        },
+      },
+      select: {
+        internships: {
+          orderBy: {
+            id: "desc",
           },
         },
       },
     });
 
-    res.json(req.body.internship);
-    return;
+    if (oldInternships?.internships.length !== newInternships.internships.length) {
+      // we have created new internships
+      const createdInternship = newInternships.internships[0];
+      res.json(createdInternship);
+      return;
+    } else {
+      // we have updated existing internships
+      res.json(req.body.internship);
+      return;
+    }
   } else {
     res.status(400).json({ message: "internship field is missing" });
     return;
@@ -977,12 +1193,12 @@ router.post("/delete_user_internship", async (req, res) => {
       },
       data: {
         internships: {
-          delete: { id: req.body.id },
+          delete: { id: +req.body.id },
         },
       },
     });
 
-    res.json({ id: req.body.id });
+    res.json({ id: +req.body.id });
     return;
   } else {
     res.status(400).json({ message: "id field is missing" });
@@ -1032,23 +1248,47 @@ router.post("/add_update_user_link", async (req, res) => {
   const prisma = PrismaClientSingleton.prisma;
 
   if ("link" in req.body) {
-    await prisma.user.update({
+    const oldLinks = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+      select: {
+        links: true,
+      },
+    });
+
+    const newLinks = await prisma.user.update({
       where: {
         email: email,
       },
       data: {
         links: {
           upsert: {
-            where: { id: req.body.link.id },
-            create: req.body.link,
-            update: req.body.link,
+            where: { id: +req.body.link.id },
+            create: sanitizePrismaData(req.body.link),
+            update: sanitizePrismaData(req.body.link),
+          },
+        },
+      },
+      select: {
+        links: {
+          orderBy: {
+            id: "desc",
           },
         },
       },
     });
 
-    res.json(req.body.link);
-    return;
+    if (oldLinks?.links.length !== newLinks.links.length) {
+      // we have created new links
+      const createdLink = newLinks.links[0];
+      res.json(createdLink);
+      return;
+    } else {
+      // we have updated existing links
+      res.json(req.body.link);
+      return;
+    }
   } else {
     res.status(400).json({ message: "link field is missing" });
     return;
@@ -1071,12 +1311,12 @@ router.post("/delete_user_link", async (req, res) => {
       },
       data: {
         links: {
-          delete: { id: req.body.id },
+          delete: { id: +req.body.id },
         },
       },
     });
 
-    res.json({ id: req.body.id });
+    res.json({ id: +req.body.id });
     return;
   } else {
     res.status(400).json({ message: "id field is missing" });
@@ -1132,8 +1372,8 @@ router.post("/add_update_user_subscription", async (req, res) => {
       data: {
         subscription: {
           upsert: {
-            create: req.body.subscription,
-            update: req.body.subscription,
+            create: sanitizePrismaData(req.body.subscription),
+            update: sanitizePrismaData(req.body.subscription),
           },
         },
       },
@@ -1168,7 +1408,7 @@ router.post("/delete_user_subscription", async (req, res) => {
       },
     });
 
-    res.json({ id: req.body.id });
+    res.json({ id: 0 });
     return;
   } else {
     res.status(400).json({ message: "id field is missing" });

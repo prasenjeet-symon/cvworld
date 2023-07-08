@@ -1,8 +1,17 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_client/client/pages/dashboard/header.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/courses-section.dart';
+import 'package:flutter_client/client/pages/make-cv-pages/education-section.dart';
+import 'package:flutter_client/client/pages/make-cv-pages/employment-history-section.dart';
+import 'package:flutter_client/client/pages/make-cv-pages/hobbie-section.dart';
+import 'package:flutter_client/client/pages/make-cv-pages/internship-section.dart';
+import 'package:flutter_client/client/pages/make-cv-pages/language-section.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/personal-details-section.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_client/client/pages/make-cv-pages/professional-summry-section.dart';
+import 'package:flutter_client/client/pages/make-cv-pages/skills-section.dart';
+import 'package:flutter_client/client/pages/make-cv-pages/website-links-section.dart';
+import 'package:flutter_client/client/utils.dart';
 
 @RoutePage()
 class AccountSettingPage extends StatefulWidget {
@@ -39,6 +48,7 @@ class _AccountSettingDesktopState extends State<AccountSettingDesktop> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            DashboardHeader(),
             SizedBox(
               width: double.infinity,
               child: Row(
@@ -50,6 +60,15 @@ class _AccountSettingDesktopState extends State<AccountSettingDesktop> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        Container(
+                            margin: EdgeInsets.fromLTRB(0, 25, 0, 0),
+                            child: Row(children: [
+                              // ignore: deprecated_member_use
+                              BackButtonApp(onPressed: () {
+                                context.popRoute(AccountSettingPage());
+                              }),
+                              Expanded(child: SizedBox()),
+                            ])),
                         PricingPlanCard(),
                         AccountCard(),
                       ],
@@ -87,10 +106,7 @@ class PricingPlanCard extends StatelessWidget {
             margin: const EdgeInsets.fromLTRB(20, 10, 0, 10),
             child: Text(
               'YOUR PLAN',
-              style: TextStyle(
-                  fontSize: 15,
-                  color: Colors.black.withOpacity(0.6),
-                  fontWeight: FontWeight.w500),
+              style: TextStyle(fontSize: 15, color: Colors.black.withOpacity(0.6), fontWeight: FontWeight.w500),
             ),
           ),
           Container(
@@ -113,10 +129,7 @@ class PricingPlanCard extends StatelessWidget {
                     children: [
                       const Text(
                         'Free Plan',
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 18),
+                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 18),
                       ),
                       Container(
                         margin: const EdgeInsets.fromLTRB(0, 5, 0, 0),
@@ -151,60 +164,23 @@ class AccountCard extends StatefulWidget {
 }
 
 class _AccountCardState extends State<AccountCard> {
-  // global key
-  final GlobalKey<PersonalDetailSectionState> personalDetailSection =
-      GlobalKey();
-
-  // Save the personal details
-  Future<void> _savePersonalDetails() async {
-    await personalDetailSection.currentState!.updatePersonalDetails();
-    // Open the toast
-    Fluttertoast.showToast(
-      msg: 'Personal details saved',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: Colors.green.withOpacity(0.8),
-      textColor: Colors.white,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return const SizedBox(
       width: double.infinity,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Column(
           children: [
-            Column(
-              children: [
-                PersonalDetailSection(
-                    key: personalDetailSection,
-                    title: 'Personal Details',
-                    description: ''),
-                Container(
-                  margin: const EdgeInsets.fromLTRB(0, 5, 0, 20),
-                  child: Row(
-                    children: [
-                      const Expanded(child: SizedBox()),
-                      TextButton(
-                          style: TextButton.styleFrom(
-                              padding:
-                                  const EdgeInsets.fromLTRB(15, 15, 15, 15)),
-                          onPressed: () {
-                            _savePersonalDetails();
-                          },
-                          child: const Text('Save')),
-                    ],
-                  ),
-                )
-              ],
-            ),
-            const Column(
-              children: [CourseSection(title: 'Courses', description: '')],
-            ),
-            const Column(
-              children: [],
-            )
+            Column(children: [PersonalDetailSection(title: 'Personal Details', description: '')]),
+            Column(children: [ProfessionalSummary(title: 'Professional Summary', description: '')]),
+            Column(children: [EmploymentHistorySection(title: 'Employment History', description: '')]),
+            Column(children: [EducationSection(title: 'Education', description: '')]),
+            Column(children: [WebsiteLinkSection(title: 'Website Links', description: '')]),
+            Column(children: [SkillSection(title: 'Skills Section', description: '')]),
+            Column(children: [HobbiesSection(title: 'Hobby Section', description: '')]),
+            Column(children: [InternshipSection(title: 'Internship', description: '')]),
+            Column(children: [CourseSection(title: 'Courses', description: '')]),
+            Column(children: [LanguageSection(title: 'Languages', description: '')]),
           ],
         )
       ]),
@@ -231,7 +207,6 @@ class AccountSettingMobile extends StatefulWidget {
 class _AccountSettingMobileState extends State<AccountSettingMobile> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-        body: SingleChildScrollView(child: Column(children: [])));
+    return const Scaffold(body: SingleChildScrollView(child: Column(children: [])));
   }
 }

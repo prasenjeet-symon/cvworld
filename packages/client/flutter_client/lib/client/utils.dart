@@ -11,12 +11,11 @@ class Constants {
   static const String appName = 'CV World';
   static const String appVersion = '1.0';
   static const int debounceTime = 1000;
+  static const googleClientId = '599994784077-8b5i8jsi9s75ddqv8p8v1031gk2mise7.apps.googleusercontent.com';
 }
 
 double pageWidth(BuildContext context) {
-  return MediaQuery.of(context).size.width >= 600
-      ? MediaQuery.of(context).size.width * 0.7
-      : MediaQuery.of(context).size.width;
+  return MediaQuery.of(context).size.width >= 600 ? MediaQuery.of(context).size.width * 0.7 : MediaQuery.of(context).size.width;
 }
 
 int flexNumber(BuildContext context) {
@@ -29,6 +28,19 @@ class AuthGuard extends AutoRouteGuard {
     var canNavigate = await DatabaseService().isAuthenticated();
     if (!canNavigate) {
       router.navigateNamed('/signin');
+      return;
+    } else {
+      resolver.next(canNavigate);
+    }
+  }
+}
+
+class RouteGuard extends AutoRouteGuard {
+  @override
+  void onNavigation(NavigationResolver resolver, StackRouter router) async {
+    var canNavigate = await DatabaseService().isAuthenticated();
+    if (canNavigate) {
+      router.navigateNamed('/dashboard');
       return;
     } else {
       resolver.next(canNavigate);
@@ -60,9 +72,7 @@ class BackButtonApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          padding: const EdgeInsets.fromLTRB(25, 15, 25, 15)),
+      style: ElevatedButton.styleFrom(backgroundColor: Colors.white, padding: const EdgeInsets.fromLTRB(25, 15, 25, 15)),
       child: const Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -92,4 +102,54 @@ String toUtcJsonDateTimeFromDateTime(DateTime dateTime) {
   String jsonDateTime = utcDateTime.toIso8601String();
 
   return jsonDateTime;
+}
+
+// For the user already exit
+class UserAlreadyExistsException implements Exception {
+  final String message;
+
+  UserAlreadyExistsException(this.message);
+
+  @override
+  String toString() => 'UserAlreadyExistsException: $message';
+}
+
+// For no user exist
+class NoUserException implements Exception {
+  final String message;
+
+  NoUserException(this.message);
+
+  @override
+  String toString() => 'NoUserException: $message';
+}
+
+// For the week password
+class WeekPasswordException implements Exception {
+  final String message;
+
+  WeekPasswordException(this.message);
+
+  @override
+  String toString() => 'WeekPasswordException: $message';
+}
+
+// For the wrong password exception
+class WrongPasswordException implements Exception {
+  final String message;
+
+  WrongPasswordException(this.message);
+
+  @override
+  String toString() => 'WrongPasswordException: $message';
+}
+
+// Input fields are required
+class RequiredFieldException implements Exception {
+  final String message;
+
+  RequiredFieldException(this.message);
+
+  @override
+  String toString() => 'RequiredFieldException: $message';
 }

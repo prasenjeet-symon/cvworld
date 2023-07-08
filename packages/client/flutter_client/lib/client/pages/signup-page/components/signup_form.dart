@@ -1,10 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/utils.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flutter_client/client/datasource.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class SignUpForm extends StatefulWidget {
   const SignUpForm({super.key});
@@ -18,6 +19,7 @@ class _SignUpFormState extends State<SignUpForm> {
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  final GoogleSignIn _googleSignIn = GoogleSignIn(clientId: Constants.googleClientId);
 
   Future<void> signUp(BuildContext ctx) async {
     var name = nameController.text;
@@ -25,35 +27,45 @@ class _SignUpFormState extends State<SignUpForm> {
     var password = passwordController.text;
 
     if (!(name.isNotEmpty && email.isNotEmpty && password.isNotEmpty)) {
+      Fluttertoast.showToast(msg: 'Please fill all fields', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.red.withOpacity(0.8), textColor: Colors.white);
       return;
     }
 
     try {
-      await DatabaseService()
-          .signUpUserWithEmailAndPassword(email, password, name);
+      await DatabaseService().signUpUserWithEmailAndPassword(email, password, name);
     } catch (e) {
-      await Fluttertoast.showToast(
-        msg: 'Something went wrong...',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.8),
-        textColor: Colors.white,
-      );
+      if (e is RequiredFieldException) {
+        await Fluttertoast.showToast(msg: e.message, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.red.withOpacity(0.8), textColor: Colors.white);
+      }
 
-      // ignore: use_build_context_synchronously
-      ctx.navigateNamedTo('/signin');
+      if (e is UserAlreadyExistsException) {
+        await Fluttertoast.showToast(msg: e.message, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.red.withOpacity(0.8), textColor: Colors.white);
+        // ignore: use_build_context_synchronously
+        ctx.navigateNamedTo('/signin');
+      }
+
+      if (e is WeekPasswordException) {
+        await Fluttertoast.showToast(msg: e.message, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.red.withOpacity(0.8), textColor: Colors.white);
+      }
+
       return;
     }
 
-    await Fluttertoast.showToast(
-      msg: 'Welcome $name',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: Colors.red.withOpacity(0.8),
-      textColor: Colors.white,
-    );
+    await Fluttertoast.showToast(msg: 'Welcome $name', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.red.withOpacity(0.8), textColor: Colors.white);
     // ignore: use_build_context_synchronously
     ctx.navigateNamedTo('/dashboard');
+  }
+
+  // Sign in with google
+  void signInWithGoogle(BuildContext ctx) async {
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+    if (googleUser != null) {
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      var accessToken = googleAuth.accessToken!;
+      await DatabaseService().continueWithGoogle(accessToken);
+      // ignore: use_build_context_synchronously
+      ctx.navigateNamedTo('/dashboard');
+    }
   }
 
   @override
@@ -104,8 +116,7 @@ class _SignUpFormState extends State<SignUpForm> {
                             margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
                             child: const Text(
                               'Create an account',
-                              style: TextStyle(
-                                  fontSize: 30, fontWeight: FontWeight.w600),
+                              style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
                               textAlign: TextAlign.start,
                             ),
                           ),
@@ -113,8 +124,7 @@ class _SignUpFormState extends State<SignUpForm> {
                             margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
                             child: const Text(
                               'Take first step toward your dream job with cvworld',
-                              style: TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.w400),
+                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
                               textAlign: TextAlign.start,
                             ),
                           ),
@@ -153,27 +163,24 @@ class _SignUpFormState extends State<SignUpForm> {
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(50),
                                       ),
-                                      padding: const EdgeInsets.fromLTRB(
-                                          20, 20, 20, 20)),
+                                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20)),
                                   child: const Text('Create account'))),
                           Container(
                             width: double.infinity,
                             margin: const EdgeInsets.fromLTRB(0, 10, 0, 15),
                             child: OutlinedButton(
-                              onPressed: () => {},
+                              onPressed: () => {signInWithGoogle(context)},
                               style: OutlinedButton.styleFrom(
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(50),
                                   ),
-                                  padding: const EdgeInsets.fromLTRB(
-                                      20, 20, 20, 20)),
+                                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 20)),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   const FaIcon(FontAwesomeIcons.google),
                                   Container(
-                                    margin:
-                                        const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                    margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                                     child: const Text('Sign up with google'),
                                   )
                                 ],
@@ -191,8 +198,7 @@ class _SignUpFormState extends State<SignUpForm> {
                                   children: [
                                     TextSpan(
                                       text: 'SignIn',
-                                      style:
-                                          const TextStyle(color: Colors.blue),
+                                      style: const TextStyle(color: Colors.blue),
                                       // Add your onPressed logic for SignUp here
                                       recognizer: TapGestureRecognizer()
                                         ..onTap = () {

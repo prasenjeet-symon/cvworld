@@ -15,20 +15,14 @@ class InternshipSection extends StatefulWidget {
   final String description;
   final Resume? resume;
 
-  const InternshipSection({
-    Key? key,
-    required this.title,
-    required this.description,
-    this.resume,
-  }) : super(key: key);
+  const InternshipSection({Key? key, required this.title, required this.description, this.resume}) : super(key: key);
 
   @override
   State<InternshipSection> createState() => InternshipSectionState();
 }
 
 class InternshipSectionState extends State<InternshipSection> {
-  final CustomInternshipSection _customInternshipSection =
-      CustomInternshipSection();
+  final CustomInternshipSection _customInternshipSection = CustomInternshipSection();
 
   List<Internship> getData() {
     return _customInternshipSection.item
@@ -36,8 +30,8 @@ class InternshipSectionState extends State<InternshipSection> {
               Internship(
                 element.jobTitle.controller.text,
                 element.employer.controller.text,
-                DateTime.parse(element.startDate.controller.text),
-                DateTime.parse(element.endDate.controller.text),
+                DateTime.parse(element.startDate.controller.text.isEmpty ? DateTime.now().toIso8601String() : element.startDate.controller.text),
+                DateTime.parse(element.endDate.controller.text.isEmpty ? DateTime.now().toIso8601String() : element.endDate.controller.text),
                 element.city.controller.text,
                 element.description.controller.text,
               )
@@ -47,24 +41,20 @@ class InternshipSectionState extends State<InternshipSection> {
   }
 
   addNewItem() {
-    _customInternshipSection.addNewItem();
-    setState(() {});
+    _customInternshipSection.addNewItem().then((value) => {setState(() {})});
   }
 
   removeItem(int index) {
-    _customInternshipSection.removeItem(index);
-    setState(() {});
+    _customInternshipSection.removeItem(index).then((value) => {setState(() {})});
   }
 
   @override
   void initState() {
-    _customInternshipSection.resume = widget.resume;
-    _customInternshipSection
-        .fetchInternships()
-        .then((value) => {setState(() {})});
-    _customInternshipSection.patchResume().then((value) => {setState(() {})});
-
     super.initState();
+
+    _customInternshipSection.resume = widget.resume;
+    _customInternshipSection.fetchInternships().then((value) => {setState(() {})});
+    _customInternshipSection.patchResume().then((value) => {setState(() {})});
   }
 
   @override
@@ -76,10 +66,12 @@ class InternshipSectionState extends State<InternshipSection> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       margin: const EdgeInsets.fromLTRB(0, 25, 0, 25),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
             margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
@@ -96,9 +88,7 @@ class InternshipSectionState extends State<InternshipSection> {
             ),
           ),
           Container(
-            margin: _customInternshipSection.item.isNotEmpty
-                ? const EdgeInsets.fromLTRB(0, 15, 0, 15)
-                : const EdgeInsets.fromLTRB(0, 0, 0, 0),
+            margin: _customInternshipSection.item.isNotEmpty ? const EdgeInsets.fromLTRB(0, 15, 0, 15) : const EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -126,9 +116,7 @@ class InternshipSectionState extends State<InternshipSection> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    _customInternshipSection.item.isNotEmpty
-                        ? const Text('Add one more internship')
-                        : const Text('Add internship'),
+                    _customInternshipSection.item.isNotEmpty ? const Text('Add one more internship') : const Text('Add internship'),
                     Container(
                       margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
                       child: const Icon(Icons.add),
@@ -155,11 +143,7 @@ class InternshipItem extends StatefulWidget {
   final CustomInternshipItem customInternshipItem;
   final int index;
 
-  const InternshipItem(
-      {super.key,
-      required this.onDelete,
-      required this.customInternshipItem,
-      required this.index});
+  const InternshipItem({super.key, required this.onDelete, required this.customInternshipItem, required this.index});
 
   @override
   State<InternshipItem> createState() => _InternshipItemState();
@@ -218,7 +202,7 @@ class _InternshipItemState extends State<InternshipItem> {
 ///
 ///
 class CustomInternshipItem {
-  final int id;
+  int id;
   final CustomInputType jobTitle;
   final CustomInputType employer;
   final CustomInputType startDate;
@@ -272,8 +256,7 @@ class CustomInternshipItem {
       controller.add(id);
     });
 
-    return controller
-        .debounceTime(const Duration(milliseconds: Constants.debounceTime));
+    return controller.debounceTime(const Duration(milliseconds: Constants.debounceTime));
   }
 
   // dispose
@@ -363,8 +346,8 @@ class CustomInternshipSection {
   // patch the resume
   Future<void> patchResume() async {
     if (resume.isNull) return;
-
     var internshipToPatch = resume!.internship;
+
     for (var internship in internshipToPatch) {
       var jobController = _addController();
       jobController.text = internship.job;
@@ -386,48 +369,12 @@ class CustomInternshipSection {
 
       var itemToAdd = CustomInternshipItem(
         id: getLatestId(),
-        jobTitle: CustomInputType(
-          'Job Title',
-          'jobTitle',
-          true,
-          jobController,
-          TextInputType.text,
-        ),
-        employer: CustomInputType(
-          'Employer',
-          'employer',
-          true,
-          employerController,
-          TextInputType.text,
-        ),
-        startDate: CustomInputType(
-          'Start Date',
-          'startDate',
-          true,
-          startDateController,
-          TextInputType.datetime,
-        ),
-        endDate: CustomInputType(
-          'End Date',
-          'endDate',
-          true,
-          endDateController,
-          TextInputType.datetime,
-        ),
-        city: CustomInputType(
-          'City',
-          'city',
-          true,
-          cityController,
-          TextInputType.text,
-        ),
-        description: CustomInputType(
-          'Description',
-          'description',
-          true,
-          descriptionController,
-          TextInputType.text,
-        ),
+        jobTitle: CustomInputType('Job Title', 'jobTitle', true, jobController, TextInputType.text),
+        employer: CustomInputType('Employer', 'employer', true, employerController, TextInputType.text),
+        startDate: CustomInputType('Start Date', 'startDate', true, startDateController, TextInputType.datetime),
+        endDate: CustomInputType('End Date', 'endDate', true, endDateController, TextInputType.datetime),
+        city: CustomInputType('City', 'city', true, cityController, TextInputType.text),
+        description: CustomInputType('Description', 'description', true, descriptionController, TextInputType.text),
       );
 
       item.add(itemToAdd);
@@ -464,48 +411,12 @@ class CustomInternshipSection {
 
       var databaseItem = CustomInternshipItem(
         id: internship.id,
-        jobTitle: CustomInputType(
-          'Job Title',
-          'jobTitle',
-          true,
-          jobController,
-          TextInputType.text,
-        ),
-        employer: CustomInputType(
-          'Employer',
-          'employer',
-          true,
-          employerController,
-          TextInputType.text,
-        ),
-        startDate: CustomInputType(
-          'Start Date',
-          'startDate',
-          true,
-          startDateController,
-          TextInputType.datetime,
-        ),
-        endDate: CustomInputType(
-          'End Date',
-          'endDate',
-          true,
-          endDateController,
-          TextInputType.datetime,
-        ),
-        city: CustomInputType(
-          'City',
-          'city',
-          true,
-          cityController,
-          TextInputType.text,
-        ),
-        description: CustomInputType(
-          'Description',
-          'description',
-          true,
-          descriptionController,
-          TextInputType.text,
-        ),
+        jobTitle: CustomInputType('Job Title', 'jobTitle', true, jobController, TextInputType.text),
+        employer: CustomInputType('Employer', 'employer', true, employerController, TextInputType.text),
+        startDate: CustomInputType('Start Date', 'startDate', true, startDateController, TextInputType.datetime),
+        endDate: CustomInputType('End Date', 'endDate', true, endDateController, TextInputType.datetime),
+        city: CustomInputType('City', 'city', true, cityController, TextInputType.text),
+        description: CustomInputType('Description', 'description', true, descriptionController, TextInputType.text),
       );
 
       item.add(databaseItem);
@@ -529,12 +440,8 @@ class CustomInternshipSection {
       itemToUpdate.id,
       itemToUpdate.jobTitleField.controller.text,
       itemToUpdate.employerField.controller.text,
-      itemToUpdate.startDateField.controller.text.isEmpty
-          ? DateTime.now()
-          : DateTime.parse(itemToUpdate.startDateField.controller.text),
-      itemToUpdate.endDateField.controller.text.isEmpty
-          ? DateTime.now()
-          : DateTime.parse(itemToUpdate.endDateField.controller.text),
+      itemToUpdate.startDateField.controller.text.isEmpty ? DateTime.now() : DateTime.parse(itemToUpdate.startDateField.controller.text),
+      itemToUpdate.endDateField.controller.text.isEmpty ? DateTime.now() : DateTime.parse(itemToUpdate.endDateField.controller.text),
       itemToUpdate.cityField.controller.text,
       itemToUpdate.descriptionField.controller.text,
       DateTime.now(),
@@ -542,21 +449,12 @@ class CustomInternshipSection {
     );
 
     await DatabaseService().addUpdateUserInternship(updatedItemForDatabase);
-    var savedItemIndex = _userInternships
-        .indexWhere((element) => element.id == updatedItemForDatabase.id);
+    var savedItemIndex = _userInternships.indexWhere((element) => element.id == updatedItemForDatabase.id);
     if (savedItemIndex != -1) {
       _userInternships[savedItemIndex] = updatedItemForDatabase;
     }
 
-    Fluttertoast.showToast(
-      msg: 'Updated internship...',
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.CENTER,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.green.withOpacity(0.8),
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
+    Fluttertoast.showToast(msg: 'Updated internship...', toastLength: Toast.LENGTH_LONG, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.green.withOpacity(0.8), textColor: Colors.white, fontSize: 16.0);
   }
 
   // Delete the internship given index
@@ -566,24 +464,14 @@ class CustomInternshipSection {
     itemToDelete.dispose();
 
     if (resume.isNull) {
-      var itemToDeleteDatabaseIndex = _userInternships
-          .indexWhere((element) => element.id == itemToDelete.id);
+      var itemToDeleteDatabaseIndex = _userInternships.indexWhere((element) => element.id == itemToDelete.id);
       if (itemToDeleteDatabaseIndex != -1) {
         _userInternships.removeAt(itemToDeleteDatabaseIndex);
-        await DatabaseService()
-            .deleteUserInternship(DeleteDocuments(itemToDelete.id));
+        await DatabaseService().deleteUserInternship(DeleteDocuments(itemToDelete.id));
       }
     }
 
-    Fluttertoast.showToast(
-      msg: 'Deleted...',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.red.withOpacity(0.8),
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
+    Fluttertoast.showToast(msg: 'Deleted...', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.red.withOpacity(0.8), textColor: Colors.white, fontSize: 16.0);
   }
 
   // Add new item to the list and if possible add it to the database
@@ -592,51 +480,13 @@ class CustomInternshipSection {
 
     var itemToAdd = CustomInternshipItem(
       id: id,
-      jobTitle: CustomInputType(
-        'Job Title',
-        'jobTitle',
-        true,
-        _addController(),
-        TextInputType.text,
-      ),
-      employer: CustomInputType(
-        'Employer',
-        'employer',
-        true,
-        _addController(),
-        TextInputType.text,
-      ),
-      startDate: CustomInputType(
-        'Start Date',
-        'startDate',
-        true,
-        _addController(),
-        TextInputType.datetime,
-      ),
-      endDate: CustomInputType(
-        'End Date',
-        'endDate',
-        true,
-        _addController(),
-        TextInputType.datetime,
-      ),
-      city: CustomInputType(
-        'City',
-        'city',
-        true,
-        _addController(),
-        TextInputType.text,
-      ),
-      description: CustomInputType(
-        'Description',
-        'description',
-        true,
-        _addController(),
-        TextInputType.text,
-      ),
+      jobTitle: CustomInputType('Job Title', 'jobTitle', true, _addController(), TextInputType.text),
+      employer: CustomInputType('Employer', 'employer', true, _addController(), TextInputType.text),
+      startDate: CustomInputType('Start Date', 'startDate', true, _addController(), TextInputType.datetime),
+      endDate: CustomInputType('End Date', 'endDate', true, _addController(), TextInputType.datetime),
+      city: CustomInputType('City', 'city', true, _addController(), TextInputType.text),
+      description: CustomInputType('Description', 'description', true, _addController(), TextInputType.text),
     );
-
-    item.add(itemToAdd);
 
     if (resume.isNull) {
       itemToAdd.listenForChanges().listen((event) {
@@ -648,31 +498,23 @@ class CustomInternshipSection {
         itemToAdd.id,
         itemToAdd.jobTitle.controller.text,
         itemToAdd.employer.controller.text,
-        itemToAdd.startDate.controller.text.isEmpty
-            ? DateTime.now()
-            : DateTime.parse(itemToAdd.startDate.controller.text),
-        itemToAdd.endDate.controller.text.isEmpty
-            ? DateTime.now()
-            : DateTime.parse(itemToAdd.endDate.controller.text),
+        itemToAdd.startDate.controller.text.isEmpty ? DateTime.now() : DateTime.parse(itemToAdd.startDate.controller.text),
+        itemToAdd.endDate.controller.text.isEmpty ? DateTime.now() : DateTime.parse(itemToAdd.endDate.controller.text),
         itemToAdd.city.controller.text,
         itemToAdd.description.controller.text,
         DateTime.now(),
         DateTime.now(),
       );
 
-      _userInternships.add(itemForDatabase);
-      await DatabaseService().addUpdateUserInternship(itemForDatabase);
+      var addedItem = await DatabaseService().addUpdateUserInternship(itemForDatabase);
+      _userInternships.add(addedItem!);
+      itemToAdd.id = addedItem.id;
+      item.add(itemToAdd);
+    } else {
+      item.add(itemToAdd);
     }
 
-    Fluttertoast.showToast(
-      msg: 'Internship added',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.green,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
+    Fluttertoast.showToast(msg: 'Internship added', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
   }
 
   // get the latest id

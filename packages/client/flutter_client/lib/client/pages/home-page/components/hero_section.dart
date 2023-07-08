@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_client/client/pages/dashboard/dashboard.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class HeroSection extends StatelessWidget {
@@ -7,8 +8,7 @@ class HeroSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
+    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       if (constraints.maxWidth < 600) {
         return const HeroSectionMobile();
       } else {
@@ -55,21 +55,13 @@ class HeroSectionDesktop extends StatelessWidget {
                         child: RichText(
                           text: const TextSpan(
                             text: 'Put Your ',
-                            style: TextStyle(
-                                fontSize: 50, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
                             children: [
                               TextSpan(
                                 text: 'dream career',
-                                style: TextStyle(
-                                    color: Colors.blue,
-                                    fontSize: 50,
-                                    fontWeight: FontWeight.bold),
+                                style: TextStyle(color: Colors.blue, fontSize: 50, fontWeight: FontWeight.bold),
                               ),
-                              TextSpan(
-                                  text: ' within reach',
-                                  style: TextStyle(
-                                      fontSize: 50,
-                                      fontWeight: FontWeight.bold)),
+                              TextSpan(text: ' within reach', style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ),
@@ -85,7 +77,7 @@ class HeroSectionDesktop extends StatelessWidget {
                           margin: const EdgeInsets.fromLTRB(0, 0, 0, 20),
                           child: ElevatedButton(
                             onPressed: () {
-                              context.navigateNamedTo('/cv-maker');
+                              context.navigateNamedTo('/dashboard');
                             },
                             style: ElevatedButton.styleFrom(
                                 primary: Colors.blue,
@@ -93,14 +85,12 @@ class HeroSectionDesktop extends StatelessWidget {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
-                                padding:
-                                    const EdgeInsets.fromLTRB(40, 20, 40, 20)),
+                                padding: const EdgeInsets.fromLTRB(40, 20, 40, 20)),
                             child: const Row(
                               mainAxisSize: MainAxisSize.min,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('Start Now',
-                                    style: TextStyle(fontSize: 16)),
+                                Text('Start Now', style: TextStyle(fontSize: 16)),
                                 Icon(
                                   Icons.arrow_right,
                                   color: Colors.white,

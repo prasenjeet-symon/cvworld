@@ -25,14 +25,7 @@ class EmploymentHistory {
   );
 
   toJson() {
-    var jsonData = {
-      'job': job,
-      'employer': employer,
-      'startDate': startDate.toUtc().toIso8601String(),
-      'endDate': endDate.toUtc().toIso8601String(),
-      'city': city,
-      'description': description
-    };
+    var jsonData = {'job': job, 'employer': employer, 'startDate': startDate.toUtc().toIso8601String(), 'endDate': endDate.toUtc().toIso8601String(), 'city': city, 'description': description};
 
     return jsonData;
   }
@@ -110,14 +103,7 @@ class Internship {
   );
 
   toJson() {
-    var jsonData = {
-      'job': job,
-      'employer': employer,
-      'startDate': startDate.toUtc().toIso8601String(),
-      'endDate': endDate.toUtc().toIso8601String(),
-      'city': city,
-      'description': description
-    };
+    var jsonData = {'job': job, 'employer': employer, 'startDate': startDate.toUtc().toIso8601String(), 'endDate': endDate.toUtc().toIso8601String(), 'city': city, 'description': description};
 
     return jsonData;
   }
@@ -148,12 +134,7 @@ class Courses {
   );
 
   toJson() {
-    var jsonData = {
-      'course': course,
-      'institution': institution,
-      'startDate': startDate.toUtc().toIso8601String(),
-      'endDate': endDate.toUtc().toIso8601String()
-    };
+    var jsonData = {'course': course, 'institution': institution, 'startDate': startDate.toUtc().toIso8601String(), 'endDate': endDate.toUtc().toIso8601String()};
 
     return jsonData;
   }
@@ -313,70 +294,30 @@ class Resume {
   );
 
   factory Resume.fromJson(Map<String, dynamic> json) {
-    List<EmploymentHistory> employmentHistory =
-        (json['employmentHistory'] as List<dynamic>)
-            .map((e) => EmploymentHistory(
-                e['job'] as String,
-                e['employer'] as String,
-                DateTime.parse(e['startDate'] as String),
-                DateTime.parse(e['endDate'] as String),
-                e['city'] as String,
-                e['description'] as String))
-            .toList();
+    List<EmploymentHistory> employmentHistory = (json['employmentHistory'] as List<dynamic>)
+        .map((e) => EmploymentHistory(e['job'] as String, e['employer'] as String, DateTime.parse(e['startDate'] as String), DateTime.parse(e['endDate'] as String), e['city'] as String, e['description'] as String))
+        .toList();
 
     List<Education> education = (json['education'] as List<dynamic>)
-        .map((e) => Education(
-            e['school'] as String,
-            DateTime.parse(e['startDate'] as String),
-            DateTime.parse(e['endDate'] as String),
-            e['degree'] as String,
-            e['city'] as String,
-            e['description'] as String))
+        .map((e) => Education(e['school'] as String, DateTime.parse(e['startDate'] as String), DateTime.parse(e['endDate'] as String), e['degree'] as String, e['city'] as String, e['description'] as String))
         .toList();
 
     List<Internship> internship = (json['internship'] as List<dynamic>)
-        .map((e) => Internship(
-            e['job'] as String,
-            e['employer'] as String,
-            DateTime.parse(e['startDate'] as String),
-            DateTime.parse(e['endDate'] as String),
-            e['city'] as String,
-            e['description'] as String))
+        .map((e) => Internship(e['job'] as String, e['employer'] as String, DateTime.parse(e['startDate'] as String), DateTime.parse(e['endDate'] as String), e['city'] as String, e['description'] as String))
         .toList();
 
-    List<Courses> courses = (json['courses'] as List<dynamic>)
-        .map((e) => Courses(
-            e['course'] as String,
-            e['institution'] as String,
-            DateTime.parse(e['startDate'] as String),
-            DateTime.parse(e['endDate'] as String)))
-        .toList();
+    List<Courses> courses = (json['courses'] as List<dynamic>).map((e) => Courses(e['course'] as String, e['institution'] as String, DateTime.parse(e['startDate'] as String), DateTime.parse(e['endDate'] as String))).toList();
 
     dynamic detailJson = json['details'];
 
-    Details details = Details(
-        detailJson['email'],
-        detailJson['phone'],
-        detailJson['country'],
-        detailJson['city'],
-        detailJson['address'],
-        detailJson['postalCode'],
-        detailJson['drivingLicense'],
-        detailJson['nationality'],
-        detailJson['placeOfBirth'],
+    Details details = Details(detailJson['email'], detailJson['phone'], detailJson['country'], detailJson['city'], detailJson['address'], detailJson['postalCode'], detailJson['drivingLicense'], detailJson['nationality'], detailJson['placeOfBirth'],
         DateTime.parse(detailJson['dateOfBirth']));
 
-    List<Links> links = (json['links'] as List<dynamic>)
-        .map((e) => Links(e['title'], e['url']))
-        .toList();
+    List<Links> links = (json['links'] as List<dynamic>).map((e) => Links(e['title'], e['url'])).toList();
 
-    List<Languages> languages = (json['languages'] as List<dynamic>)
-        .map((e) => Languages(e['language'], e['level']))
-        .toList();
+    List<Languages> languages = (json['languages'] as List<dynamic>).map((e) => Languages(e['language'], e['level'])).toList();
 
-    List<Skills> skills = (json['skills'] as List<dynamic>)
-        .map((e) => Skills(e['skill'], e['level']))
-        .toList();
+    List<Skills> skills = (json['skills'] as List<dynamic>).map((e) => Skills(e['skill'], e['level'])).toList();
 
     return Resume(
       json['name'],
@@ -435,16 +376,16 @@ class GeneratedResume {
   final int userId;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final Resume resumeRow;
-  final ResumeLink resume;
+  final Resume resume;
+  final ResumeLink resumeLink;
 
   GeneratedResume(
     this.id,
     this.userId,
     this.createdAt,
     this.updatedAt,
-    this.resumeRow,
     this.resume,
+    this.resumeLink,
   );
 
   factory GeneratedResume.fromJson(Map<String, dynamic> json) {
@@ -453,21 +394,13 @@ class GeneratedResume {
       json['userId'],
       DateTime.parse(json['createdAt']),
       DateTime.parse(json['updatedAt']),
-      Resume.fromJson(json['resumeRow']),
-      ResumeLink(DatabaseService().publicResource(json['resume']['imageUrl']),
-          DatabaseService().publicResource(json['resume']['pdfUrl'])),
+      Resume.fromJson(json['resume']),
+      ResumeLink(DatabaseService().publicResource(json['imageUrl']), DatabaseService().publicResource(json['pdfUrl'])),
     );
   }
 
   toJson() {
-    var jsonData = {
-      'id': id,
-      'userId': userId,
-      'createdAt': createdAt.toUtc().toIso8601String(),
-      'updatedAt': updatedAt.toUtc().toIso8601String(),
-      'resumeRow': resumeRow.toJson(),
-      'resume': resume.toJson(),
-    };
+    var jsonData = {'id': id, 'userId': userId, 'createdAt': createdAt.toUtc().toIso8601String(), 'updatedAt': updatedAt.toUtc().toIso8601String(), 'resume': resume.toJson(), 'imageUrl': resumeLink.imageUrl, 'pdfUrl': resumeLink.pdfUrl};
     return jsonData;
   }
 }
@@ -486,6 +419,8 @@ class SignUpSignInWithEmailAndPassword {
     return jsonData;
   }
 }
+
+// sign in / sign up with google
 
 class IsLoggedIn {
   final String userId;
@@ -1162,7 +1097,7 @@ class User {
   // updatedAt
   final DateTime updatedAt;
   // subscription
-  final UserSubscription subscription;
+  final UserSubscription? subscription;
 
   User(
     this.id,
@@ -1184,7 +1119,7 @@ class User {
       DatabaseService().publicResource(json['profilePicture']),
       json['reference'],
       DateTime.parse(json['updatedAt']),
-      UserSubscription.fromJson(json['subscription']),
+      json['subscription'] == null ? null : UserSubscription.fromJson(json['subscription']),
     );
   }
 
@@ -1197,7 +1132,7 @@ class User {
       'profilePicture': profilePicture,
       'reference': reference,
       'updatedAt': updatedAt.toUtc().toIso8601String(),
-      'subscription': subscription.toJson(),
+      'subscription': subscription!.toJson(),
     };
 
     return jsonData;
@@ -1217,6 +1152,65 @@ class DeleteDocuments {
 
   toJson() {
     var jsonData = {'id': id};
+    return jsonData;
+  }
+}
+
+// Contact us
+class ContactUs {
+  // id
+  final int id;
+  // createdAt
+  final DateTime createdAt;
+  // email
+  final String email;
+  // isResolved
+  final bool isResolved;
+  // message
+  final String message;
+  // name
+  final String name;
+  // updatedAt
+  final DateTime updatedAt;
+  // phone
+  final String phone;
+
+  ContactUs(
+    this.id,
+    this.createdAt,
+    this.email,
+    this.isResolved,
+    this.message,
+    this.name,
+    this.updatedAt,
+    this.phone,
+  );
+
+  factory ContactUs.fromJson(Map<String, dynamic> json) {
+    return ContactUs(
+      json['id'],
+      DateTime.parse(json['createdAt']),
+      json['email'],
+      json['isResolved'],
+      json['message'],
+      json['name'],
+      DateTime.parse(json['updatedAt']),
+      json['phone'],
+    );
+  }
+
+  toJson() {
+    var jsonData = {
+      'id': id,
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'email': email,
+      'isResolved': isResolved,
+      'message': message,
+      'name': name,
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
+      'phone': phone,
+    };
+
     return jsonData;
   }
 }
@@ -1356,79 +1350,67 @@ class DatabaseService {
   // update_resume
   late Uri updateResumeRoute;
   // delete_resume
+  late Uri deleteResumeRoute;
+  // continue_with_google
+  late Uri continueWithGoogleRoute;
+  // server/api_public/contact_us
+  late Uri contactUsRoute;
 
   DatabaseService() {
     authRoute = Uri.parse('$origin/server/auth');
     apiRoute = Uri.parse('$origin/server/api');
-    signInRoute =
-        Uri.parse('$origin/server/auth/sign_in_with_email_and_password');
-    signUpRoute =
-        Uri.parse('$origin/server/auth/sign_up_with_email_and_password');
+    signInRoute = Uri.parse('$origin/server/auth/sign_in_with_email_and_password');
+    signUpRoute = Uri.parse('$origin/server/auth/sign_up_with_email_and_password');
     allResumeRoute = Uri.parse('$origin/server/api/generated_resumes');
     singleResumeRoute = Uri.parse('$origin/server/api/generated_resume');
     isLoggedInRoute = Uri.parse('$origin/server/auth/session');
     generateResumeRoute = Uri.parse('$origin/server/api/generate');
-    addUpdateUserDetailsRoute =
-        Uri.parse('$origin/server/api/add_update_user_details');
+    addUpdateUserDetailsRoute = Uri.parse('$origin/server/api/add_update_user_details');
     userDetailsRoute = Uri.parse('$origin/server/api/user_details');
-    addUpdateUserSkillRoute =
-        Uri.parse('$origin/server/api/add_update_user_skill');
+    addUpdateUserSkillRoute = Uri.parse('$origin/server/api/add_update_user_skill');
     deleteUserSkillRoute = Uri.parse('$origin/server/api/delete_user_skill');
     userSkillsRoute = Uri.parse('$origin/server/api/user_skills');
     getUserHobbyRoute = Uri.parse('$origin/server/api/get_user_hobby');
-    addUpdateUserHobbyRoute =
-        Uri.parse('$origin/server/api/add_update_user_hobby');
+    addUpdateUserHobbyRoute = Uri.parse('$origin/server/api/add_update_user_hobby');
     deleteUserHobbyRoute = Uri.parse('$origin/server/api/delete_user_hobby');
-    getUserProfessionalSummaryRoute =
-        Uri.parse('$origin/server/api/get_user_professional_summary');
-    addUpdateUserProfessionalSummaryRoute =
-        Uri.parse('$origin/server/api/add_update_user_professional_summary');
-    deleteUserProfessionalSummaryRoute =
-        Uri.parse('$origin/server/api/delete_user_professional_summary');
+    getUserProfessionalSummaryRoute = Uri.parse('$origin/server/api/get_user_professional_summary');
+    addUpdateUserProfessionalSummaryRoute = Uri.parse('$origin/server/api/add_update_user_professional_summary');
+    deleteUserProfessionalSummaryRoute = Uri.parse('$origin/server/api/delete_user_professional_summary');
     getUserLanguagesRoute = Uri.parse('$origin/server/api/get_user_languages');
-    addUpdateUserLanguageRoute =
-        Uri.parse('$origin/server/api/add_update_user_language');
-    deleteUserLanguageRoute =
-        Uri.parse('$origin/server/api/delete_user_language');
+    addUpdateUserLanguageRoute = Uri.parse('$origin/server/api/add_update_user_language');
+    deleteUserLanguageRoute = Uri.parse('$origin/server/api/delete_user_language');
     getUserCoursesRoute = Uri.parse('$origin/server/api/get_user_courses');
-    addUpdateUserCourseRoute =
-        Uri.parse('$origin/server/api/add_update_user_course');
+    addUpdateUserCourseRoute = Uri.parse('$origin/server/api/add_update_user_course');
     deleteUserCourseRoute = Uri.parse('$origin/server/api/delete_user_course');
-    getUserEducationsRoute =
-        Uri.parse('$origin/server/api/get_user_educations');
-    addUpdateUserEducationRoute =
-        Uri.parse('$origin/server/api/add_update_user_education');
-    deleteUserEducationRoute =
-        Uri.parse('$origin/server/api/delete_user_education');
-    getUserEmploymentHistoriesRoute =
-        Uri.parse('$origin/server/api/get_user_employment_histories');
-    addUpdateUserEmploymentHistoryRoute =
-        Uri.parse('$origin/server/api/add_update_user_employment_history');
-    deleteUserEmploymentHistoryRoute =
-        Uri.parse('$origin/server/api/delete_user_employment_history');
-    getUserInternshipsRoute =
-        Uri.parse('$origin/server/api/get_user_internships');
-    addUpdateUserInternshipRoute =
-        Uri.parse('$origin/server/api/add_update_user_internship');
-    deleteUserInternshipRoute =
-        Uri.parse('$origin/server/api/delete_user_internship');
+    getUserEducationsRoute = Uri.parse('$origin/server/api/get_user_educations');
+    addUpdateUserEducationRoute = Uri.parse('$origin/server/api/add_update_user_education');
+    deleteUserEducationRoute = Uri.parse('$origin/server/api/delete_user_education');
+    getUserEmploymentHistoriesRoute = Uri.parse('$origin/server/api/get_user_employment_histories');
+    addUpdateUserEmploymentHistoryRoute = Uri.parse('$origin/server/api/add_update_user_employment_history');
+    deleteUserEmploymentHistoryRoute = Uri.parse('$origin/server/api/delete_user_employment_history');
+    getUserInternshipsRoute = Uri.parse('$origin/server/api/get_user_internships');
+    addUpdateUserInternshipRoute = Uri.parse('$origin/server/api/add_update_user_internship');
+    deleteUserInternshipRoute = Uri.parse('$origin/server/api/delete_user_internship');
     getUserLinksRoute = Uri.parse('$origin/server/api/get_user_links');
-    addUpdateUserLinkRoute =
-        Uri.parse('$origin/server/api/add_update_user_link');
+    addUpdateUserLinkRoute = Uri.parse('$origin/server/api/add_update_user_link');
     deleteUserLinkRoute = Uri.parse('$origin/server/api/delete_user_link');
-    getUserSubscriptionRoute =
-        Uri.parse('$origin/server/api/get_user_subscription');
-    addUpdateUserSubscriptionRoute =
-        Uri.parse('$origin/server/api/add_update_user_subscription');
-    deleteUserSubscriptionRoute =
-        Uri.parse('$origin/server/api/delete_user_subscription');
-    updateUserProfilePictureRoute =
-        Uri.parse('$origin/server/api/media/update_user_profile_picture');
+    getUserSubscriptionRoute = Uri.parse('$origin/server/api/get_user_subscription');
+    addUpdateUserSubscriptionRoute = Uri.parse('$origin/server/api/add_update_user_subscription');
+    deleteUserSubscriptionRoute = Uri.parse('$origin/server/api/delete_user_subscription');
+    updateUserProfilePictureRoute = Uri.parse('$origin/server/api/media/update_user_profile_picture');
     getUserRoute = Uri.parse('$origin/server/api/get_user');
     updateResumeRoute = Uri.parse('$origin/server/api/update_resume');
+    deleteResumeRoute = Uri.parse('$origin/server/api/delete_resume');
+    continueWithGoogleRoute = Uri.parse('$origin/server/auth/continue_with_google');
+    contactUsRoute = Uri.parse('$origin/server/api_public/contact_us');
   }
 
   publicResource(String path) {
+    // if http or https then just return
+    if (path.startsWith('http') || path.startsWith('https')) {
+      return path;
+    }
+
     return '$origin/$path';
   }
 
@@ -1443,16 +1425,14 @@ class DatabaseService {
   }
 
   /// Sign in the user using the email and password
-  Future<SignUpSignInWithEmailAndPassword?> signInUserWithEmailAndPassword(
-      String email, String password) async {
+  Future<SignUpSignInWithEmailAndPassword?> signInUserWithEmailAndPassword(String email, String password) async {
     // Prepare the request body
     var requestBody = {'email': email, 'password': password};
     // Make a POST request with the request body
     var response = await http.post(signInRoute, body: requestBody);
     if (response.statusCode == 200) {
       // POST request successful, parse the response into MyDataModel
-      var responseData =
-          SignUpSignInWithEmailAndPassword.fromJson(json.decode(response.body));
+      var responseData = SignUpSignInWithEmailAndPassword.fromJson(json.decode(response.body));
       // set the JWT
       const storage = FlutterSecureStorage();
       await storage.write(key: 'JWT', value: responseData.token);
@@ -1462,19 +1442,33 @@ class DatabaseService {
       if (kDebugMode) {
         print('POST request failed with status code: ${response.statusCode}');
       }
+
+      if (response.statusCode == 400) {
+        // All input field is required
+        throw RequiredFieldException('All input fields are required');
+      }
+
+      if (response.statusCode == 402) {
+        // no such user
+        throw NoUserException('No such user');
+      }
+
+      if (response.statusCode == 403) {
+        // wrong password
+        throw WrongPasswordException('Wrong password');
+      }
     }
 
     return null;
   }
 
   /// Sign up the user with email and password
-  Future<SignUpSignInWithEmailAndPassword?> signUpUserWithEmailAndPassword(
-      String email, String password, String name) async {
+  Future<SignUpSignInWithEmailAndPassword?> signUpUserWithEmailAndPassword(String email, String password, String name) async {
     var requestBody = {'email': email, 'password': password, 'name': name};
     var response = await http.post(signUpRoute, body: requestBody);
+
     if (response.statusCode == 200) {
-      var responseData =
-          SignUpSignInWithEmailAndPassword.fromJson(json.decode(response.body));
+      var responseData = SignUpSignInWithEmailAndPassword.fromJson(json.decode(response.body));
       const storage = FlutterSecureStorage();
       await storage.write(key: 'JWT', value: responseData.token);
       return responseData;
@@ -1483,8 +1477,37 @@ class DatabaseService {
       if (kDebugMode) {
         print('POST request failed with status code: ${response.statusCode}');
       }
+
+      if (response.statusCode == 400) {
+        // All input fields are required
+        throw RequiredFieldException('All input fields are required');
+      }
+
+      if (response.statusCode == 402) {
+        // user is already registered
+        throw UserAlreadyExistsException('User already exists');
+      }
+
+      // for the weak password
+      if (response.statusCode == 403) {
+        throw WeekPasswordException('Password is too weak');
+      }
+
+      return null;
     }
-    return null;
+  }
+
+  // continue with google
+  Future<SignUpSignInWithEmailAndPassword?> continueWithGoogle(String googleToken) async {
+    var response = await http.post(continueWithGoogleRoute, body: {'google_token': googleToken});
+    if (response.statusCode == 200) {
+      var responseData = SignUpSignInWithEmailAndPassword.fromJson(json.decode(response.body));
+      const storage = FlutterSecureStorage();
+      await storage.write(key: 'JWT', value: responseData.token);
+      return responseData;
+    } else {
+      return null;
+    }
   }
 
   Future<String?> getToken() async {
@@ -1509,8 +1532,7 @@ class DatabaseService {
     if (response.statusCode == 200) {
       var decodedJson = json.decode(response.body) as List<dynamic>;
       var responseData = decodedJson;
-      var finalData =
-          responseData.map((e) => GeneratedResume.fromJson(e)).toList();
+      var finalData = responseData.map((e) => GeneratedResume.fromJson(e)).toList();
       client.dispose();
       return finalData;
     } else {
@@ -1527,8 +1549,7 @@ class DatabaseService {
   Future<GeneratedResume?> fetchSingleResume(int resumeId) async {
     var client = JwtClient();
     var payload = {'resumeId': resumeId};
-    var response =
-        await client.post(singleResumeRoute, body: json.encode(payload));
+    var response = await client.post(singleResumeRoute, body: json.encode(payload));
 
     if (response.statusCode == 200) {
       var decodedData = json.decode(response.body);
@@ -1565,8 +1586,7 @@ class DatabaseService {
     var payload = resume.toJson();
     var client = JwtClient();
 
-    var response = await client.post(generateResumeRoute,
-        body: json.encode({'resume': payload, 'isDummy': 'no'}));
+    var response = await client.post(generateResumeRoute, body: json.encode({'resume': payload, 'isDummy': 'no'}));
     if (response.statusCode == 200) {
       client.dispose();
 
@@ -1586,8 +1606,7 @@ class DatabaseService {
     var payload = userDetails.toJson();
     var client = JwtClient();
 
-    var response = await client.post(addUpdateUserDetailsRoute,
-        body: json.encode({'personalDetails': payload}));
+    var response = await client.post(addUpdateUserDetailsRoute, body: json.encode({'personalDetails': payload}));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -1629,8 +1648,7 @@ class DatabaseService {
     var payload = userSkill.toJson();
     var client = JwtClient();
 
-    var response = await client.post(addUpdateUserSkillRoute,
-        body: json.encode({"skill": payload}));
+    var response = await client.post(addUpdateUserSkillRoute, body: json.encode({"skill": payload}));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -1652,8 +1670,7 @@ class DatabaseService {
     var payload = delete.toJson();
     var client = JwtClient();
 
-    var response =
-        await client.post(deleteUserSkillRoute, body: json.encode(payload));
+    var response = await client.post(deleteUserSkillRoute, body: json.encode(payload));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -1709,8 +1726,7 @@ class DatabaseService {
     var payload = userHobby.toJson();
     var client = JwtClient();
 
-    var response = await client.post(addUpdateUserHobbyRoute,
-        body: json.encode({"hobby": payload}));
+    var response = await client.post(addUpdateUserHobbyRoute, body: json.encode({"hobby": payload}));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -1731,8 +1747,7 @@ class DatabaseService {
     var payload = delete.toJson();
     var client = JwtClient();
 
-    var response =
-        await client.post(deleteUserHobbyRoute, body: json.encode(payload));
+    var response = await client.post(deleteUserHobbyRoute, body: json.encode(payload));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -1754,8 +1769,7 @@ class DatabaseService {
 
     var response = await client.post(getUserProfessionalSummaryRoute);
     if (response.statusCode == 200) {
-      var responseData =
-          UserProfessionalSummary.fromJson(json.decode(response.body));
+      var responseData = UserProfessionalSummary.fromJson(json.decode(response.body));
       client.dispose();
       return responseData;
     } else {
@@ -1769,23 +1783,19 @@ class DatabaseService {
   }
 
   // add_update_user_professional_summary
-  Future<UserProfessionalSummary?> addUpdateUserProfessionalSummary(
-      UserProfessionalSummary userProfessionalSummary) async {
+  Future<UserProfessionalSummary?> addUpdateUserProfessionalSummary(UserProfessionalSummary userProfessionalSummary) async {
     var payload = userProfessionalSummary.toJson();
     var client = JwtClient();
 
-    var response = await client.post(addUpdateUserProfessionalSummaryRoute,
-        body: json.encode({"professionalSummary": payload}));
+    var response = await client.post(addUpdateUserProfessionalSummaryRoute, body: json.encode({"professionalSummary": payload}));
 
     if (response.statusCode == 200) {
       client.dispose();
-      var responseData =
-          UserProfessionalSummary.fromJson(json.decode(response.body));
+      var responseData = UserProfessionalSummary.fromJson(json.decode(response.body));
       return responseData;
     } else {
       if (kDebugMode) {
-        print(
-            'Something went wrong while adding/update user professional summary');
+        print('Something went wrong while adding/update user professional summary');
       }
 
       client.dispose();
@@ -1794,13 +1804,11 @@ class DatabaseService {
   }
 
   // delete_user_professional_summary
-  Future<DeleteDocuments?> deleteUserProfessionalSummary(
-      DeleteDocuments delete) async {
+  Future<DeleteDocuments?> deleteUserProfessionalSummary(DeleteDocuments delete) async {
     var payload = delete.toJson();
     var client = JwtClient();
 
-    var response = await client.post(deleteUserProfessionalSummaryRoute,
-        body: json.encode(payload));
+    var response = await client.post(deleteUserProfessionalSummaryRoute, body: json.encode(payload));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -1823,8 +1831,7 @@ class DatabaseService {
     var response = await client.post(getUserLanguagesRoute);
     if (response.statusCode == 200) {
       var responseData = (json.decode(response.body) as List<dynamic>);
-      var finalData =
-          responseData.map((e) => UserLanguage.fromJson(e)).toList();
+      var finalData = responseData.map((e) => UserLanguage.fromJson(e)).toList();
       client.dispose();
       return finalData;
     } else {
@@ -1842,8 +1849,7 @@ class DatabaseService {
     var payload = userLanguage.toJson();
     var client = JwtClient();
 
-    var response = await client.post(addUpdateUserLanguageRoute,
-        body: json.encode({"language": payload}));
+    var response = await client.post(addUpdateUserLanguageRoute, body: json.encode({"language": payload}));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -1864,8 +1870,7 @@ class DatabaseService {
     var payload = delete.toJson();
     var client = JwtClient();
 
-    var response =
-        await client.post(deleteUserLanguageRoute, body: json.encode(payload));
+    var response = await client.post(deleteUserLanguageRoute, body: json.encode(payload));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -1906,8 +1911,7 @@ class DatabaseService {
     var payload = userCourse.toJson();
     var client = JwtClient();
 
-    var response = await client.post(addUpdateUserCourseRoute,
-        body: json.encode({'course': payload}));
+    var response = await client.post(addUpdateUserCourseRoute, body: json.encode({'course': payload}));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -1928,8 +1932,7 @@ class DatabaseService {
     var payload = delete.toJson();
     var client = JwtClient();
 
-    var response =
-        await client.post(deleteUserCourseRoute, body: json.encode(payload));
+    var response = await client.post(deleteUserCourseRoute, body: json.encode(payload));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -1952,8 +1955,7 @@ class DatabaseService {
     var response = await client.post(getUserEducationsRoute);
     if (response.statusCode == 200) {
       var responseData = (json.decode(response.body) as List<dynamic>);
-      var finalData =
-          responseData.map((e) => UserEducation.fromJson(e)).toList();
+      var finalData = responseData.map((e) => UserEducation.fromJson(e)).toList();
       client.dispose();
       return finalData;
     } else {
@@ -1967,13 +1969,11 @@ class DatabaseService {
   }
 
   // add_update_user_education
-  Future<UserEducation?> addUpdateUserEducation(
-      UserEducation userEducation) async {
+  Future<UserEducation?> addUpdateUserEducation(UserEducation userEducation) async {
     var payload = userEducation.toJson();
     var client = JwtClient();
 
-    var response = await client.post(addUpdateUserEducationRoute,
-        body: json.encode({"education": payload}));
+    var response = await client.post(addUpdateUserEducationRoute, body: json.encode({"education": payload}));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -1994,8 +1994,7 @@ class DatabaseService {
     var payload = delete.toJson();
     var client = JwtClient();
 
-    var response =
-        await client.post(deleteUserEducationRoute, body: json.encode(payload));
+    var response = await client.post(deleteUserEducationRoute, body: json.encode(payload));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -2018,8 +2017,7 @@ class DatabaseService {
     var response = await client.post(getUserEmploymentHistoriesRoute);
     if (response.statusCode == 200) {
       var responseData = (json.decode(response.body) as List<dynamic>);
-      var finalData =
-          responseData.map((e) => UserEmployment.fromJson(e)).toList();
+      var finalData = responseData.map((e) => UserEmployment.fromJson(e)).toList();
 
       client.dispose();
       return finalData;
@@ -2034,13 +2032,11 @@ class DatabaseService {
   }
 
   // add_update_user_employment_history
-  Future<UserEmployment?> addUpdateUserEmploymentHistory(
-      UserEmployment userEmployment) async {
+  Future<UserEmployment?> addUpdateUserEmploymentHistory(UserEmployment userEmployment) async {
     var payload = userEmployment.toJson();
     var client = JwtClient();
 
-    var response = await client.post(addUpdateUserEmploymentHistoryRoute,
-        body: json.encode({"employmentHistory": payload}));
+    var response = await client.post(addUpdateUserEmploymentHistoryRoute, body: json.encode({"employmentHistory": payload}));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -2048,8 +2044,7 @@ class DatabaseService {
       return responseData;
     } else {
       if (kDebugMode) {
-        print(
-            'Something went wrong while adding/update user employment history');
+        print('Something went wrong while adding/update user employment history');
       }
 
       client.dispose();
@@ -2058,13 +2053,11 @@ class DatabaseService {
   }
 
   // delete_user_employment_history
-  Future<DeleteDocuments?> deleteUserEmploymentHistory(
-      DeleteDocuments delete) async {
+  Future<DeleteDocuments?> deleteUserEmploymentHistory(DeleteDocuments delete) async {
     var payload = delete.toJson();
     var client = JwtClient();
 
-    var response = await client.post(deleteUserEmploymentHistoryRoute,
-        body: json.encode(payload));
+    var response = await client.post(deleteUserEmploymentHistoryRoute, body: json.encode(payload));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -2087,8 +2080,7 @@ class DatabaseService {
     var response = await client.post(getUserInternshipsRoute);
     if (response.statusCode == 200) {
       var responseData = (json.decode(response.body) as List<dynamic>);
-      var finalData =
-          responseData.map((e) => UserInternship.fromJson(e)).toList();
+      var finalData = responseData.map((e) => UserInternship.fromJson(e)).toList();
 
       client.dispose();
       return finalData;
@@ -2103,14 +2095,12 @@ class DatabaseService {
   }
 
   // add_update_user_internship
-  Future<UserInternship?> addUpdateUserInternship(
-      UserInternship userInternship) async {
+  Future<UserInternship?> addUpdateUserInternship(UserInternship userInternship) async {
     var payload = userInternship.toJson();
 
     var client = JwtClient();
 
-    var response = await client.post(addUpdateUserInternshipRoute,
-        body: json.encode({"internship": payload}));
+    var response = await client.post(addUpdateUserInternshipRoute, body: json.encode({"internship": payload}));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -2131,8 +2121,7 @@ class DatabaseService {
     var payload = delete.toJson();
     var client = JwtClient();
 
-    var response = await client.post(deleteUserInternshipRoute,
-        body: json.encode(payload));
+    var response = await client.post(deleteUserInternshipRoute, body: json.encode(payload));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -2174,8 +2163,7 @@ class DatabaseService {
     var payload = userLink.toJson();
     var client = JwtClient();
 
-    var response = await client.post(addUpdateUserLinkRoute,
-        body: json.encode({"link": payload}));
+    var response = await client.post(addUpdateUserLinkRoute, body: json.encode({"link": payload}));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -2196,8 +2184,7 @@ class DatabaseService {
     var payload = delete.toJson();
     var client = JwtClient();
 
-    var response =
-        await client.post(deleteUserLinkRoute, body: json.encode(payload));
+    var response = await client.post(deleteUserLinkRoute, body: json.encode(payload));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -2232,13 +2219,11 @@ class DatabaseService {
   }
 
   // add_update_user_subscription
-  Future<UserSubscription?> addUpdateUserSubscription(
-      UserSubscription userSubscription) async {
+  Future<UserSubscription?> addUpdateUserSubscription(UserSubscription userSubscription) async {
     var payload = userSubscription.toJson();
     var client = JwtClient();
 
-    var response = await client.post(addUpdateUserSubscriptionRoute,
-        body: json.encode({"subscription": payload}));
+    var response = await client.post(addUpdateUserSubscriptionRoute, body: json.encode({"subscription": payload}));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -2255,13 +2240,11 @@ class DatabaseService {
   }
 
   // delete_user_subscription
-  Future<DeleteDocuments?> deleteUserSubscription(
-      DeleteDocuments delete) async {
+  Future<DeleteDocuments?> deleteUserSubscription(DeleteDocuments delete) async {
     var payload = delete.toJson();
     var client = JwtClient();
 
-    var response = await client.post(deleteUserSubscriptionRoute,
-        body: json.encode(payload));
+    var response = await client.post(deleteUserSubscriptionRoute, body: json.encode(payload));
 
     if (response.statusCode == 200) {
       client.dispose();
@@ -2284,6 +2267,7 @@ class DatabaseService {
     var response = await client.post(getUserRoute);
     if (response.statusCode == 200) {
       client.dispose();
+      print(json.decode(response.body));
       var responseData = User.fromJson(json.decode(response.body));
       return responseData;
     } else {
@@ -2301,13 +2285,10 @@ class DatabaseService {
     File file,
   ) async {
     // multi part request
-    var multipartRequest =
-        http.MultipartRequest('POST', updateUserProfilePictureRoute);
-    multipartRequest.files
-        .add(await http.MultipartFile.fromPath('file', file.path));
+    var multipartRequest = http.MultipartRequest('POST', updateUserProfilePictureRoute);
+    multipartRequest.files.add(await http.MultipartFile.fromPath('file', file.path));
 
-    var response =
-        await http.Response.fromStream(await multipartRequest.send());
+    var response = await http.Response.fromStream(await multipartRequest.send());
 
     if (response.statusCode == 200) {
       var user = await fetchUser();
@@ -2325,7 +2306,8 @@ class DatabaseService {
   Future<GeneratedResume?> updateResume(Resume resume, int id) async {
     var payload = resume.toJson();
     var client = JwtClient();
-    var finalPayload = json.encode({id: id, resume: payload});
+
+    var finalPayload = json.encode({'id': id, 'resume': payload});
 
     var response = await client.post(updateResumeRoute, body: finalPayload);
     if (response.statusCode == 200) {
@@ -2338,6 +2320,43 @@ class DatabaseService {
       }
 
       client.dispose();
+      return null;
+    }
+  }
+
+  // Delete resume
+  Future<DeleteDocuments?> deleteResume(int id) async {
+    var client = JwtClient();
+    var payload = {'id': id};
+    var response = await client.post(deleteResumeRoute, body: json.encode(payload));
+    if (response.statusCode == 200) {
+      client.dispose();
+      var responseData = DeleteDocuments.fromJson(json.decode(response.body));
+      return responseData;
+    } else {
+      if (kDebugMode) {
+        print('Something went wrong while deleting resume');
+      }
+
+      client.dispose();
+      return null;
+    }
+  }
+
+  // server/api_public/contact_us
+  Future<ContactUs?> contactUs(String name, String email, String message, String phone) async {
+    var payload = {'name': name, 'email': email, 'message': message, 'phone': phone};
+
+    var response = await http.post(contactUsRoute, body: (payload));
+    if (response.statusCode == 200) {
+      var responseData = ContactUs.fromJson(json.decode(response.body));
+      return responseData;
+    } else {
+      print(response.body);
+      if (kDebugMode) {
+        print('Something went wrong while sending contact us');
+      }
+
       return null;
     }
   }

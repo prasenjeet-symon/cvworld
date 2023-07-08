@@ -15,12 +15,7 @@ class SkillSection extends StatefulWidget {
   final String description;
   final Resume? resume;
 
-  const SkillSection({
-    Key? key,
-    required this.title,
-    required this.description,
-    this.resume,
-  }) : super(key: key);
+  const SkillSection({Key? key, required this.title, required this.description, this.resume}) : super(key: key);
 
   @override
   State<SkillSection> createState() => SkillSectionState();
@@ -30,35 +25,24 @@ class SkillSectionState extends State<SkillSection> {
   final CustomSkillSection _customSkillSection = CustomSkillSection();
 
   List<Skills> getData() {
-    return _customSkillSection.item
-        .map(
-          (e) => {
-            Skills(
-              e.skill.controller.text,
-              double.parse(e.level.controller.text),
-            )
-          },
-        )
-        .expand((element) => element)
-        .toList();
+    return _customSkillSection.item.map((e) => {Skills(e.skill.controller.text, double.parse(e.level.controller.text.isEmpty ? '0' : e.level.controller.text))}).expand((element) => element).toList();
   }
 
   addNewItem() {
-    _customSkillSection.addNewItem();
-    setState(() {});
+    _customSkillSection.addNewItem().then((value) => {setState(() {})});
   }
 
   removeItem(int index) {
-    _customSkillSection.removeItem(index);
-    setState(() {});
+    _customSkillSection.removeItem(index).then((value) => {setState(() {})});
   }
 
   @override
   void initState() {
+    super.initState();
+
     _customSkillSection.resume = widget.resume;
     _customSkillSection.fetchUserSkills().then((value) => {setState(() {})});
     _customSkillSection.patchResume().then((value) => {setState(() {})});
-    super.initState();
   }
 
   @override
@@ -70,10 +54,12 @@ class SkillSectionState extends State<SkillSection> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       margin: const EdgeInsets.fromLTRB(0, 25, 0, 25),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
             margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
@@ -90,9 +76,7 @@ class SkillSectionState extends State<SkillSection> {
             ),
           ),
           Container(
-            margin: _customSkillSection.item.isNotEmpty
-                ? const EdgeInsets.fromLTRB(0, 15, 0, 15)
-                : const EdgeInsets.fromLTRB(0, 0, 0, 0),
+            margin: _customSkillSection.item.isNotEmpty ? const EdgeInsets.fromLTRB(0, 15, 0, 15) : const EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -120,9 +104,7 @@ class SkillSectionState extends State<SkillSection> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    _customSkillSection.item.isNotEmpty
-                        ? const Text('Add one more skill')
-                        : const Text('Add Skills'),
+                    _customSkillSection.item.isNotEmpty ? const Text('Add one more skill') : const Text('Add Skills'),
                     Container(
                       margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
                       child: const Icon(Icons.add),
@@ -147,11 +129,7 @@ class SkillItem extends StatefulWidget {
   final CustomSkillItem customSkillsItem;
   final int index;
 
-  const SkillItem(
-      {super.key,
-      required this.onDelete,
-      required this.customSkillsItem,
-      required this.index});
+  const SkillItem({super.key, required this.onDelete, required this.customSkillsItem, required this.index});
 
   @override
   State<SkillItem> createState() => _SkillItemState();
@@ -194,7 +172,7 @@ class _SkillItemState extends State<SkillItem> {
 ///
 ///
 class CustomSkillItem {
-  final int id;
+  int id;
   final CustomInputType skill;
   final CustomInputType level;
 
@@ -215,8 +193,7 @@ class CustomSkillItem {
       controller.add(id);
     });
 
-    return controller
-        .debounceTime(const Duration(milliseconds: Constants.debounceTime));
+    return controller.debounceTime(const Duration(milliseconds: Constants.debounceTime));
   }
 
   // dispose
@@ -282,6 +259,7 @@ class CustomSkillSection {
   Future<void> patchResume() async {
     if (resume.isNull) return;
     var skillsToPatch = resume!.skills;
+
     for (var element in skillsToPatch) {
       var skillController = _addController();
       skillController.text = element.skill;
@@ -291,20 +269,8 @@ class CustomSkillSection {
 
       var itemToAdd = CustomSkillItem(
         id: getLatestId(),
-        skill: CustomInputType(
-          'Skill',
-          'skill',
-          true,
-          skillController,
-          TextInputType.text,
-        ),
-        level: CustomInputType(
-          'Level',
-          'level',
-          true,
-          levelController,
-          TextInputType.text,
-        ),
+        skill: CustomInputType('Skill', 'skill', true, skillController, TextInputType.text),
+        level: CustomInputType('Level', 'level', true, levelController, TextInputType.text),
       );
 
       item.add(itemToAdd);
@@ -328,20 +294,8 @@ class CustomSkillSection {
 
       var itemToAdd = CustomSkillItem(
         id: element.id,
-        skill: CustomInputType(
-          'Skill',
-          'skill',
-          true,
-          skillController,
-          TextInputType.text,
-        ),
-        level: CustomInputType(
-          'Level',
-          'level',
-          true,
-          levelController,
-          TextInputType.text,
-        ),
+        skill: CustomInputType('Skill', 'skill', true, skillController, TextInputType.text),
+        level: CustomInputType('Level', 'level', true, levelController, TextInputType.text),
       );
 
       item.add(itemToAdd);
@@ -364,32 +318,19 @@ class CustomSkillSection {
     var userSkillForDatabase = UserSkill(
       userSkillToUpdate.id,
       userSkillToUpdate.skill.controller.text,
-      userSkillToUpdate.level.controller.text.isEmpty
-          ? 0
-          : double.parse(
-              userSkillToUpdate.level.controller.text,
-            ),
+      userSkillToUpdate.level.controller.text.isEmpty ? 0 : double.parse(userSkillToUpdate.level.controller.text),
       DateTime.now(),
       DateTime.now(),
     );
 
     await DatabaseService().addUpdateUserSkill(userSkillForDatabase);
 
-    var localUserSkillIndex =
-        _userSkills.indexWhere((element) => element.id == id);
+    var localUserSkillIndex = _userSkills.indexWhere((element) => element.id == id);
     if (localUserSkillIndex != -1) {
       _userSkills[localUserSkillIndex] = userSkillForDatabase;
     }
 
-    Fluttertoast.showToast(
-      msg: 'Skill updated',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.green,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
+    Fluttertoast.showToast(msg: 'Skill updated', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
   }
 
   Future<void> addNewItem() async {
@@ -397,23 +338,9 @@ class CustomSkillSection {
 
     var itemToAdd = CustomSkillItem(
       id: id,
-      skill: CustomInputType(
-        'Skill',
-        'skill',
-        true,
-        _addController(),
-        TextInputType.text,
-      ),
-      level: CustomInputType(
-        'Level',
-        'level',
-        true,
-        _addController(),
-        TextInputType.text,
-      ),
+      skill: CustomInputType('Skill', 'skill', true, _addController(), TextInputType.text),
+      level: CustomInputType('Level', 'level', true, _addController(), TextInputType.text),
     );
-
-    item.add(itemToAdd);
 
     if (resume.isNull) {
       // add to database
@@ -424,52 +351,36 @@ class CustomSkillSection {
       var itemForDatabase = UserSkill(
         itemToAdd.id,
         itemToAdd.skill.controller.text,
-        itemToAdd.level.controller.text.isEmpty
-            ? 0
-            : double.parse(itemToAdd.level.controller.text),
+        itemToAdd.level.controller.text.isEmpty ? 0 : double.parse(itemToAdd.level.controller.text),
         DateTime.now(),
         DateTime.now(),
       );
 
-      await DatabaseService().addUpdateUserSkill(itemForDatabase);
-      _userSkills.add(itemForDatabase);
+      var addedItem = await DatabaseService().addUpdateUserSkill(itemForDatabase);
+      _userSkills.add(addedItem!);
+      itemToAdd.id = addedItem.id;
+      item.add(itemToAdd);
+    } else {
+      item.add(itemToAdd);
     }
 
-    Fluttertoast.showToast(
-      msg: 'Added a new skill',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.grey,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
+    Fluttertoast.showToast(msg: 'Added a new skill', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.grey, textColor: Colors.white, fontSize: 16.0);
   }
 
-  void removeItem(int index) async {
+  Future<void> removeItem(int index) async {
     var itemToRemove = item[index];
     item.removeAt(index);
     itemToRemove.dispose();
 
     if (resume.isNull) {
       // also remove from database
-      var itemToRemoveDatabaseIndex =
-          _userSkills.indexWhere((element) => element.id == itemToRemove.id);
+      var itemToRemoveDatabaseIndex = _userSkills.indexWhere((element) => element.id == itemToRemove.id);
       if (itemToRemoveDatabaseIndex != -1) {
         _userSkills.removeAt(itemToRemoveDatabaseIndex);
-        await DatabaseService()
-            .deleteUserSkill(DeleteDocuments(itemToRemove.id));
+        await DatabaseService().deleteUserSkill(DeleteDocuments(itemToRemove.id));
       }
     }
 
-    Fluttertoast.showToast(
-      msg: 'Removed a skill',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.red,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
+    Fluttertoast.showToast(msg: 'Removed a skill', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white, fontSize: 16.0);
   }
 }

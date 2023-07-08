@@ -15,12 +15,7 @@ class LanguageSection extends StatefulWidget {
   final String description;
   final Resume? resume;
 
-  const LanguageSection({
-    Key? key,
-    required this.title,
-    required this.description,
-    this.resume,
-  }) : super(key: key);
+  const LanguageSection({Key? key, required this.title, required this.description, this.resume}) : super(key: key);
 
   @override
   State<LanguageSection> createState() => LanguageSectionState();
@@ -30,51 +25,41 @@ class LanguageSectionState extends State<LanguageSection> {
   final CustomLanguageSection _customLanguageSection = CustomLanguageSection();
 
   List<Languages> getData() {
-    return _customLanguageSection.item
-        .map((e) => {
-              Languages(
-                e.language.controller.text,
-                double.parse(e.level.controller.text),
-              )
-            })
-        .expand((element) => element)
-        .toList();
+    return _customLanguageSection.item.map((e) => {Languages(e.language.controller.text, double.parse(e.level.controller.text.isEmpty ? '0' : e.level.controller.text))}).expand((element) => element).toList();
   }
 
   addNewItem() {
-    _customLanguageSection.addNewItem();
-    setState(() {});
+    _customLanguageSection.addNewItem().then((value) => {setState(() {})});
   }
 
   removeItem(int index) {
-    _customLanguageSection.removeItem(index);
-    setState(() {});
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _customLanguageSection.dispose();
+    _customLanguageSection.removeItem(index).then((value) => {setState(() {})});
   }
 
   @override
   void initState() {
-    _customLanguageSection.resume = widget.resume;
-    _customLanguageSection
-        .fetchUserLanguages()
-        .then((value) => {setState(() {})});
-    _customLanguageSection.patchResume().then((value) => {setState(() {})});
-
     super.initState();
+
+    _customLanguageSection.resume = widget.resume;
+    _customLanguageSection.fetchUserLanguages().then((value) => {setState(() {})});
+    _customLanguageSection.patchResume().then((value) => {setState(() {})});
+  }
+
+  @override
+  void dispose() {
+    _customLanguageSection.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       margin: const EdgeInsets.fromLTRB(0, 25, 0, 25),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
             margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
@@ -91,9 +76,7 @@ class LanguageSectionState extends State<LanguageSection> {
             ),
           ),
           Container(
-            margin: _customLanguageSection.item.isNotEmpty
-                ? const EdgeInsets.fromLTRB(0, 15, 0, 15)
-                : const EdgeInsets.fromLTRB(0, 0, 0, 0),
+            margin: _customLanguageSection.item.isNotEmpty ? const EdgeInsets.fromLTRB(0, 15, 0, 15) : const EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -121,9 +104,7 @@ class LanguageSectionState extends State<LanguageSection> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    _customLanguageSection.item.isNotEmpty
-                        ? const Text('Add one more language')
-                        : const Text('Add language'),
+                    _customLanguageSection.item.isNotEmpty ? const Text('Add one more language') : const Text('Add language'),
                     Container(
                       margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
                       child: const Icon(Icons.add),
@@ -170,11 +151,6 @@ class _LanguageItemState extends State<LanguageItem> {
     widget.customLanguageItem.generateCustomInputFields();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   toggleIsExpanded() {
     if (mounted) {
       setState(() {
@@ -215,7 +191,7 @@ class _LanguageItemState extends State<LanguageItem> {
 class CustomLanguageItem {
   final CustomInputType language;
   final CustomInputType level;
-  final int id;
+  int id;
 
   late CustomInputField languageField;
   late CustomInputField levelField;
@@ -239,8 +215,7 @@ class CustomLanguageItem {
       controller.add(id);
     });
 
-    return controller
-        .debounceTime(const Duration(milliseconds: Constants.debounceTime));
+    return controller.debounceTime(const Duration(milliseconds: Constants.debounceTime));
   }
 
   // dispose
@@ -256,17 +231,9 @@ class CustomLanguageItem {
   }
 
   generateCustomInputFields() {
-    languageField = CustomInputField(
-        label: language.label,
-        isRequired: language.isRequired,
-        controller: language.controller,
-        type: language.type);
+    languageField = CustomInputField(label: language.label, isRequired: language.isRequired, controller: language.controller, type: language.type);
 
-    levelField = CustomInputField(
-        label: level.label,
-        isRequired: level.isRequired,
-        controller: level.controller,
-        type: level.type);
+    levelField = CustomInputField(label: level.label, isRequired: level.isRequired, controller: level.controller, type: level.type);
   }
 }
 
@@ -286,6 +253,7 @@ class CustomLanguageSection {
   Future<void> patchResume() async {
     if (resume.isNull) return;
     var resumeToPatch = resume!.languages;
+
     for (var language in resumeToPatch) {
       var languageController = _addController();
       languageController.text = language.language;
@@ -295,20 +263,8 @@ class CustomLanguageSection {
 
       var itemToAdd = CustomLanguageItem(
         id: getLatestId(),
-        language: CustomInputType(
-          'Language',
-          'language',
-          true,
-          languageController,
-          TextInputType.text,
-        ),
-        level: CustomInputType(
-          'Level',
-          'level',
-          true,
-          levelController,
-          TextInputType.number,
-        ),
+        language: CustomInputType('Language', 'language', true, languageController, TextInputType.text),
+        level: CustomInputType('Level', 'level', true, levelController, TextInputType.text),
       );
 
       item.add(itemToAdd);
@@ -329,6 +285,7 @@ class CustomLanguageSection {
         id = element.id;
       }
     }
+
     return id + 1;
   }
 
@@ -351,20 +308,8 @@ class CustomLanguageSection {
 
       var itemToAdd = CustomLanguageItem(
         id: language.id,
-        language: CustomInputType(
-          'Language',
-          'language',
-          true,
-          languageController,
-          TextInputType.text,
-        ),
-        level: CustomInputType(
-          'Level',
-          'level',
-          true,
-          levelController,
-          TextInputType.text,
-        ),
+        language: CustomInputType('Language', 'language', true, languageController, TextInputType.text),
+        level: CustomInputType('Level', 'level', true, levelController, TextInputType.text),
       );
 
       item.add(itemToAdd);
@@ -385,24 +330,14 @@ class CustomLanguageSection {
 
     // remove from database
     if (resume.isNull) {
-      var itemToRemoveDatabaseIndex =
-          _userLanguages.indexWhere((element) => element.id == itemToRemove.id);
+      var itemToRemoveDatabaseIndex = _userLanguages.indexWhere((element) => element.id == itemToRemove.id);
       if (itemToRemoveDatabaseIndex != -1) {
         _userLanguages.removeAt(itemToRemoveDatabaseIndex);
-        await DatabaseService()
-            .deleteUserLanguage(DeleteDocuments(itemToRemove.id));
+        await DatabaseService().deleteUserLanguage(DeleteDocuments(itemToRemove.id));
       }
     }
 
-    Fluttertoast.showToast(
-      msg: 'Language removed',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.red,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
+    Fluttertoast.showToast(msg: 'Language removed', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white, fontSize: 16.0);
   }
 
   // update the item given id
@@ -416,24 +351,14 @@ class CustomLanguageSection {
     var itemForDatabaseUpdated = UserLanguage(
       updateItem.id,
       updateItem.language.controller.text,
-      updateItem.level.controller.text.isEmpty
-          ? 0
-          : double.parse(updateItem.level.controller.text),
+      updateItem.level.controller.text.isEmpty ? 0 : double.parse(updateItem.level.controller.text),
       DateTime.now(),
       DateTime.now(),
     );
 
     await DatabaseService().addUpdateUserLanguage(itemForDatabaseUpdated);
 
-    Fluttertoast.showToast(
-      msg: 'Language updated',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.green,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
+    Fluttertoast.showToast(msg: 'Language updated', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
   }
 
   // Add new item
@@ -442,23 +367,9 @@ class CustomLanguageSection {
 
     var itemToAdd = CustomLanguageItem(
       id: id,
-      language: CustomInputType(
-        'Language',
-        'language',
-        true,
-        _addController(),
-        TextInputType.text,
-      ),
-      level: CustomInputType(
-        'Level',
-        'level',
-        true,
-        _addController(),
-        TextInputType.text,
-      ),
+      language: CustomInputType('Language', 'language', true, _addController(), TextInputType.text),
+      level: CustomInputType('Level', 'level', true, _addController(), TextInputType.text),
     );
-
-    item.add(itemToAdd);
 
     if (resume.isNull) {
       itemToAdd.listenForChanges().listen((event) {
@@ -469,25 +380,19 @@ class CustomLanguageSection {
       var itemForDatabase = UserLanguage(
         itemToAdd.id,
         itemToAdd.language.controller.text,
-        itemToAdd.level.controller.text.isEmpty
-            ? 0
-            : double.parse(itemToAdd.level.controller.text),
+        itemToAdd.level.controller.text.isEmpty ? 0 : double.parse(itemToAdd.level.controller.text),
         DateTime.now(),
         DateTime.now(),
       );
 
-      await DatabaseService().addUpdateUserLanguage(itemForDatabase);
-      _userLanguages.add(itemForDatabase);
+      var addedItem = await DatabaseService().addUpdateUserLanguage(itemForDatabase);
+      _userLanguages.add(addedItem!);
+      itemToAdd.id = addedItem.id;
+      item.add(itemToAdd);
+    } else {
+      item.add(itemToAdd);
     }
 
-    Fluttertoast.showToast(
-      msg: 'Language added',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.green,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
+    Fluttertoast.showToast(msg: 'Language added', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
   }
 }

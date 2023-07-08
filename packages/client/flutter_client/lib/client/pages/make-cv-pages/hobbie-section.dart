@@ -13,12 +13,7 @@ class HobbiesSection extends StatefulWidget {
   final String description;
   final Resume? resume;
 
-  const HobbiesSection({
-    Key? key,
-    required this.title,
-    required this.description,
-    this.resume,
-  }) : super(key: key);
+  const HobbiesSection({Key? key, required this.title, required this.description, this.resume}) : super(key: key);
 
   @override
   State<HobbiesSection> createState() => HobbiesSectionState();
@@ -45,9 +40,7 @@ class HobbiesSectionState extends State<HobbiesSection> {
 
   // fetch the hobby
   Future<void> fetchHobby() async {
-    if (!widget.resume.isNull) {
-      return;
-    }
+    if (!widget.resume.isNull) return;
 
     var fetchedHobby = await DatabaseService().fetchUserHobby();
     if (fetchedHobby.isNull) return;
@@ -60,44 +53,17 @@ class HobbiesSectionState extends State<HobbiesSection> {
 
   // update the hobby
   Future<void> updateHobby() async {
-    var updatedHobby = UserHobby(
-      hobby.isNull ? 1 : hobby!.id,
-      _controller.text,
-      DateTime.now(),
-      DateTime.now(),
-    );
-
+    var updatedHobby = UserHobby(hobby.isNull ? 1 : hobby!.id, _controller.text, DateTime.now(), DateTime.now());
     await DatabaseService().addUpdateUserHobby(updatedHobby);
-
-    Fluttertoast.showToast(
-      msg: "Hobby updated",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      backgroundColor: Colors.green.withOpacity(0.8),
-      timeInSecForIosWeb: 1,
-      textColor: Colors.white,
-    );
+    Fluttertoast.showToast(msg: "Hobby updated", toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, backgroundColor: Colors.green.withOpacity(0.8), timeInSecForIosWeb: 1, textColor: Colors.white);
   }
 
   @override
   void initState() {
     super.initState();
 
-    final CustomInputType textEditorType = CustomInputType(
-      'Hobbies',
-      'hobbies',
-      true,
-      _controller,
-      TextInputType.multiline,
-    );
-
-    textEditor = CustomInputField(
-      label: textEditorType.label,
-      isRequired: textEditorType.isRequired,
-      controller: textEditorType.controller,
-      type: textEditorType.type,
-      isTextArea: true,
-    );
+    final CustomInputType textEditorType = CustomInputType('Hobbies', 'hobbies', true, _controller, TextInputType.multiline);
+    textEditor = CustomInputField(label: textEditorType.label, isRequired: textEditorType.isRequired, controller: textEditorType.controller, type: textEditorType.type, isTextArea: true);
 
     // listen for the changes and update the database
     if (widget.resume.isNull) {
@@ -105,9 +71,7 @@ class HobbiesSectionState extends State<HobbiesSection> {
         controller.add(textEditor.controller.text);
       });
 
-      controller
-          .debounceTime(const Duration(milliseconds: Constants.debounceTime))
-          .listen((value) {
+      controller.debounceTime(const Duration(milliseconds: Constants.debounceTime)).listen((value) {
         updateHobby();
       });
     }
@@ -119,11 +83,21 @@ class HobbiesSectionState extends State<HobbiesSection> {
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    controller.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       margin: const EdgeInsets.fromLTRB(0, 25, 0, 25),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
             margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),

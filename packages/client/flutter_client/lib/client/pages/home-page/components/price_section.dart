@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 
-class PriceSection extends StatelessWidget {
-  const PriceSection({super.key});
+class PriceSection extends StatefulWidget {
+  const PriceSection({
+    Key? key,
+  }) : super(key: key);
 
   @override
+  State<PriceSection> createState() => PriceSectionState();
+}
+
+class PriceSectionState extends State<PriceSection> {
+  @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
+    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       if (constraints.maxWidth < 600) {
         return const PriceSectionMobile();
       } else {
@@ -63,8 +69,7 @@ class PriceSectionDesktop extends StatelessWidget {
                       Container(
                         child: Text(
                           'Free',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w600),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                         ),
                       ),
                       Container(
@@ -78,8 +83,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                 ),
                                 TextSpan(
                                   text: '00.00',
-                                  style: TextStyle(
-                                      fontSize: 24, color: Colors.black),
+                                  style: TextStyle(fontSize: 24, color: Colors.black),
                                 ),
                               ],
                             ),
@@ -120,8 +124,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                       margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                       child: Text(
                                         'Easy to use online resume builder',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                        style: TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                     ))
                                   ],
@@ -141,8 +144,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                       margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                       child: Text(
                                         'ATS optimized resumes',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                        style: TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                     ))
                                   ],
@@ -162,8 +164,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                       margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                       child: Text(
                                         'Trusted by verified resume writers',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                        style: TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                     ))
                                   ],
@@ -183,8 +184,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                       margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                       child: Text(
                                         'Trusted by verified resume writers',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                        style: TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                     ))
                                   ],
@@ -204,8 +204,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                       margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                       child: Text(
                                         'Trusted by verified resume writers',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                        style: TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                     ))
                                   ],
@@ -225,8 +224,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                       margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                       child: Text(
                                         'Trusted by verified resume writers',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                        style: TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                     ))
                                   ],
@@ -246,8 +244,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                       margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                       child: Text(
                                         'Trusted by verified resume writers',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                        style: TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                     ))
                                   ],
@@ -267,8 +264,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                       margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                       child: Text(
                                         'Trusted by verified resume writers',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                        style: TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                     ))
                                   ],
@@ -288,8 +284,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                       margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                       child: Text(
                                         'Trusted by verified resume writers',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                        style: TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                     ))
                                   ],
@@ -309,8 +304,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                       margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                       child: Text(
                                         'Trusted by verified resume writers',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                        style: TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                     ))
                                   ],
@@ -341,8 +335,7 @@ class PriceSectionDesktop extends StatelessWidget {
                       Container(
                         child: Text(
                           'Premium',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w600),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                         ),
                       ),
                       Container(
@@ -356,8 +349,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                 ),
                                 TextSpan(
                                   text: '99.00',
-                                  style: TextStyle(
-                                      fontSize: 24, color: Colors.black),
+                                  style: TextStyle(fontSize: 24, color: Colors.black),
                                 ),
                               ],
                             ),
@@ -397,8 +389,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                       margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                       child: Text(
                                         'Easy to use online resume builder',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                        style: TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                     ))
                                   ],
@@ -418,8 +409,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                       margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                       child: Text(
                                         'ATS optimized resumes',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                        style: TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                     ))
                                   ],
@@ -439,8 +429,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                       margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                       child: Text(
                                         'Trusted by verified resume writers',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                        style: TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                     ))
                                   ],
@@ -460,8 +449,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                       margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                       child: Text(
                                         'Trusted by verified resume writers',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                        style: TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                     ))
                                   ],
@@ -481,8 +469,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                       margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                       child: Text(
                                         'Trusted by verified resume writers',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                        style: TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                     ))
                                   ],
@@ -502,8 +489,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                       margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                       child: Text(
                                         'Trusted by verified resume writers',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                        style: TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                     ))
                                   ],
@@ -523,8 +509,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                       margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                       child: Text(
                                         'Trusted by verified resume writers',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                        style: TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                     ))
                                   ],
@@ -544,8 +529,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                       margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                       child: Text(
                                         'Trusted by verified resume writers',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                        style: TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                     ))
                                   ],
@@ -565,8 +549,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                       margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                       child: Text(
                                         'Trusted by verified resume writers',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                        style: TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                     ))
                                   ],
@@ -586,8 +569,7 @@ class PriceSectionDesktop extends StatelessWidget {
                                       margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                       child: Text(
                                         'Trusted by verified resume writers',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                        style: TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                     ))
                                   ],

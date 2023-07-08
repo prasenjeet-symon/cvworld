@@ -214,3 +214,15 @@ model Links {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 }
+
+// for the contact us form
+model ContactUs {
+  id         Int      @id @default(autoincrement())
+  name       String
+  email      String
+  phone      String
+  message    String
+  isResolved Boolean @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+}

@@ -16,28 +16,22 @@ class EducationSection extends StatefulWidget {
   final String description;
   final Resume? resume;
 
-  const EducationSection({
-    Key? key,
-    required this.title,
-    required this.description,
-    this.resume,
-  }) : super(key: key);
+  const EducationSection({Key? key, required this.title, required this.description, this.resume}) : super(key: key);
 
   @override
   State<EducationSection> createState() => EducationSectionState();
 }
 
 class EducationSectionState extends State<EducationSection> {
-  final CustomEducationSection _customEducationSection =
-      CustomEducationSection();
+  final CustomEducationSection _customEducationSection = CustomEducationSection();
 
   List<Education> getData() {
     return _customEducationSection.item
         .map((e) => {
               Education(
                 e.school.controller.text,
-                DateTime.parse(e.startDate.controller.text),
-                DateTime.parse(e.endDate.controller.text),
+                DateTime.parse(e.startDate.controller.text.isEmpty ? DateTime.now().toIso8601String() : e.startDate.controller.text),
+                DateTime.parse(e.endDate.controller.text.isEmpty ? DateTime.now().toIso8601String() : e.endDate.controller.text),
                 e.degree.controller.text,
                 e.city.controller.text,
                 e.description.controller.text,
@@ -48,36 +42,37 @@ class EducationSectionState extends State<EducationSection> {
   }
 
   addNewItem() {
-    _customEducationSection.addNewItem();
-    setState(() {});
+    _customEducationSection.addNewItem().then((value) => {setState(() {})});
   }
 
   removeItem(int index) {
-    _customEducationSection.removeItem(index);
-    setState(() {});
+    _customEducationSection.removeItem(index).then((value) => {setState(() {})});
   }
 
   @override
   void initState() {
+    super.initState();
+
     _customEducationSection.resume = widget.resume;
     _customEducationSection.fetchEducation().then((value) => {setState(() {})});
     _customEducationSection.patchResume().then((value) => {setState(() {})});
-    super.initState();
   }
 
   @override
   void dispose() {
-    super.dispose();
     _customEducationSection.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       margin: const EdgeInsets.fromLTRB(0, 25, 0, 25),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
             margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
@@ -94,9 +89,7 @@ class EducationSectionState extends State<EducationSection> {
             ),
           ),
           Container(
-            margin: _customEducationSection.item.isNotEmpty
-                ? const EdgeInsets.fromLTRB(0, 15, 0, 15)
-                : const EdgeInsets.fromLTRB(0, 0, 0, 0),
+            margin: _customEducationSection.item.isNotEmpty ? const EdgeInsets.fromLTRB(0, 15, 0, 15) : const EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -124,9 +117,7 @@ class EducationSectionState extends State<EducationSection> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    _customEducationSection.item.isNotEmpty
-                        ? const Text('Add one more education')
-                        : const Text('Add education'),
+                    _customEducationSection.item.isNotEmpty ? const Text('Add one more education') : const Text('Add education'),
                     Container(
                       margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
                       child: const Icon(Icons.add),
@@ -151,11 +142,7 @@ class EducationItem extends StatefulWidget {
   final CustomEducationItem customEducationItem;
   final int index;
 
-  const EducationItem(
-      {super.key,
-      required this.onDelete,
-      required this.customEducationItem,
-      required this.index});
+  const EducationItem({super.key, required this.onDelete, required this.customEducationItem, required this.index});
 
   @override
   State<EducationItem> createState() => _EducationItemState();
@@ -181,12 +168,6 @@ class _EducationItemState extends State<EducationItem> {
 
   @override
   void dispose() {
-    widget.customEducationItem.city.controller.dispose();
-    widget.customEducationItem.degree.controller.dispose();
-    widget.customEducationItem.description.controller.dispose();
-    widget.customEducationItem.endDate.controller.dispose();
-    widget.customEducationItem.school.controller.dispose();
-    widget.customEducationItem.startDate.controller.dispose();
     super.dispose();
   }
 
@@ -244,7 +225,7 @@ class _EducationItemState extends State<EducationItem> {
 ///
 ///
 class CustomEducationItem {
-  final int id;
+  int id;
   final CustomInputType school;
   final CustomInputType degree;
   final CustomInputType startDate;
@@ -297,8 +278,7 @@ class CustomEducationItem {
       controller.add(id);
     });
 
-    return controller
-        .debounceTime(const Duration(milliseconds: Constants.debounceTime));
+    return controller.debounceTime(const Duration(milliseconds: Constants.debounceTime));
   }
 
   // dispose
@@ -322,41 +302,17 @@ class CustomEducationItem {
   }
 
   generateCustomInputFields() {
-    schoolField = CustomInputField(
-        label: school.label,
-        isRequired: school.isRequired,
-        controller: school.controller,
-        type: school.type);
+    schoolField = CustomInputField(label: school.label, isRequired: school.isRequired, controller: school.controller, type: school.type);
 
-    degreeField = CustomInputField(
-        label: degree.label,
-        isRequired: degree.isRequired,
-        controller: degree.controller,
-        type: degree.type);
+    degreeField = CustomInputField(label: degree.label, isRequired: degree.isRequired, controller: degree.controller, type: degree.type);
 
-    startDateField = CustomInputField(
-        label: startDate.label,
-        isRequired: startDate.isRequired,
-        controller: startDate.controller,
-        type: startDate.type);
+    startDateField = CustomInputField(label: startDate.label, isRequired: startDate.isRequired, controller: startDate.controller, type: startDate.type);
 
-    endDateField = CustomInputField(
-        label: endDate.label,
-        isRequired: endDate.isRequired,
-        controller: endDate.controller,
-        type: endDate.type);
+    endDateField = CustomInputField(label: endDate.label, isRequired: endDate.isRequired, controller: endDate.controller, type: endDate.type);
 
-    cityField = CustomInputField(
-        label: city.label,
-        isRequired: city.isRequired,
-        controller: city.controller,
-        type: city.type);
+    cityField = CustomInputField(label: city.label, isRequired: city.isRequired, controller: city.controller, type: city.type);
 
-    descriptionField = CustomInputField(
-        label: description.label,
-        isRequired: description.isRequired,
-        controller: description.controller,
-        type: description.type);
+    descriptionField = CustomInputField(label: description.label, isRequired: description.isRequired, controller: description.controller, type: description.type);
   }
 }
 
@@ -382,6 +338,7 @@ class CustomEducationSection {
   Future<void> patchResume() async {
     if (resume.isNull) return;
     var educationToPatch = resume!.education;
+
     for (var element in educationToPatch) {
       var schoolController = _addController();
       schoolController.text = element.school;
@@ -403,48 +360,12 @@ class CustomEducationSection {
 
       var customEducationItem = CustomEducationItem(
         id: getId(),
-        school: CustomInputType(
-          'School',
-          'school',
-          true,
-          schoolController,
-          TextInputType.text,
-        ),
-        degree: CustomInputType(
-          'Degree',
-          'degree',
-          true,
-          degreeController,
-          TextInputType.text,
-        ),
-        startDate: CustomInputType(
-          'Start Date',
-          'startDate',
-          true,
-          startDateController,
-          TextInputType.text,
-        ),
-        endDate: CustomInputType(
-          'End Date',
-          'endDate',
-          true,
-          endDateController,
-          TextInputType.text,
-        ),
-        city: CustomInputType(
-          'City',
-          'city',
-          true,
-          cityController,
-          TextInputType.text,
-        ),
-        description: CustomInputType(
-          'Description',
-          'description',
-          true,
-          descriptionController,
-          TextInputType.text,
-        ),
+        school: CustomInputType('School', 'school', true, schoolController, TextInputType.text),
+        degree: CustomInputType('Degree', 'degree', true, degreeController, TextInputType.text),
+        startDate: CustomInputType('Start Date', 'startDate', true, startDateController, TextInputType.datetime),
+        endDate: CustomInputType('End Date', 'endDate', true, endDateController, TextInputType.datetime),
+        city: CustomInputType('City', 'city', true, cityController, TextInputType.text),
+        description: CustomInputType('Description', 'description', true, descriptionController, TextInputType.text),
       );
 
       item.add(customEducationItem);
@@ -480,48 +401,12 @@ class CustomEducationSection {
 
       var customEducationItem = CustomEducationItem(
         id: element.id,
-        school: CustomInputType(
-          'School',
-          'school',
-          true,
-          schoolController,
-          TextInputType.text,
-        ),
-        degree: CustomInputType(
-          'Degree',
-          'degree',
-          true,
-          degreeController,
-          TextInputType.text,
-        ),
-        startDate: CustomInputType(
-          'Start Date',
-          'startDate',
-          true,
-          startDateController,
-          TextInputType.datetime,
-        ),
-        endDate: CustomInputType(
-          'End Date',
-          'endDate',
-          true,
-          endDateController,
-          TextInputType.datetime,
-        ),
-        city: CustomInputType(
-          'City',
-          'city',
-          true,
-          cityController,
-          TextInputType.text,
-        ),
-        description: CustomInputType(
-          'Description',
-          'description',
-          true,
-          descriptionController,
-          TextInputType.text,
-        ),
+        school: CustomInputType('School', 'school', true, schoolController, TextInputType.text),
+        degree: CustomInputType('Degree', 'degree', true, degreeController, TextInputType.text),
+        startDate: CustomInputType('Start Date', 'startDate', true, startDateController, TextInputType.datetime),
+        endDate: CustomInputType('End Date', 'endDate', true, endDateController, TextInputType.datetime),
+        city: CustomInputType('City', 'city', true, cityController, TextInputType.text),
+        description: CustomInputType('Description', 'description', true, descriptionController, TextInputType.text),
       );
 
       item.add(customEducationItem);
@@ -542,7 +427,7 @@ class CustomEducationSection {
   // get the latest id
   int getId() {
     var id = 0;
-    for (var element in education) {
+    for (var element in item) {
       if (element.id > id) {
         id = element.id;
       }
@@ -556,51 +441,13 @@ class CustomEducationSection {
 
     var customEducationItem = CustomEducationItem(
       id: id,
-      school: CustomInputType(
-        'School',
-        'school',
-        true,
-        _addController(),
-        TextInputType.text,
-      ),
-      degree: CustomInputType(
-        'Degree',
-        'degree',
-        true,
-        _addController(),
-        TextInputType.text,
-      ),
-      startDate: CustomInputType(
-        'Start Date',
-        'startDate',
-        true,
-        _addController(),
-        TextInputType.datetime,
-      ),
-      endDate: CustomInputType(
-        'End Date',
-        'endDate',
-        true,
-        _addController(),
-        TextInputType.datetime,
-      ),
-      city: CustomInputType(
-        'City',
-        'city',
-        true,
-        _addController(),
-        TextInputType.text,
-      ),
-      description: CustomInputType(
-        'Description',
-        'description',
-        true,
-        _addController(),
-        TextInputType.text,
-      ),
+      school: CustomInputType('School', 'school', true, _addController(), TextInputType.text),
+      degree: CustomInputType('Degree', 'degree', true, _addController(), TextInputType.text),
+      startDate: CustomInputType('Start Date', 'startDate', true, _addController(), TextInputType.datetime),
+      endDate: CustomInputType('End Date', 'endDate', true, _addController(), TextInputType.datetime),
+      city: CustomInputType('City', 'city', true, _addController(), TextInputType.text),
+      description: CustomInputType('Description', 'description', true, _addController(), TextInputType.text),
     );
-
-    item.add(customEducationItem);
 
     if (resume.isNull) {
       // listen for the changes and update the item
@@ -612,12 +459,8 @@ class CustomEducationSection {
       var educationItemToAdd = UserEducation(
         customEducationItem.id,
         customEducationItem.school.controller.text,
-        customEducationItem.startDate.controller.text.isEmpty
-            ? DateTime.now()
-            : DateTime.parse(customEducationItem.startDate.controller.text),
-        customEducationItem.endDate.controller.text.isEmpty
-            ? DateTime.now()
-            : DateTime.parse(customEducationItem.endDate.controller.text),
+        customEducationItem.startDate.controller.text.isEmpty ? DateTime.now() : DateTime.parse(customEducationItem.startDate.controller.text),
+        customEducationItem.endDate.controller.text.isEmpty ? DateTime.now() : DateTime.parse(customEducationItem.endDate.controller.text),
         customEducationItem.degree.controller.text,
         customEducationItem.city.controller.text,
         customEducationItem.description.controller.text,
@@ -625,67 +468,45 @@ class CustomEducationSection {
         DateTime.now(),
       );
 
-      await DatabaseService().addUpdateUserEducation(educationItemToAdd);
-      education.add(educationItemToAdd);
-
-      Fluttertoast.showToast(
-        msg: 'Added education',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+      var addedItem = await DatabaseService().addUpdateUserEducation(educationItemToAdd);
+      education.add(addedItem!);
+      customEducationItem.id = addedItem.id;
+      item.add(customEducationItem);
+    } else {
+      item.add(customEducationItem);
     }
+
+    Fluttertoast.showToast(msg: 'Added education', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
   }
 
-  void removeItem(int index) async {
+  Future<void> removeItem(int index) async {
     // remove locally
     var itemToRemove = item[index];
     itemToRemove.dispose();
     item.removeAt(index);
 
     if (resume.isNull) {
-      var savedItemIndex =
-          education.indexWhere((element) => element.id == itemToRemove.id);
-
+      var savedItemIndex = education.indexWhere((element) => element.id == itemToRemove.id);
       if (savedItemIndex != -1) {
         education.removeAt(savedItemIndex);
-        await DatabaseService()
-            .deleteUserEducation(DeleteDocuments(itemToRemove.id));
+        await DatabaseService().deleteUserEducation(DeleteDocuments(itemToRemove.id));
       }
     }
 
-    Fluttertoast.showToast(
-      msg: 'Removed education',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.red,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
+    Fluttertoast.showToast(msg: 'Removed education', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white, fontSize: 16.0);
   }
 
   // update the item
   Future<void> updateItem(int id) async {
     var changedItemIndex = item.indexWhere((element) => element.id == id);
-    if (changedItemIndex == -1) {
-      return;
-    }
-
+    if (changedItemIndex == -1) return;
     var changedItem = item[changedItemIndex];
 
     var itemForUpdate = UserEducation(
       changedItem.id,
       changedItem.school.controller.text,
-      changedItem.startDate.controller.text.isEmpty
-          ? DateTime.now()
-          : DateTime.parse(changedItem.startDate.controller.text),
-      changedItem.endDate.controller.text.isEmpty
-          ? DateTime.now()
-          : DateTime.parse(changedItem.endDate.controller.text),
+      changedItem.startDate.controller.text.isEmpty ? DateTime.now() : DateTime.parse(changedItem.startDate.controller.text),
+      changedItem.endDate.controller.text.isEmpty ? DateTime.now() : DateTime.parse(changedItem.endDate.controller.text),
       changedItem.degree.controller.text,
       changedItem.city.controller.text,
       changedItem.description.controller.text,
@@ -694,21 +515,12 @@ class CustomEducationSection {
     );
 
     await DatabaseService().addUpdateUserEducation(itemForUpdate);
-    var savedItemIndexChanged =
-        education.indexWhere((element) => element.id == changedItem.id);
+    var savedItemIndexChanged = education.indexWhere((element) => element.id == changedItem.id);
 
     if (savedItemIndexChanged != -1) {
       education[savedItemIndexChanged] = itemForUpdate;
     }
 
-    Fluttertoast.showToast(
-      msg: 'Updated education',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.green,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
+    Fluttertoast.showToast(msg: 'Updated education', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
   }
 }

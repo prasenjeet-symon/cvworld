@@ -9,25 +9,13 @@ class Dashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
+    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       if (constraints.maxWidth < 600) {
         return const DashboardMobile();
       } else {
         return const DashboardDesktop();
       }
     });
-  }
-}
-
-// Dashboard for mobile
-class DashboardMobile extends StatelessWidget {
-  const DashboardMobile({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
   }
 }
 
@@ -47,5 +35,15 @@ class DashboardDesktop extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+// Dashboard for mobile
+class DashboardMobile extends StatelessWidget {
+  const DashboardMobile({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    throw UnimplementedError();
   }
 }

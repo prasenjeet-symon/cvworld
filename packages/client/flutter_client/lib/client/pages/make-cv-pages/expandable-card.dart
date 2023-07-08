@@ -8,12 +8,7 @@ class ExpandableCard extends StatefulWidget {
   final DeleteFunction onDelete;
   final int index;
 
-  const ExpandableCard(
-      {super.key,
-      required this.title,
-      required this.children,
-      required this.onDelete,
-      required this.index});
+  const ExpandableCard({super.key, required this.title, required this.children, required this.onDelete, required this.index});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -41,16 +36,14 @@ class _ExpandableCardState extends State<ExpandableCard> {
               },
               title: Text(
                 widget.title,
-                style:
-                    const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+                style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
               ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    icon: Icon(
-                        _isExpanded ? Icons.expand_less : Icons.expand_more),
+                    icon: Icon(_isExpanded ? Icons.expand_less : Icons.expand_more),
                     onPressed: () {
                       setState(() {
                         if (mounted) {
@@ -69,14 +62,7 @@ class _ExpandableCardState extends State<ExpandableCard> {
                 ],
               ),
             ),
-            _isExpanded
-                ? Container(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Container(
-                      child: widget.children,
-                    ),
-                  )
-                : SizedBox(),
+            _isExpanded ? Container(padding: const EdgeInsets.all(5.0), child: Container(child: widget.children)) : const SizedBox(),
           ],
         ),
       ),

@@ -1,11 +1,11 @@
-import 'dart:js_interop';
-
+// ignore: file_names
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/dashboard/header.dart';
 import 'package:flutter_client/client/utils.dart';
+import 'package:flutter_client/routes/router.gr.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:flutter_client/client/datasource.dart';
 
 @RoutePage()
 class ViewResume extends StatefulWidget {
@@ -20,14 +20,11 @@ class ViewResume extends StatefulWidget {
 class _ViewResumeState extends State<ViewResume> {
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
+    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       if (constraints.maxWidth < 600) {
         return const ViewResumeMobile();
       } else {
-        return ViewResumeDesktop(
-          resumeID: widget.resumeID,
-        );
+        return ViewResumeDesktop(resumeID: widget.resumeID);
       }
     });
   }
@@ -49,9 +46,7 @@ class _ViewResumeDesktopState extends State<ViewResumeDesktop> {
         child: Column(
           children: [
             const DashboardHeader(),
-            ResumeViewer(
-              resumeID: widget.resumeID,
-            )
+            ResumeViewer(resumeID: widget.resumeID),
           ],
         ),
       ),
@@ -68,8 +63,8 @@ class ResumeViewer extends StatefulWidget {
 }
 
 class _ResumeViewerState extends State<ResumeViewer> {
-  late List<GeneratedResume> resume = [];
-  bool isLoading = false;
+  late GeneratedResume? resume;
+  bool isLoading = true;
   bool isError = false;
 
   Future<void> fetchSingleResume() async {
@@ -77,18 +72,10 @@ class _ResumeViewerState extends State<ResumeViewer> {
     setState(() {});
 
     try {
-      var resumeFetched =
-          await DatabaseService().fetchSingleResume(widget.resumeID);
-      resume = [];
-      resume.add((resumeFetched as GeneratedResume));
+      var resumeFetched = await DatabaseService().fetchSingleResume(widget.resumeID);
+      resume = resumeFetched;
     } catch (e) {
-      await Fluttertoast.showToast(
-        msg: 'Something went wrong...',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.8),
-        textColor: Colors.white,
-      );
+      await Fluttertoast.showToast(msg: 'Something went wrong...', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.red.withOpacity(0.8), textColor: Colors.white);
     }
 
     isLoading = false;
@@ -97,17 +84,14 @@ class _ResumeViewerState extends State<ResumeViewer> {
 
   @override
   void initState() {
-    print(widget.resumeID);
-    fetchSingleResume();
     super.initState();
+    fetchSingleResume();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading || resume.isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+    if (isLoading) {
+      return const Center(child: Padding(padding: EdgeInsets.all(50), child: CircularProgressIndicator()));
     }
 
     return SizedBox(
@@ -124,21 +108,27 @@ class _ResumeViewerState extends State<ResumeViewer> {
                 Container(
                   margin: const EdgeInsets.fromLTRB(0, 25, 0, 0),
                   child: BackButtonApp(onPressed: () {
-                    context.back();
+                    context.popRoute(ViewResume(resumeID: widget.resumeID));
                   }),
                 ),
                 Container(
                   margin: const EdgeInsets.fromLTRB(0, 45, 0, 50),
-                  child: Image.network(resume[0].resume.imageUrl),
+                  child: Image.network(resume!.resumeLink.imageUrl, ),
                 ),
                 Row(
                   children: [
                     const Expanded(child: SizedBox()),
+                    Container(
+                      width: 100,
+                      margin: const EdgeInsets.fromLTRB(0, 0, 20, 0),
+                      child: EditButton(onPressed: () {
+                        context.pushRoute(CvMakerRoute(resumeID: widget.resumeID));
+                      }),
+                    ),
                     SizedBox(
                       width: 200,
                       child: DownloadButton(onPressed: () {
-                        downloadFile(
-                            resume[0].resume.pdfUrl, resume[0].resume.pdfUrl);
+                        downloadFile(resume!.resumeLink.pdfUrl, resume!.resumeLink.pdfUrl);
                       }),
                     )
                   ],
@@ -153,19 +143,12 @@ class _ResumeViewerState extends State<ResumeViewer> {
   }
 }
 
-/** 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- */
+///
+///
+///
+///
+///
+///
 class ViewResumeMobile extends StatefulWidget {
   const ViewResumeMobile({super.key});
 
@@ -176,18 +159,16 @@ class ViewResumeMobile extends StatefulWidget {
 class _ViewResumeMobileState extends State<ViewResumeMobile> {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     throw UnimplementedError();
   }
 }
 
-/**  
- * 
- * 
- * 
- * 
- * 
- */
+///
+///
+///
+///
+///
+///
 class DownloadButton extends StatelessWidget {
   final void Function() onPressed;
 
@@ -197,24 +178,36 @@ class DownloadButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
-          padding: const EdgeInsets.fromLTRB(20, 25, 20, 25)),
+      style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, padding: const EdgeInsets.fromLTRB(20, 25, 20, 25)),
       child: const Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.download,
-            color: Colors.white,
-          ),
+          Icon(Icons.download, color: Colors.white),
           SizedBox(width: 8.0),
-          Text(
-            'Download PDF',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16.0,
-            ),
-          ),
+          Text('Download PDF', style: TextStyle(color: Colors.white, fontSize: 16.0)),
+        ],
+      ),
+    );
+  }
+}
+
+// Edit Button
+class EditButton extends StatelessWidget {
+  final void Function() onPressed;
+
+  const EditButton({super.key, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(backgroundColor: Colors.white, padding: const EdgeInsets.fromLTRB(20, 25, 20, 25)),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.edit, color: Colors.blue),
+          SizedBox(width: 8.0),
+          Text('Edit', style: TextStyle(color: Colors.blue, fontSize: 16.0)),
         ],
       ),
     );

@@ -16,12 +16,7 @@ class CourseSection extends StatefulWidget {
   final String description;
   final Resume? resume;
 
-  const CourseSection({
-    Key? key,
-    required this.title,
-    required this.description,
-    this.resume,
-  }) : super(key: key);
+  const CourseSection({Key? key, required this.title, required this.description, this.resume}) : super(key: key);
 
   @override
   State<CourseSection> createState() => CourseSectionState();
@@ -36,8 +31,8 @@ class CourseSectionState extends State<CourseSection> {
               Courses(
                 e.course.controller.text,
                 e.institution.controller.text,
-                DateTime.parse(e.startDate.controller.text),
-                DateTime.parse(e.endDate.controller.text),
+                DateTime.parse(e.startDate.controller.text.isEmpty ? DateTime.now().toIso8601String() : e.startDate.controller.text),
+                DateTime.parse(e.endDate.controller.text.isEmpty ? DateTime.now().toIso8601String() : e.endDate.controller.text),
               )
             })
         .expand((element) => element)
@@ -45,19 +40,17 @@ class CourseSectionState extends State<CourseSection> {
   }
 
   addNewItem() {
-    _customCourseSection.addNewItem();
-    setState(() {});
+    _customCourseSection.addNewItem().then((value) => {setState(() {})});
   }
 
   removeItem(int index) {
-    _customCourseSection.removeItem(index);
-    setState(() {});
+    _customCourseSection.removeItem(index).then((value) => {setState(() {})});
   }
 
   @override
   void dispose() {
-    super.dispose();
     _customCourseSection.dispose();
+    super.dispose();
   }
 
   @override
@@ -72,10 +65,12 @@ class CourseSectionState extends State<CourseSection> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       margin: const EdgeInsets.fromLTRB(0, 25, 0, 25),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
             margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
@@ -92,9 +87,7 @@ class CourseSectionState extends State<CourseSection> {
             ),
           ),
           Container(
-            margin: _customCourseSection.item.isNotEmpty
-                ? const EdgeInsets.fromLTRB(0, 15, 0, 15)
-                : const EdgeInsets.fromLTRB(0, 0, 0, 0),
+            margin: _customCourseSection.item.isNotEmpty ? const EdgeInsets.fromLTRB(0, 15, 0, 15) : const EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -122,9 +115,7 @@ class CourseSectionState extends State<CourseSection> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    _customCourseSection.item.isNotEmpty
-                        ? const Text('Add one more course')
-                        : const Text('Add course'),
+                    _customCourseSection.item.isNotEmpty ? const Text('Add one more course') : const Text('Add course'),
                     Container(
                       margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
                       child: const Icon(Icons.add),
@@ -228,7 +219,7 @@ class _CourseItemState extends State<CourseItem> {
 ///
 ///
 class CustomCoursesItem {
-  final int id;
+  int id;
   final CustomInputType course;
   final CustomInputType institution;
   final CustomInputType startDate;
@@ -267,8 +258,7 @@ class CustomCoursesItem {
       controller.add(id);
     });
 
-    return controller
-        .debounceTime(const Duration(milliseconds: Constants.debounceTime));
+    return controller.debounceTime(const Duration(milliseconds: Constants.debounceTime));
   }
 
   // dispose
@@ -356,34 +346,10 @@ class CustomCourseSection {
 
       var courseItem = CustomCoursesItem(
         id: getId(),
-        course: CustomInputType(
-          'Course',
-          'course',
-          true,
-          courseController,
-          TextInputType.text,
-        ),
-        institution: CustomInputType(
-          'Institution',
-          'institution',
-          true,
-          institutionController,
-          TextInputType.text,
-        ),
-        startDate: CustomInputType(
-          'Start Date',
-          'startDate',
-          true,
-          startDateController,
-          TextInputType.datetime,
-        ),
-        endDate: CustomInputType(
-          'End Date',
-          'endDate',
-          true,
-          endDateController,
-          TextInputType.datetime,
-        ),
+        course: CustomInputType('Course', 'course', true, courseController, TextInputType.text),
+        institution: CustomInputType('Institution', 'institution', true, institutionController, TextInputType.text),
+        startDate: CustomInputType('Start Date', 'startDate', true, startDateController, TextInputType.datetime),
+        endDate: CustomInputType('End Date', 'endDate', true, endDateController, TextInputType.datetime),
       );
 
       item.add(courseItem);
@@ -413,34 +379,10 @@ class CustomCourseSection {
 
       var courseItem = CustomCoursesItem(
         id: element.id,
-        course: CustomInputType(
-          'Course',
-          'course',
-          true,
-          courseController,
-          TextInputType.text,
-        ),
-        institution: CustomInputType(
-          'Institution',
-          'institution',
-          true,
-          institutionController,
-          TextInputType.text,
-        ),
-        startDate: CustomInputType(
-          'Start Date',
-          'startDate',
-          true,
-          startDateController,
-          TextInputType.datetime,
-        ),
-        endDate: CustomInputType(
-          'End Date',
-          'endDate',
-          true,
-          endDateController,
-          TextInputType.datetime,
-        ),
+        course: CustomInputType('Course', 'course', true, courseController, TextInputType.text),
+        institution: CustomInputType('Institution', 'institution', true, institutionController, TextInputType.text),
+        startDate: CustomInputType('Start Date', 'startDate', true, startDateController, TextInputType.datetime),
+        endDate: CustomInputType('End Date', 'endDate', true, endDateController, TextInputType.datetime),
       );
 
       item.add(courseItem);
@@ -460,6 +402,7 @@ class CustomCourseSection {
         maxId = element.id;
       }
     }
+
     return maxId + 1;
   }
 
@@ -469,42 +412,16 @@ class CustomCourseSection {
     }
   }
 
-  addNewItem() async {
+  Future<void> addNewItem() async {
     var id = getId();
 
     var courseItem = CustomCoursesItem(
       id: id,
-      course: CustomInputType(
-        'Course',
-        'course',
-        true,
-        _addController(),
-        TextInputType.text,
-      ),
-      institution: CustomInputType(
-        'Institution',
-        'institution',
-        true,
-        _addController(),
-        TextInputType.text,
-      ),
-      endDate: CustomInputType(
-        'End Date',
-        'endDate',
-        true,
-        _addController(),
-        TextInputType.datetime,
-      ),
-      startDate: CustomInputType(
-        'Start Date',
-        'startDate',
-        true,
-        _addController(),
-        TextInputType.datetime,
-      ),
+      course: CustomInputType('Course', 'course', true, _addController(), TextInputType.text),
+      institution: CustomInputType('Institution', 'institution', true, _addController(), TextInputType.text),
+      endDate: CustomInputType('End Date', 'endDate', true, _addController(), TextInputType.datetime),
+      startDate: CustomInputType('Start Date', 'startDate', true, _addController(), TextInputType.datetime),
     );
-
-    item.add(courseItem);
 
     if (resume.isNull) {
       // listen for the changes and update the item
@@ -519,97 +436,64 @@ class CustomCourseSection {
         courseItem.id,
         courseItem.course.controller.text,
         courseItem.institution.controller.text,
-        courseItem.startDate.controller.text.isEmpty
-            ? DateTime.now()
-            : DateTime.parse(courseItem.startDate.controller.text),
-        courseItem.endDate.controller.text.isEmpty
-            ? DateTime.now()
-            : DateTime.parse(courseItem.endDate.controller.text),
+        courseItem.startDate.controller.text.isEmpty ? DateTime.now() : DateTime.parse(courseItem.startDate.controller.text),
+        courseItem.endDate.controller.text.isEmpty ? DateTime.now() : DateTime.parse(courseItem.endDate.controller.text),
         DateTime.now(),
         DateTime.now(),
       );
 
-      await DatabaseService().addUpdateUserCourse(userCourse);
-
-      // display flutter toast
-      Fluttertoast.showToast(
-        msg: 'Course added',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-      );
-
-      courses.add(userCourse);
+      var addedItem = await DatabaseService().addUpdateUserCourse(userCourse);
+      courses.add(addedItem!);
+      courseItem.id = addedItem.id;
+      item.add(courseItem);
+    } else {
+      item.add(courseItem);
     }
+
+    // display flutter toast
+    Fluttertoast.showToast(msg: 'Course added', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white);
   }
 
-  void removeItem(int index) async {
+  Future<void> removeItem(int index) async {
     // find the course in the list
     var courseToDelete = item[index];
     courseToDelete.dispose();
     item.removeAt(index);
 
     if (resume.isNull) {
-      var courseToDeleteDatabaseIndex =
-          courses.indexWhere((element) => element.id == courseToDelete.id);
+      var courseToDeleteDatabaseIndex = courses.indexWhere((element) => element.id == courseToDelete.id);
       if (courseToDeleteDatabaseIndex != -1) {
         courses.removeAt(courseToDeleteDatabaseIndex);
         // remove the course from the database
-        await DatabaseService()
-            .deleteUserCourse(DeleteDocuments(courseToDelete.id));
+        await DatabaseService().deleteUserCourse(DeleteDocuments(courseToDelete.id));
       }
     }
 
-    Fluttertoast.showToast(
-      msg: 'Course removed',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.red,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
+    Fluttertoast.showToast(msg: 'Course removed', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white, fontSize: 16.0);
   }
 
   // update the item
   updateItem(int id) async {
     var courseIndex = item.indexWhere((element) => element.id == id);
-    if (courseIndex == -1) {
-      return;
-    }
-
+    if (courseIndex == -1) return;
     var course = item[courseIndex];
 
     var updatedCourse = UserCourse(
       course.id,
       course.course.controller.text,
       course.institution.controller.text,
-      course.startDate.controller.text.isEmpty
-          ? DateTime.now()
-          : DateTime.parse(course.startDate.controller.text),
-      course.endDate.controller.text.isEmpty
-          ? DateTime.now()
-          : DateTime.parse(course.endDate.controller.text),
+      course.startDate.controller.text.isEmpty ? DateTime.now() : DateTime.parse(course.startDate.controller.text),
+      course.endDate.controller.text.isEmpty ? DateTime.now() : DateTime.parse(course.endDate.controller.text),
       DateTime.now(),
       DateTime.now(),
     );
 
     await DatabaseService().addUpdateUserCourse(updatedCourse);
-    var savedItemIndexChanged =
-        courses.indexWhere((element) => element.id == updatedCourse.id);
+    var savedItemIndexChanged = courses.indexWhere((element) => element.id == updatedCourse.id);
     if (savedItemIndexChanged != -1) {
       courses[savedItemIndexChanged] = updatedCourse;
     }
 
-    Fluttertoast.showToast(
-      msg: 'Course updated',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.green,
-      textColor: Colors.white,
-    );
+    Fluttertoast.showToast(msg: 'Course updated', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white);
   }
 }

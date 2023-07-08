@@ -7,13 +7,7 @@ class CustomInputType {
   final TextInputType type;
   final TextEditingController controller;
 
-  CustomInputType(
-    this.label,
-    this.jsonKey,
-    this.isRequired,
-    this.controller,
-    this.type,
-  );
+  CustomInputType(this.label, this.jsonKey, this.isRequired, this.controller, this.type);
 }
 
 typedef DeleteFunction = void Function(int index);

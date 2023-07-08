@@ -9,13 +9,7 @@ class CustomInputField extends StatefulWidget {
   final TextInputType type;
   bool? isTextArea;
 
-  CustomInputField(
-      {super.key,
-      required this.label,
-      required this.isRequired,
-      required this.controller,
-      required this.type,
-      this.isTextArea});
+  CustomInputField({super.key, required this.label, required this.isRequired, required this.controller, required this.type, this.isTextArea});
 
   @override
   State<CustomInputField> createState() => _CustomInputFieldState();
@@ -23,14 +17,7 @@ class CustomInputField extends StatefulWidget {
 
 class _CustomInputFieldState extends State<CustomInputField> {
   Future<void> _showDatePicker() async {
-    var dateTime = await showDatePicker(
-      context: context,
-      initialDate: widget.controller.text.isEmpty
-          ? DateTime.now()
-          : DateTime.parse(widget.controller.text),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
+    var dateTime = await showDatePicker(context: context, initialDate: widget.controller.text.isEmpty ? DateTime.now() : DateTime.parse(widget.controller.text), firstDate: DateTime(2000), lastDate: DateTime(2100));
 
     if (dateTime.isNull) {
       // closed
@@ -41,21 +28,9 @@ class _CustomInputFieldState extends State<CustomInputField> {
   }
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return TextFormField(
-      onTap: () => {
-        widget.type == TextInputType.datetime ? _showDatePicker() : () => {}
-      },
+      onTap: () => {widget.type == TextInputType.datetime ? _showDatePicker() : () => {}},
       controller: widget.controller,
       keyboardType: widget.type,
       maxLines: widget.isTextArea.isNull ? 1 : null, // Allow unlimited lines

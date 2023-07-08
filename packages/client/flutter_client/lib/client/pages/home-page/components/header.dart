@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/material.dart';
 
 class HeaderSection extends StatelessWidget {
-  const HeaderSection({super.key});
+  Function pricingSectionCallback;
+
+  HeaderSection({super.key, required this.pricingSectionCallback});
 
   @override
   Widget build(BuildContext context) {
@@ -34,26 +36,20 @@ class HeaderSection extends StatelessWidget {
                     Container(
                       margin: const EdgeInsets.fromLTRB(0, 0, 40, 0),
                       child: TextButton(
-                        onPressed: () => {},
+                        onPressed: () => {context.navigateNamedTo('/')},
                         child: const Text(
                           'Home',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500),
+                          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
                         ),
                       ),
                     ),
                     Container(
                       margin: const EdgeInsets.fromLTRB(0, 0, 40, 0),
                       child: TextButton(
-                        onPressed: () => {},
+                        onPressed: () => {context.navigateNamedTo('/contact-us')},
                         child: const Text(
                           'Contact Us',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500),
+                          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
                         ),
                       ),
                     ),
@@ -63,23 +59,17 @@ class HeaderSection extends StatelessWidget {
                         onPressed: () => {},
                         child: const Text(
                           'About Us',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500),
+                          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
                         ),
                       ),
                     ),
                     Container(
                       margin: const EdgeInsets.fromLTRB(0, 0, 40, 0),
                       child: TextButton(
-                        onPressed: () => {},
+                        onPressed: () => {pricingSectionCallback()},
                         child: const Text(
                           'Pricing',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500),
+                          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
                         ),
                       ),
                     ),

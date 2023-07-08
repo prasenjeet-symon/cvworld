@@ -16,21 +16,14 @@ class EmploymentHistorySection extends StatefulWidget {
   final String description;
   final Resume? resume;
 
-  const EmploymentHistorySection({
-    Key? key,
-    required this.title,
-    required this.description,
-    this.resume,
-  }) : super(key: key);
+  const EmploymentHistorySection({Key? key, required this.title, required this.description, this.resume}) : super(key: key);
 
   @override
-  State<EmploymentHistorySection> createState() =>
-      EmploymentHistorySectionState();
+  State<EmploymentHistorySection> createState() => EmploymentHistorySectionState();
 }
 
 class EmploymentHistorySectionState extends State<EmploymentHistorySection> {
-  final CustomEmploymentHistory _customEmploymentHistory =
-      CustomEmploymentHistory();
+  final CustomEmploymentHistory _customEmploymentHistory = CustomEmploymentHistory();
 
   List<EmploymentHistory> getData() {
     return _customEmploymentHistory.item
@@ -38,8 +31,8 @@ class EmploymentHistorySectionState extends State<EmploymentHistorySection> {
               EmploymentHistory(
                 e.jobTitle.controller.text,
                 e.employer.controller.text,
-                DateTime.parse(e.startDate.controller.text),
-                DateTime.parse(e.endDate.controller.text),
+                DateTime.parse(e.startDate.controller.text.isEmpty ? DateTime.now().toIso8601String() : e.startDate.controller.text),
+                DateTime.parse(e.endDate.controller.text.isEmpty ? DateTime.now().toIso8601String() : e.endDate.controller.text),
                 e.city.controller.text,
                 e.description.controller.text,
               )
@@ -49,25 +42,20 @@ class EmploymentHistorySectionState extends State<EmploymentHistorySection> {
   }
 
   addNewItem() {
-    _customEmploymentHistory.addNewItem();
-    setState(() {});
+    _customEmploymentHistory.addNewItem().then((value) => {setState(() {})});
   }
 
   removeItem(int index) {
-    _customEmploymentHistory.removeItem(index);
-    setState(() {});
+    _customEmploymentHistory.removeItem(index).then((value) => {setState(() {})});
   }
 
   @override
   void initState() {
-    _customEmploymentHistory.resume = widget.resume;
-    _customEmploymentHistory
-        .fetchEmploymentHistory()
-        .then((value) => {setState(() {})});
-
-    _customEmploymentHistory.patchResume().then((value) => {setState(() {})});
-
     super.initState();
+
+    _customEmploymentHistory.resume = widget.resume;
+    _customEmploymentHistory.fetchEmploymentHistory().then((value) => {setState(() {})});
+    _customEmploymentHistory.patchResume().then((value) => {setState(() {})});
   }
 
   @override
@@ -122,9 +110,7 @@ class EmploymentHistorySectionState extends State<EmploymentHistorySection> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    _customEmploymentHistory.item.isEmpty
-                        ? const Text('Add employment history')
-                        : const Text('Add one more employment history'),
+                    _customEmploymentHistory.item.isEmpty ? const Text('Add employment history') : const Text('Add one more employment history'),
                     Container(
                       margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
                       child: const Icon(Icons.add),
@@ -143,11 +129,7 @@ class EmploymentHistoryItem extends StatefulWidget {
   final CustomEmploymentHistoryItem customEmploymentHistoryItem;
   final int index;
 
-  const EmploymentHistoryItem(
-      {super.key,
-      required this.onDelete,
-      required this.customEmploymentHistoryItem,
-      required this.index});
+  const EmploymentHistoryItem({super.key, required this.onDelete, required this.customEmploymentHistoryItem, required this.index});
 
   @override
   State<EmploymentHistoryItem> createState() => _EmploymentHistoryItemState();
@@ -171,16 +153,10 @@ class _EmploymentHistoryItemState extends State<EmploymentHistoryItem> {
         child: Column(
           children: [
             SideBySideInputs(
-              inputFields: [
-                widget.customEmploymentHistoryItem.jobTitleField,
-                widget.customEmploymentHistoryItem.employerField
-              ].toList(),
+              inputFields: [widget.customEmploymentHistoryItem.jobTitleField, widget.customEmploymentHistoryItem.employerField].toList(),
             ),
             SideBySideInputs(
-              inputFields: [
-                widget.customEmploymentHistoryItem.startDateField,
-                widget.customEmploymentHistoryItem.endDateField
-              ].toList(),
+              inputFields: [widget.customEmploymentHistoryItem.startDateField, widget.customEmploymentHistoryItem.endDateField].toList(),
             ),
             SideBySideInputs(
               inputFields: [
@@ -201,7 +177,7 @@ class _EmploymentHistoryItemState extends State<EmploymentHistoryItem> {
 
 // For the employment history collection
 class CustomEmploymentHistoryItem {
-  final int id;
+  int id;
   final CustomInputType jobTitle;
   final CustomInputType employer;
   final CustomInputType startDate;
@@ -298,8 +274,7 @@ class CustomEmploymentHistoryItem {
       controller.add(id);
     });
 
-    return controller
-        .debounceTime(const Duration(milliseconds: Constants.debounceTime));
+    return controller.debounceTime(const Duration(milliseconds: Constants.debounceTime));
   }
 
   // dispose
@@ -332,8 +307,8 @@ class CustomEmploymentHistory {
   // patch the resume
   Future<void> patchResume() async {
     if (resume.isNull) return;
-
     var employmentHistoryToPatch = resume!.employmentHistory;
+
     for (var element in employmentHistoryToPatch) {
       var jobController = _addController();
       jobController.text = element.job;
@@ -355,48 +330,12 @@ class CustomEmploymentHistory {
 
       var itemToAdd = CustomEmploymentHistoryItem(
         id: getLatestId(),
-        jobTitle: CustomInputType(
-          'Job Title',
-          'jobTitle',
-          true,
-          jobController,
-          TextInputType.text,
-        ),
-        employer: CustomInputType(
-          'Employer',
-          'employer',
-          true,
-          employerController,
-          TextInputType.text,
-        ),
-        startDate: CustomInputType(
-          'Start Date',
-          'startDate',
-          true,
-          startDateController,
-          TextInputType.text,
-        ),
-        endDate: CustomInputType(
-          'End Date',
-          'endDate',
-          true,
-          endDateController,
-          TextInputType.text,
-        ),
-        city: CustomInputType(
-          'City',
-          'city',
-          true,
-          cityController,
-          TextInputType.text,
-        ),
-        description: CustomInputType(
-          'Description',
-          'description',
-          true,
-          descriptionController,
-          TextInputType.text,
-        ),
+        jobTitle: CustomInputType('Job Title', 'jobTitle', true, jobController, TextInputType.text),
+        employer: CustomInputType('Employer', 'employer', true, employerController, TextInputType.text),
+        startDate: CustomInputType('Start Date', 'startDate', true, startDateController, TextInputType.datetime),
+        endDate: CustomInputType('End Date', 'endDate', true, endDateController, TextInputType.datetime),
+        city: CustomInputType('City', 'city', true, cityController, TextInputType.text),
+        description: CustomInputType('Description', 'description', true, descriptionController, TextInputType.text),
       );
 
       item.add(itemToAdd);
@@ -406,10 +345,7 @@ class CustomEmploymentHistory {
   // fetch employment history
   Future<void> fetchEmploymentHistory() async {
     if (!resume.isNull) return;
-
-    var fetchedEmploymentHistory =
-        await DatabaseService().fetchUserEmploymentHistories();
-
+    var fetchedEmploymentHistory = await DatabaseService().fetchUserEmploymentHistories();
     if (fetchedEmploymentHistory.isNull) return;
     employment = fetchedEmploymentHistory!;
 
@@ -434,48 +370,12 @@ class CustomEmploymentHistory {
 
       var itemToAdd = CustomEmploymentHistoryItem(
         id: element.id,
-        jobTitle: CustomInputType(
-          'Job Title',
-          'jobTitle',
-          true,
-          jobController,
-          TextInputType.text,
-        ),
-        employer: CustomInputType(
-          'Employer',
-          'employer',
-          true,
-          employerController,
-          TextInputType.text,
-        ),
-        startDate: CustomInputType(
-          'Start Date',
-          'startDate',
-          true,
-          startDateController,
-          TextInputType.text,
-        ),
-        endDate: CustomInputType(
-          'End Date',
-          'endDate',
-          true,
-          endDateController,
-          TextInputType.text,
-        ),
-        city: CustomInputType(
-          'City',
-          'city',
-          true,
-          cityController,
-          TextInputType.text,
-        ),
-        description: CustomInputType(
-          'Description',
-          'description',
-          true,
-          descriptionController,
-          TextInputType.text,
-        ),
+        jobTitle: CustomInputType('Job Title', 'jobTitle', true, jobController, TextInputType.text),
+        employer: CustomInputType('Employer', 'employer', true, employerController, TextInputType.text),
+        startDate: CustomInputType('Start Date', 'startDate', true, startDateController, TextInputType.datetime),
+        endDate: CustomInputType('End Date', 'endDate', true, endDateController, TextInputType.datetime),
+        city: CustomInputType('City', 'city', true, cityController, TextInputType.text),
+        description: CustomInputType('Description', 'description', true, descriptionController, TextInputType.text),
       );
 
       item.add(itemToAdd);
@@ -507,6 +407,7 @@ class CustomEmploymentHistory {
         id = element.id;
       }
     }
+
     return id + 1;
   }
 
@@ -515,51 +416,13 @@ class CustomEmploymentHistory {
 
     var itemToAdd = CustomEmploymentHistoryItem(
       id: id,
-      jobTitle: CustomInputType(
-        'Job Title',
-        'jobTitle',
-        true,
-        _addController(),
-        TextInputType.text,
-      ),
-      employer: CustomInputType(
-        'Employer',
-        'employer',
-        true,
-        _addController(),
-        TextInputType.text,
-      ),
-      startDate: CustomInputType(
-        'Start Date',
-        'startDate',
-        true,
-        _addController(),
-        TextInputType.datetime,
-      ),
-      endDate: CustomInputType(
-        'End Date',
-        'endDate',
-        true,
-        _addController(),
-        TextInputType.datetime,
-      ),
-      city: CustomInputType(
-        'City',
-        'city',
-        true,
-        _addController(),
-        TextInputType.text,
-      ),
-      description: CustomInputType(
-        'Description',
-        'description',
-        true,
-        _addController(),
-        TextInputType.text,
-      ),
+      jobTitle: CustomInputType('Job Title', 'jobTitle', true, _addController(), TextInputType.text),
+      employer: CustomInputType('Employer', 'employer', true, _addController(), TextInputType.text),
+      startDate: CustomInputType('Start Date', 'startDate', true, _addController(), TextInputType.datetime),
+      endDate: CustomInputType('End Date', 'endDate', true, _addController(), TextInputType.datetime),
+      city: CustomInputType('City', 'city', true, _addController(), TextInputType.text),
+      description: CustomInputType('Description', 'description', true, _addController(), TextInputType.text),
     );
-
-    item.add(itemToAdd);
 
     if (resume.isNull) {
       itemToAdd.listenForChanges().listen((event) {
@@ -571,30 +434,23 @@ class CustomEmploymentHistory {
         itemToAdd.id,
         itemToAdd.jobTitle.controller.text,
         itemToAdd.employer.controller.text,
-        itemToAdd.startDate.controller.text.isEmpty
-            ? DateTime.now()
-            : DateTime.parse(itemToAdd.startDate.controller.text),
-        itemToAdd.endDate.controller.text.isEmpty
-            ? DateTime.now()
-            : DateTime.parse(itemToAdd.endDate.controller.text),
+        itemToAdd.startDate.controller.text.isEmpty ? DateTime.now() : DateTime.parse(itemToAdd.startDate.controller.text),
+        itemToAdd.endDate.controller.text.isEmpty ? DateTime.now() : DateTime.parse(itemToAdd.endDate.controller.text),
         itemToAdd.city.controller.text,
         itemToAdd.description.controller.text,
         DateTime.now(),
         DateTime.now(),
       );
 
-      await DatabaseService().addUpdateUserEmploymentHistory(databaseItem);
-      employment.add(databaseItem);
-
-      Fluttertoast.showToast(
-        toastLength: Toast.LENGTH_SHORT,
-        msg: 'Employment history added.',
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-      );
+      var addedItem = await DatabaseService().addUpdateUserEmploymentHistory(databaseItem);
+      employment.add(addedItem!);
+      itemToAdd.id = addedItem.id;
+      item.add(itemToAdd);
+    } else {
+      item.add(itemToAdd);
     }
+
+    Fluttertoast.showToast(toastLength: Toast.LENGTH_SHORT, msg: 'Employment history added.', gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white);
   }
 
   Future<void> removeItem(int index) async {
@@ -604,23 +460,14 @@ class CustomEmploymentHistory {
     item.removeAt(index);
 
     if (resume.isNull) {
-      var databaseItemIndex =
-          employment.indexWhere((element) => element.id == itemToRemove.id);
+      var databaseItemIndex = employment.indexWhere((element) => element.id == itemToRemove.id);
       if (databaseItemIndex != -1) {
         employment.removeAt(databaseItemIndex);
-        await DatabaseService()
-            .deleteUserEmploymentHistory(DeleteDocuments(itemToRemove.id));
+        await DatabaseService().deleteUserEmploymentHistory(DeleteDocuments(itemToRemove.id));
       }
     }
 
-    Fluttertoast.showToast(
-      toastLength: Toast.LENGTH_SHORT,
-      msg: 'Employment history removed.',
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.red,
-      textColor: Colors.white,
-    );
+    Fluttertoast.showToast(toastLength: Toast.LENGTH_SHORT, msg: 'Employment history removed.', gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white);
   }
 
   // update the employment history
@@ -636,12 +483,8 @@ class CustomEmploymentHistory {
       itemToUpdate.id,
       itemToUpdate.jobTitle.controller.text,
       itemToUpdate.employer.controller.text,
-      itemToUpdate.startDate.controller.text.isEmpty
-          ? DateTime.now()
-          : DateTime.parse(itemToUpdate.startDate.controller.text),
-      itemToUpdate.endDate.controller.text.isEmpty
-          ? DateTime.now()
-          : DateTime.parse(itemToUpdate.endDate.controller.text),
+      itemToUpdate.startDate.controller.text.isEmpty ? DateTime.now() : DateTime.parse(itemToUpdate.startDate.controller.text),
+      itemToUpdate.endDate.controller.text.isEmpty ? DateTime.now() : DateTime.parse(itemToUpdate.endDate.controller.text),
       itemToUpdate.city.controller.text,
       itemToUpdate.description.controller.text,
       DateTime.now(),
@@ -649,19 +492,11 @@ class CustomEmploymentHistory {
     );
 
     await DatabaseService().addUpdateUserEmploymentHistory(itemForDatabase);
-    var databaseItemIndex =
-        employment.indexWhere((element) => element.id == itemToUpdate.id);
+    var databaseItemIndex = employment.indexWhere((element) => element.id == itemToUpdate.id);
     if (databaseItemIndex != -1) {
       employment[databaseItemIndex] = itemForDatabase;
     }
 
-    Fluttertoast.showToast(
-      toastLength: Toast.LENGTH_SHORT,
-      msg: 'Employment history updated.',
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.green,
-      textColor: Colors.white,
-    );
+    Fluttertoast.showToast(toastLength: Toast.LENGTH_SHORT, msg: 'Employment history updated.', gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white);
   }
 }

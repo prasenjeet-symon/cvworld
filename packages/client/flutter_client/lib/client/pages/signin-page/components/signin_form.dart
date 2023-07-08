@@ -1,10 +1,12 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_client/client/datasource.dart';
+import 'package:flutter_client/client/pages/dashboard/dashboard.dart';
 import 'package:flutter_client/client/utils.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flutter_client/client/datasource.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class SignInForm extends StatefulWidget {
   const SignInForm({super.key});
@@ -24,13 +26,25 @@ class _SignInFormState extends State<SignInForm> {
     try {
       await DatabaseService().signInUserWithEmailAndPassword(email, password);
     } catch (e) {
-      await Fluttertoast.showToast(
-        msg: 'Something went wrong...',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.8),
-        textColor: Colors.white,
-      );
+      if (e is NoUserException) {
+        await Fluttertoast.showToast(
+          msg: e.message,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red.withOpacity(0.8),
+          textColor: Colors.white,
+        );
+      }
+
+      if (e is WrongPasswordException) {
+        await Fluttertoast.showToast(
+          msg: e.message,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red.withOpacity(0.8),
+          textColor: Colors.white,
+        );
+      }
 
       return;
     }
@@ -45,6 +59,19 @@ class _SignInFormState extends State<SignInForm> {
 
     // ignore: use_build_context_synchronously
     ctx.navigateNamedTo('/dashboard');
+  }
+
+  // Sign in with google
+  void signInWithGoogle(BuildContext ctx) async {
+    final GoogleSignIn _googleSignIn = GoogleSignIn(clientId: Constants.googleClientId);
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+    if (googleUser != null) {
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      var accessToken = googleAuth.accessToken!;
+      await DatabaseService().continueWithGoogle(accessToken);
+      // ignore: use_build_context_synchronously
+      ctx.navigateNamedTo('/dashboard');
+    }
   }
 
   @override
@@ -94,8 +121,7 @@ class _SignInFormState extends State<SignInForm> {
                             margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
                             child: const Text(
                               'Welcome back ',
-                              style: TextStyle(
-                                  fontSize: 30, fontWeight: FontWeight.w600),
+                              style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
                               textAlign: TextAlign.start,
                             ),
                           ),
@@ -103,8 +129,7 @@ class _SignInFormState extends State<SignInForm> {
                             margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
                             child: const Text(
                               'Ready to generate new cv just fill the details to login',
-                              style: TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.w400),
+                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
                               textAlign: TextAlign.start,
                             ),
                           ),
@@ -137,27 +162,24 @@ class _SignInFormState extends State<SignInForm> {
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(50),
                                       ),
-                                      padding: const EdgeInsets.fromLTRB(
-                                          20, 20, 20, 20)),
+                                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20)),
                                   child: const Text('Login to account'))),
                           Container(
                             width: double.infinity,
                             margin: const EdgeInsets.fromLTRB(0, 10, 0, 20),
                             child: OutlinedButton(
-                              onPressed: () => {},
+                              onPressed: () => {signInWithGoogle(context)},
                               style: OutlinedButton.styleFrom(
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(50),
                                   ),
-                                  padding: const EdgeInsets.fromLTRB(
-                                      20, 20, 20, 20)),
+                                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 20)),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   const FaIcon(FontAwesomeIcons.google),
                                   Container(
-                                    margin:
-                                        const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                    margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                                     child: const Text('Sign in with google'),
                                   )
                                 ],
@@ -175,8 +197,7 @@ class _SignInFormState extends State<SignInForm> {
                                   children: [
                                     TextSpan(
                                       text: 'SignUp',
-                                      style:
-                                          const TextStyle(color: Colors.blue),
+                                      style: const TextStyle(color: Colors.blue),
                                       // Add your onPressed logic for SignUp here
                                       recognizer: TapGestureRecognizer()
                                         ..onTap = () {
