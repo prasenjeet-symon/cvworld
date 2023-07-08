@@ -222,7 +222,7 @@ model ContactUs {
   email      String
   phone      String
   message    String
-  isResolved Boolean @default(false)
+  isResolved Boolean
   createdAt  DateTime @default(now())
   updatedAt  DateTime @default(now())
 }

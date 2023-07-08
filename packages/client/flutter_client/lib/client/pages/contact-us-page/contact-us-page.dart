@@ -69,7 +69,7 @@ class _ContactUsPageDesktopBodyState extends State<ContactUsPageDesktopBody> {
             height: 700,
             color: Colors.blue,
             child: Image.asset(
-              'contact_us.png',
+              'assets/contact_us.png',
               fit: BoxFit.cover,
               height: double.infinity,
               width: double.infinity,
@@ -367,7 +367,7 @@ class ContactUsMessageSent extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                 width: 250,
                 height: 250,
-                child: Image.asset('msg_sent.png', fit: BoxFit.cover, width: double.infinity, height: double.infinity),
+                child: Image.asset('assets/msg_sent.png', fit: BoxFit.cover, width: double.infinity, height: double.infinity),
               )
             ],
           ),

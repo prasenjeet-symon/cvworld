@@ -25,7 +25,7 @@ services:
     depends_on:
       - mysql
     environment:
-      - DATABASE_URL=mysql://cvworld:cvworld@mysql:3306/cvworld
+      - DATABASE_URL=mysql://root:root@mysql:3306/cvworld
       - ADMIN_EMAIL=admin@gmail.com
       - ADMIN_PASSWORD=user
       - ADMIN_NAME=user

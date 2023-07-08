@@ -1,22 +1,64 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE `Admin` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `email` VARCHAR(191) NOT NULL,
+    `fullName` VARCHAR(191) NOT NULL,
+    `profilePicture` VARCHAR(191) NULL,
+    `password` VARCHAR(191) NOT NULL,
+    `reference` VARCHAR(191) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
-  - You are about to drop the column `data` on the `resumes` table. All the data in the column will be lost.
-  - A unique constraint covering the columns `[reference]` on the table `User` will be added. If there are existing duplicate values, this will fail.
-  - Added the required column `imageUrl` to the `Resumes` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `pdfUrl` to the `Resumes` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `resume` to the `Resumes` table without a default value. This is not possible if the table is not empty.
+    UNIQUE INDEX `Admin_email_key`(`email`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-*/
--- AlterTable
-ALTER TABLE `resumes` DROP COLUMN `data`,
-    ADD COLUMN `imageUrl` VARCHAR(191) NOT NULL,
-    ADD COLUMN `pdfUrl` VARCHAR(191) NOT NULL,
-    ADD COLUMN `resume` JSON NOT NULL;
+-- CreateTable
+CREATE TABLE `User` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `email` VARCHAR(191) NOT NULL,
+    `fullName` VARCHAR(191) NOT NULL,
+    `profilePicture` VARCHAR(191) NULL,
+    `password` VARCHAR(191) NULL,
+    `reference` VARCHAR(191) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
--- AlterTable
-ALTER TABLE `subscription` MODIFY `discount` DOUBLE NOT NULL,
-    MODIFY `basePrice` DOUBLE NOT NULL;
+    UNIQUE INDEX `User_email_key`(`email`),
+    UNIQUE INDEX `User_reference_key`(`reference`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Subscription` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `planName` VARCHAR(191) NOT NULL,
+    `isActive` BOOLEAN NOT NULL,
+    `expireOn` DATETIME(3) NOT NULL,
+    `activatedOn` DATETIME(3) NOT NULL,
+    `cycle` ENUM('MONTHLY', 'YEARLY') NOT NULL,
+    `discount` DOUBLE NOT NULL,
+    `basePrice` DOUBLE NOT NULL,
+    `userId` INTEGER NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    UNIQUE INDEX `Subscription_userId_key`(`userId`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Resumes` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `resume` JSON NOT NULL,
+    `imageUrl` VARCHAR(191) NOT NULL,
+    `pdfUrl` VARCHAR(191) NOT NULL,
+    `userId` INTEGER NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `PersonalDetails` (
@@ -163,8 +205,25 @@ CREATE TABLE `Links` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateIndex
-CREATE UNIQUE INDEX `User_reference_key` ON `User`(`reference`);
+-- CreateTable
+CREATE TABLE `ContactUs` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NOT NULL,
+    `email` VARCHAR(191) NOT NULL,
+    `phone` VARCHAR(191) NOT NULL,
+    `message` VARCHAR(191) NOT NULL,
+    `isResolved` BOOLEAN NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `Subscription` ADD CONSTRAINT `Subscription_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Resumes` ADD CONSTRAINT `Resumes_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `PersonalDetails` ADD CONSTRAINT `PersonalDetails_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

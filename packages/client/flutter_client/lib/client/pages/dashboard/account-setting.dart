@@ -117,9 +117,7 @@ class PricingPlanCard extends StatelessWidget {
                 SizedBox(
                   width: 50,
                   height: 50,
-                  child: Image.asset(
-                    '/renew.png',
-                  ),
+                  child: Image.asset('assets/renew.png'),
                 ),
                 Expanded(
                     child: Container(

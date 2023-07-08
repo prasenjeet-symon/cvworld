@@ -1,3 +1,143 @@
+# Development under Prasenjeet Symon
+## Milestone 1
+- [x] Create a new Flutter project
+- [x] Create a new express API
+- [x] Setup initial development environment for both Flutter and Express API
+
+## Milestone 2
+### Express
+- [x] Authentication
+    <!-- Write small task description -->
+    <!-- Is logged in -->
+    - [x] Route to check if user is logged in
+    <!-- Sign Up with email and password -->
+    - [x] Route for signup with email and password
+    <!-- Sign In with Email -->
+    - [x] Route for signin with email and password
+    <!-- Reset password -->
+    - [ ] Route for reset password
+    <!-- Sign in with google -->
+    - [x] Route for signin with google
+    <!-- Signup with google -->
+    - [x] Route for signup with google
+- [x] Resumes
+    <!-- Delete resume -->
+    - [x] Route to delete resume
+    <!-- Update the resume -->
+    - [x] Route to update resume
+    <!-- Get single generated resume -->
+    - [x] Route to get single generated resume
+    <!-- Generate the new resume -->
+    - [x] Route to generate new resume
+    <!-- Get all the generated resumes -->
+    - [x] Route to get all the generated resumes
+- [x] User Skills
+    <!-- Delete user skill -->
+    - [x] Route to delete user skill
+    <!-- Get user skills -->
+    - [x] Route to get user skills
+    <!-- Add update user skill -->
+    - [x] Route to add update user skill
+- [x] User Personal Details
+    <!-- Get user details -->
+    - [x] Route to get user details
+    <!-- add_update_user_details -->
+    - [x] Route to add update user details
+- [x] User Hobby
+    <!-- Add update the hobby of the user -->
+    - [x] Route to add update the hobby of the user
+    <!-- Get hobby of the user -->
+    - [x] Route to get hobby of the user
+    <!-- Delete the hobby of the user -->
+    - [x] Route to delete the hobby of the user
+- [x] Contact Us
+    <!-- Add contact us -->
+    - [x] Route to add contact us details
+- [x] Professional Summary
+    <!-- Get professionalSummary of the user -->
+    - [x] Route to get professionalSummary of the user
+    <!-- Add update the professionalSummary of the user -->
+    - [x] Route to add update the professionalSummary of the user
+    <!-- Delete the professionalSummary of the user -->
+    - [x] Route to delete the professionalSummary of the user
+- [x] User Languages
+    <!-- Get languages of the user -->
+    - [x] Route to get languages of the user
+    <!-- Add update the language of the user -->
+    - [x] Route to add update the language of the user
+    <!-- Delete the language of the user -->
+    - [x] Route to delete the language of the user
+- [x] User Courses
+    <!-- Get all courses of the user -->
+    - [x] Route to get all courses of the user
+    <!-- Add update the course of the user -->
+    - [x] Route to add update the course of the user
+    <!-- Delete the course of the user -->
+    - [x] Route to delete the course of the user
+- [x] User Education
+    <!-- Get all educations of the user -->
+    - [x] Route to get all educations of the user
+    <!-- Add update the education of the user -->
+    - [x] Route to add update the education of the user
+    <!-- Delete the education of the user -->
+    - [x] Route to delete the education of the user
+- [x] User Employment
+    <!-- Get all employmentHistories of the user -->
+    - [x] Route to get all employmentHistories of the user
+    <!-- Add update the employmentHistory of the user -->
+    - [x] Route to add update the employmentHistory of the user
+    <!-- Delete the employmentHistory of the user -->
+    - [x] Route to delete the employmentHistory of the user
+- [x] User Internship
+    <!-- Get all internships of the user -->
+    - [x] Route to get all internships of the user
+    <!-- Add update the internship of the user -->
+    - [x] Route to add update the internship of the user
+    <!-- Delete the internship of the user -->
+    - [x] Route to delete the internship of the user
+- [x] User Websites Links
+    <!-- Get all websites of the user -->
+    - [x] Route to get all websites of the user
+    <!-- Add update the website of the user -->
+    - [x] Route to add update the website of the user
+    <!-- Delete the website of the user -->
+    - [x] Route to delete the website of the user
+- [x] User Subscriptions
+    <!-- Get all subscriptions of the user -->
+    - [x] Route to get all subscriptions of the user
+    <!-- Add update the subscription of the user -->
+    - [x] Route to add update the subscription of the user
+    <!-- Delete the subscription of the user -->
+    - [x] Route to delete the subscription of the user
+- [x] Users
+    <!-- Get user single -->
+    - [x] Route to get user single
+    <!-- Handles the HTTP POST request to update the user profile picture. -->
+    - [x] Route to update the user profile picture
+
+### Flutter Web
+- [x] Homepage
+    <!-- add header section -->
+    - [x] Make new widget to display the website header section
+    <!-- make hero section -->
+    - [x] Make new widget to display the website hero section
+    <!-- make two more sub sections to express what cv world is  -->
+    - [x] Make two new widget to display the cv world sub section
+    <!-- Make pricing section -->
+    - [x] Make new widget to display the pricing section
+    <!-- Make footer -->
+    - [x] Make new widget to display the footer
+- [x] Contact Us Page
+    <!-- Make new widget to display the contact us page -->
+    - [x] Make new widget to display the contact us page and make it work properly
+    <!-- Make a widget to display message sent successfully -->
+    - [x] Make a widget to display message sent successfully
+- [x] Login Page
+    <!-- Make login page  -->
+    - [x] Make login page and make it work properly ( email and password based )
+    <!-- Make Google login button -->
+    - [x] Make Google login button and make it work properly
+
 # Technologies stack
 - Node.js         
 - Express.js       

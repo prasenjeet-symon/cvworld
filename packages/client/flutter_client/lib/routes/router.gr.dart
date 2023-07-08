@@ -10,14 +10,19 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:auto_route/auto_route.dart' as _i9;
 import 'package:flutter/material.dart' as _i10;
-import 'package:flutter_client/client/pages/contact-us-page/contact-us-page.dart' as _i8;
-import 'package:flutter_client/client/pages/dashboard/account-setting.dart' as _i1;
+import 'package:flutter_client/client/pages/contact-us-page/contact-us-page.dart'
+    as _i8;
+import 'package:flutter_client/client/pages/dashboard/account-setting.dart'
+    as _i1;
 import 'package:flutter_client/client/pages/dashboard/dashboard.dart' as _i2;
 import 'package:flutter_client/client/pages/dashboard/view-resume.dart' as _i3;
 import 'package:flutter_client/client/pages/home-page/home-page.dart' as _i4;
-import 'package:flutter_client/client/pages/make-cv-pages/cv-maker-page.dart' as _i5;
-import 'package:flutter_client/client/pages/signin-page/signin-page.dart' as _i6;
-import 'package:flutter_client/client/pages/signup-page/signup-page.dart' as _i7;
+import 'package:flutter_client/client/pages/make-cv-pages/cv-maker-page.dart'
+    as _i5;
+import 'package:flutter_client/client/pages/signin-page/signin-page.dart'
+    as _i6;
+import 'package:flutter_client/client/pages/signup-page/signup-page.dart'
+    as _i7;
 
 abstract class $AppRouter extends _i9.RootStackRouter {
   $AppRouter({super.navigatorKey});
@@ -38,7 +43,9 @@ abstract class $AppRouter extends _i9.RootStackRouter {
     },
     ViewResume.name: (routeData) {
       final pathParams = routeData.inheritedPathParams;
-      final args = routeData.argsAs<ViewResumeArgs>(orElse: () => ViewResumeArgs(resumeID: pathParams.getInt('resumeID')));
+      final args = routeData.argsAs<ViewResumeArgs>(
+          orElse: () =>
+              ViewResumeArgs(resumeID: pathParams.getInt('resumeID')));
       return _i9.AutoRoutePage<dynamic>(
         routeData: routeData,
         child: _i3.ViewResume(
@@ -50,12 +57,14 @@ abstract class $AppRouter extends _i9.RootStackRouter {
     HomeRoute.name: (routeData) {
       return _i9.AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: _i4.HomeScreen(),
+        child: const _i4.HomeScreen(),
       );
     },
     CvMakerRoute.name: (routeData) {
       final pathParams = routeData.inheritedPathParams;
-      final args = routeData.argsAs<CvMakerRouteArgs>(orElse: () => CvMakerRouteArgs(resumeID: pathParams.optInt('resumeID')));
+      final args = routeData.argsAs<CvMakerRouteArgs>(
+          orElse: () =>
+              CvMakerRouteArgs(resumeID: pathParams.optInt('resumeID')));
       return _i9.AutoRoutePage<dynamic>(
         routeData: routeData,
         child: _i5.CvMakerScreen(
@@ -132,7 +141,8 @@ class ViewResume extends _i9.PageRouteInfo<ViewResumeArgs> {
 
   static const String name = 'ViewResume';
 
-  static const _i9.PageInfo<ViewResumeArgs> page = _i9.PageInfo<ViewResumeArgs>(name);
+  static const _i9.PageInfo<ViewResumeArgs> page =
+      _i9.PageInfo<ViewResumeArgs>(name);
 }
 
 class ViewResumeArgs {
@@ -184,7 +194,8 @@ class CvMakerRoute extends _i9.PageRouteInfo<CvMakerRouteArgs> {
 
   static const String name = 'CvMakerRoute';
 
-  static const _i9.PageInfo<CvMakerRouteArgs> page = _i9.PageInfo<CvMakerRouteArgs>(name);
+  static const _i9.PageInfo<CvMakerRouteArgs> page =
+      _i9.PageInfo<CvMakerRouteArgs>(name);
 }
 
 class CvMakerRouteArgs {

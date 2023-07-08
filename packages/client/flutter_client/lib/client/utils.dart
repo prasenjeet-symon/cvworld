@@ -25,12 +25,12 @@ int flexNumber(BuildContext context) {
 class AuthGuard extends AutoRouteGuard {
   @override
   void onNavigation(NavigationResolver resolver, StackRouter router) async {
-    var canNavigate = await DatabaseService().isAuthenticated();
-    if (!canNavigate) {
+    var isAuthenticated = await DatabaseService().isAuthenticated();
+    if (!isAuthenticated) {
       router.navigateNamed('/signin');
       return;
     } else {
-      resolver.next(canNavigate);
+      resolver.next(true);
     }
   }
 }
@@ -38,12 +38,12 @@ class AuthGuard extends AutoRouteGuard {
 class RouteGuard extends AutoRouteGuard {
   @override
   void onNavigation(NavigationResolver resolver, StackRouter router) async {
-    var canNavigate = await DatabaseService().isAuthenticated();
-    if (canNavigate) {
+    var isAuthenticated = await DatabaseService().isAuthenticated();
+    if (isAuthenticated) {
       router.navigateNamed('/dashboard');
       return;
     } else {
-      resolver.next(canNavigate);
+      resolver.next(true);
     }
   }
 }

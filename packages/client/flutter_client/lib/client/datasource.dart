@@ -1270,7 +1270,7 @@ class JwtClient extends http.BaseClient {
 ///
 ///
 class DatabaseService {
-  String origin = 'http://localhost:8080';
+  String origin = 'http://localhost:3001';
   late Uri authRoute;
   late Uri apiRoute;
   late Uri signInRoute;
@@ -1417,7 +1417,7 @@ class DatabaseService {
   Future<bool> isAuthenticated() async {
     const storage = FlutterSecureStorage();
     var token = await storage.read(key: 'JWT');
-    if (token.isNull) {
+    if (token == null) {
       return false;
     } else {
       return true;
