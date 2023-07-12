@@ -199,6 +199,37 @@ Any public user can submit complaints or inquiries using the Contact Us page. Th
 
 - The Privacy Policy and Terms and Conditions pages are currently unavailable as I lack the necessary information regarding the company's policies. Once I receive the required information, I will create and include these pages accordingly.
 
+## Milestone 3
+In this milestone i am going to build the `Mobile application` and `Admin Dashboard` with operational `payment integration`.
+
+### Pricing Rules
+#### Pricing Rules for CV World:
+
+#### Template Options:
+
+Upon signing up, users will have access to both free and premium templates.
+Free templates can be used without any additional cost.
+Premium templates can be purchased for a price of $1 each.
+#### Monthly Subscription:
+
+Users have the option to buy a monthly subscription plan for $9.99.
+Once subscribed, users can generate multiple resumes using any premium template available.
+There are no restrictions on the number of resumes that can be generated during the subscription period.
+#### Template Usage:
+
+With the purchased premium templates, users can generate as many resumes as they need.
+#### Download Limit:
+
+There is no restriction on the number of downloads for generated resumes. Users can download their resumes as many times as they want.
+#### Subscription Cancellation:
+
+Users have the flexibility to cancel their monthly subscription at any time.
+#### Template Purchase:
+
+Once a premium template is bought, it is a one-time purchase and cannot be returned or refunded.
+#### Payment Gateway:
+CV World utilizes Razorpay as the payment gateway for processing transactions.
+
 # Technologies stack
 - Node.js         
 - Express.js       
