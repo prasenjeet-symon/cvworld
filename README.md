@@ -230,6 +230,21 @@ Once a premium template is bought, it is a one-time purchase and cannot be retur
 #### Payment Gateway:
 CV World utilizes Razorpay as the payment gateway for processing transactions.
 
+### Express API ( Continued )
+- [x] Razorpay Webhook
+    - [x] Order Paid
+        - Using this route user can buy on the go premium template.
+    - [x] Subscription Authenticated
+        - Using this route user can start the monthly subscription.
+    - [x] Subscription Activated
+        - Using this route user can start the monthly subscription which was previously paused or canceled.
+    - [x] Subscription Charged
+        - Using this route user can pay for the monthly subscription every month.
+    - [x] Subscription Halted
+        - When razorpay was not able to process the payment for any reason this route will be triggered.
+    - [x] Subscription Cancelled
+        - Using this route user can cancel the monthly subscription.
+
 # Technologies stack
 - Node.js         
 - Express.js       

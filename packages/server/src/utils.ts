@@ -2,9 +2,248 @@ import { PrismaClient } from "@prisma/client";
 import express, { NextFunction, Request, Response } from "express";
 import { v4 } from "uuid";
 import router from "./api";
+import routerPublic from "./api-public";
 import routerMedia from "./api/media";
 import routerAuth from "./auth";
-import routerPublic from "./api-public";
+
+export type paymentMethod = 'netbanking' | 'card'  | 'wallet' | 'upi';
+export enum EPaymentMethod {
+  netbanking = 'netbanking',
+  card = 'card',
+  wallet = 'wallet',
+  upi = 'upi',
+}
+
+export interface OrderPayloadNetBanking {
+  entity: string;
+  account_id: string;
+  event: string;
+  contains: string[];
+  payload: {
+    payment: {
+      entity: {
+        id: string;
+        entity: string;
+        amount: number;
+        currency: string;
+        status: string;
+        order_id: string;
+        invoice_id: string | null;
+        international: boolean;
+        method: paymentMethod;
+        amount_refunded: number;
+        refund_status: string | null;
+        captured: boolean;
+        description: string | null;
+        card_id: string | null;
+        bank: string;
+        wallet: string | null;
+        vpa: string | null;
+        email: string;
+        contact: string;
+        notes: any;
+        fee: number;
+        tax: number;
+        error_code: string | null;
+        error_description: string | null;
+        created_at: number;
+      };
+    };
+    order: {
+      entity: {
+        id: string;
+        entity: string;
+        amount: number;
+        amount_paid: number;
+        amount_due: number;
+        currency: string;
+        receipt: string;
+        offer_id: string | null;
+        status: string;
+        attempts: number;
+        notes: any;
+        created_at: number;
+      };
+    };
+  };
+  created_at: number;
+}
+
+export interface OrderPayloadCard {
+  entity: string;
+  account_id: string;
+  event: string;
+  contains: string[];
+  payload: {
+    payment: {
+      entity: {
+        id: string;
+        entity: string;
+        amount: number;
+        currency: string;
+        status: string;
+        order_id: string;
+        invoice_id: string | null;
+        international: boolean;
+        method: paymentMethod;
+        amount_refunded: number;
+        refund_status: string | null;
+        captured: boolean;
+        description: string | null;
+        card_id: string | null;
+        card: {
+          id: string;
+          entity: string;
+          name: string;
+          last4: string;
+          network: string;
+          type: string;
+          issuer: string | null;
+          international: boolean;
+          emi: boolean;
+        };
+        bank: string | null;
+        wallet: string | null;
+        vpa: string | null;
+        email: string;
+        contact: string;
+        notes: any;
+        fee: number;
+        tax: number;
+        error_code: string | null;
+        error_description: string | null;
+        created_at: number;
+      };
+    };
+    order: {
+      entity: {
+        id: string;
+        entity: string;
+        amount: number;
+        amount_paid: number;
+        amount_due: number;
+        currency: string;
+        receipt: string;
+        offer_id: string | null;
+        status: string;
+        attempts: number;
+        notes: any;
+        created_at: number;
+      };
+    };
+  };
+  created_at: number;
+}
+
+export interface OrderPayloadWallet {
+  entity: string;
+  account_id: string;
+  event: string;
+  contains: string[];
+  payload: {
+    payment: {
+      entity: {
+        id: string;
+        entity: string;
+        amount: number;
+        currency: string;
+        status: string;
+        order_id: string;
+        invoice_id: string | null;
+        international: boolean;
+        method: paymentMethod;
+        amount_refunded: number;
+        refund_status: string | null;
+        captured: boolean;
+        description: string | null;
+        card_id: string | null;
+        bank: string | null;
+        wallet: string;
+        vpa: string | null;
+        email: string;
+        contact: string;
+        notes: any;
+        fee: number;
+        tax: number;
+        error_code: string | null;
+        error_description: string | null;
+        created_at: number;
+      };
+    };
+    order: {
+      entity: {
+        id: string;
+        entity: string;
+        amount: number;
+        amount_paid: number;
+        amount_due: number;
+        currency: string;
+        receipt: string;
+        offer_id: string | null;
+        status: string;
+        attempts: number;
+        notes: any;
+        created_at: number;
+      };
+    };
+  };
+  created_at: number;
+}
+
+export interface OrderPayloadUPI {
+  entity: string;
+  account_id: string;
+  event: string;
+  contains: string[];
+  payload: {
+    payment: {
+      entity: {
+        id: string;
+        entity: string;
+        amount: number;
+        currency: string;
+        status: string;
+        order_id: string;
+        invoice_id: string | null;
+        international: boolean;
+        method: paymentMethod;
+        amount_refunded: number;
+        refund_status: string | null;
+        captured: boolean;
+        description: string | null;
+        card_id: string | null;
+        bank: string | null;
+        wallet: string | null;
+        vpa: string | null;
+        email: string;
+        contact: string;
+        notes: any;
+        fee: number;
+        tax: number;
+        error_code: string | null;
+        error_description: string | null;
+        created_at: number;
+      };
+    };
+    order: {
+      entity: {
+        id: string;
+        entity: string;
+        amount: number;
+        amount_paid: number;
+        amount_due: number;
+        currency: string;
+        receipt: string;
+        offer_id: string | null;
+        status: string;
+        attempts: number;
+        notes: any;
+        created_at: number;
+      };
+    };
+  };
+  created_at: number;
+}
 
 interface IGoogleAuthTokenResponse {
   userId: string;
@@ -592,7 +831,7 @@ export interface Resume {
   }[];
 }
 
-import { faker } from "@faker-js/faker";
+import { en, faker } from "@faker-js/faker";
 import axios from "axios";
 
 // Generate dummy data for the Resume interface
