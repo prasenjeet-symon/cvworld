@@ -247,20 +247,9 @@ router.post("/razorpay_webhook", async (req, res) => {
       },
       data: {
         subscription: {
-          upsert: {
-            create: {
-              activatedOn: new Date(),
-              basePrice: 0,
-              cycle: "MONTHLY",
-              discount: 0,
-              expireOn: moment().add(1, "month").toDate(),
-              isActive: true,
-              planName: "Earth",
-            },
-            update: {
-              expireOn: moment().add(1, "month").toDate(),
-              isActive: true,
-            },
+          update: {
+            expireOn: moment().add(1, "month").toDate(),
+            isActive: true,
           },
         },
       },
@@ -305,7 +294,6 @@ router.post("/razorpay_webhook", async (req, res) => {
           update: {
             isActive: true,
             expireOn: moment().add(1, "month").toDate(),
-            basePrice: +subscriptionPayload.payment.entity.amount,
             transaction: {
               create: {
                 amount: +subscriptionPayload.payment.entity.amount,
@@ -338,9 +326,7 @@ router.post("/razorpay_webhook", async (req, res) => {
       },
       data: {
         subscription: {
-          update: {
-            isActive: false,
-          },
+          delete: true,
         },
       },
     });

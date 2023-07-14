@@ -29,6 +29,7 @@
     "mysql2": "^3.3.1",
     "prisma": "^4.14.0",
     "puppeteer": "^20.7.2",
+    "razorpay": "^2.9.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

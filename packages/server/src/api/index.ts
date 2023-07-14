@@ -1,7 +1,7 @@
 import express from "express";
 import { rmSync } from "fs";
 import path from "path";
-import { PrismaClientSingleton, Resume, generateDummyResume, generateImage, generatePDF, sanitizePrismaData } from "../utils";
+import { PrismaClientSingleton, Resume, Subscription, generateDummyResume, generateImage, generatePDF, sanitizePrismaData } from "../utils";
 const router = express.Router();
 
 router.get("/", (req, res) => res.send("Hello World!"));
@@ -1460,6 +1460,147 @@ router.post("/get_user", async (req, res) => {
 
   res.json(user);
   return;
+});
+
+/**
+ *
+ *
+ * Generate the order for the template
+ */
+router.post("/generate_order", async (req, res) => {
+  const email = res.locals.email;
+  const Razorpay = require("razorpay");
+  const razorpayKeyID = process.env.RAZORPAY_KEY_ID;
+  const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET;
+  const nameOfTemplate = req.body.nameOfTemplate;
+  const instance = new Razorpay({ key_id: razorpayKeyID, key_secret: razorpayKeySecret });
+  const prisma = PrismaClientSingleton.prisma;
+
+  const marketPlaceTemplate = await prisma.resumeTemplateMarketplace.findUnique({
+    where: {
+      name: nameOfTemplate,
+    },
+  });
+
+  // get the current user
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+  });
+
+  if (!user) {
+    res.status(500).json({ message: "user not found" });
+    return;
+  }
+
+  if (!marketPlaceTemplate) {
+    res.status(500).json({ message: "template not found" });
+    return;
+  }
+
+  // generate the order
+  const order = await instance.orders.create({
+    amount: +marketPlaceTemplate.price,
+    currency: "INR",
+    payment_capture: 1,
+    notes: {
+      email: user.email,
+      templateName: nameOfTemplate,
+    },
+  });
+
+  res.json(order);
+});
+
+/**
+ *
+ *
+ * Create subscription
+ */
+router.post("/create_subscription", async (req, res) => {
+  if (!("planName" in req.body && req.body.planName)) {
+    res.status(400).json({ message: "planName field is missing" });
+    return;
+  }
+
+  const email = res.locals.email;
+  const planName = req.body.planName;
+  const prisma = PrismaClientSingleton.prisma;
+  const razorpayKeyID = process.env.RAZORPAY_KEY_ID;
+  const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET;
+  const Razorpay = require("razorpay");
+  const instance = new Razorpay({ key_id: razorpayKeyID, key_secret: razorpayKeySecret });
+
+  // if already created then just return the link
+  const oldSubscription = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+    select: {
+      subscription: true,
+    },
+  });
+
+  if (oldSubscription && oldSubscription.subscription) {
+    res.json(oldSubscription.subscription.subscriptionLink);
+    return;
+  }
+
+  const targetPlan = await prisma.admin.findUnique({
+    where: {
+      email: process.env.ADMIN_EMAIL || "",
+    },
+    select: {
+      premiumTemplatePlans: {
+        where: {
+          name: planName,
+        },
+      },
+    },
+  });
+
+  if (!(targetPlan && targetPlan.premiumTemplatePlans.length !== 0)) {
+    res.status(500).json({ message: "plan not found" });
+    return;
+  }
+
+  const choosenPlan = targetPlan.premiumTemplatePlans[0];
+
+  const subscriptionCreated: Subscription = await instance.subscriptions.create({
+    plan_id: choosenPlan.planID,
+    customer_notify: 1,
+    quantity: 1,
+    total_count: 12,
+    addons: [],
+    notes: {
+      email: email,
+    },
+  });
+
+  // add to the database
+  await prisma.user.update({
+    where: {
+      email: email,
+    },
+    data: {
+      subscription: {
+        create: {
+          activatedOn: new Date(),
+          basePrice: +choosenPlan.price, // in paisa
+          cycle: "MONTHLY",
+          discount: 0,
+          expireOn: new Date(),
+          isActive: false,
+          planName: planName,
+          subscriptionID: subscriptionCreated.id,
+          subscriptionLink: subscriptionCreated.short_url,
+        },
+      },
+    },
+  });
+
+  res.json(subscriptionCreated.short_url);
 });
 
 export default router;

@@ -6,12 +6,103 @@ import routerPublic from "./api-public";
 import routerMedia from "./api/media";
 import routerAuth from "./auth";
 
-export type paymentMethod = 'netbanking' | 'card'  | 'wallet' | 'upi';
+export type paymentMethod = "netbanking" | "card" | "wallet" | "upi";
 export enum EPaymentMethod {
-  netbanking = 'netbanking',
-  card = 'card',
-  wallet = 'wallet',
-  upi = 'upi',
+  netbanking = "netbanking",
+  card = "card",
+  wallet = "wallet",
+  upi = "upi",
+}
+
+export interface Subscription {
+  id: string;
+  entity: string;
+  plan_id: string;
+  status: string;
+  current_start: number | null;
+  current_end: number | null;
+  ended_at: number | null;
+  quantity: number;
+  notes: {
+    [key: string]: string;
+  };
+  charge_at: number;
+  start_at: number;
+  end_at: number;
+  auth_attempts: number;
+  total_count: number;
+  paid_count: number;
+  customer_notify: boolean;
+  created_at: number;
+  expire_by: number;
+  short_url: string;
+  has_scheduled_changes: boolean;
+  change_scheduled_at: number | null;
+  source: string;
+  offer_id: string;
+  remaining_count: number;
+}
+
+interface Plan {
+  id: string;
+  entity: string;
+  interval: number;
+  period: string;
+  item: {
+    id: string;
+    active: boolean;
+    name: string;
+    description: string | null;
+    amount: number;
+    unit_amount: number;
+    currency: string;
+    type: string;
+    unit: string | null;
+    tax_inclusive: boolean;
+    hsn_code: string | null;
+    sac_code: string | null;
+    tax_rate: number | null;
+    tax_id: string | null;
+    tax_group_id: string | null;
+    created_at: number;
+    updated_at: number;
+  };
+  notes: Record<string, string> | Array<unknown>;
+  created_at: number;
+}
+
+export interface templatePlans {
+  entity: string;
+  count: number;
+  items: Plan[];
+}
+
+export interface PremiumTemplatePlan {
+  id: string;
+  entity: string;
+  interval: number;
+  period: string;
+  item: {
+    id: string;
+    active: boolean;
+    name: string;
+    description: string;
+    amount: number;
+    unit_amount: number;
+    currency: string;
+    type: string;
+    unit: any; // The type for this property is not provided in the JSON, so it's set as 'any'
+    tax_inclusive: boolean;
+    hsn_code: any; // The type for this property is not provided in the JSON, so it's set as 'any'
+    sac_code: any; // The type for this property is not provided in the JSON, so it's set as 'any'
+    tax_rate: any; // The type for this property is not provided in the JSON, so it's set as 'any'
+    tax_id: any; // The type for this property is not provided in the JSON, so it's set as 'any'
+    tax_group_id: any; // The type for this property is not provided in the JSON, so it's set as 'any'
+    created_at: number;
+    updated_at: number;
+  };
+  notes: any;
+  created_at: number;
 }
 
 export interface SubscriptionHaltedEvent {
@@ -56,7 +147,6 @@ export interface SubscriptionHaltedEvent {
   created_at: number;
 }
 
-
 export interface SubscriptionCancelledEvent {
   entity: string;
   account_id: string;
@@ -98,7 +188,6 @@ export interface SubscriptionCancelledEvent {
   };
   created_at: number;
 }
-
 
 export interface SubscriptionChargedEvent {
   entity: string;
@@ -187,7 +276,6 @@ export interface SubscriptionChargedEvent {
   created_at: number;
 }
 
-
 export interface SubscriptionAuthenticatedEvent {
   entity: string;
   account_id: string;
@@ -267,7 +355,6 @@ export interface SubscriptionActivatedEvent {
   };
   created_at: number;
 }
-
 
 export interface OrderPayloadNetBanking {
   entity: string;
@@ -1086,7 +1173,7 @@ export interface Resume {
   }[];
 }
 
-import { en, faker } from "@faker-js/faker";
+import { faker } from "@faker-js/faker";
 import axios from "axios";
 
 // Generate dummy data for the Resume interface
@@ -1765,4 +1852,85 @@ function isWeakPassword(password: string): boolean {
 
   // Password is considered strong
   return false;
+}
+
+function isNumeric(value: any) {
+  // Use isNaN() to check if the value is NaN (Not a Number)
+  // Use Number() to attempt to convert the value to a number
+  // If the converted value is NaN, it means the value is not a valid number
+  return !isNaN(Number(value));
+}
+
+export function razorpayPrice(price: number) {
+  if (!price) return 0;
+  if (!isNumeric(price)) return 0;
+  return +(+price * 100).toFixed(0);
+}
+
+/**
+ *
+ * Create new premium resume template
+ */
+export async function createPremiumTemplatePlan() {
+  const nameOfPlan = "Earth";
+  const price = razorpayPrice(820.84); // 10 Dollar
+  const Razorpay = require("razorpay");
+  const razorpayKeyID = process.env.RAZORPAY_KEY_ID;
+  const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET;
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const instance = new Razorpay({ key_id: razorpayKeyID, key_secret: razorpayKeySecret });
+  const prisma = PrismaClientSingleton.prisma;
+  // check if the plan already created in the database
+  const oldPlan = await prisma.admin.findUnique({
+    where: {
+      email: adminEmail,
+    },
+    select: {
+      premiumTemplatePlans: {
+        where: {
+          name: nameOfPlan,
+        },
+      },
+    },
+  });
+
+  if (oldPlan) {
+    return true;
+  }
+
+  // Is already created on razorpay
+  const allCreatedPlans = (await instance.plans.all()) as templatePlans;
+  if (allCreatedPlans.count === 0 || !!!allCreatedPlans.items.find((p) => p.item.name === nameOfPlan)) {
+    const createdPlan = (await instance.plans.create({
+      period: "monthly",
+      interval: 1,
+      item: {
+        name: nameOfPlan,
+        amount: price,
+        currency: "INR",
+        description: "Access all the premium templates",
+      },
+    })) as PremiumTemplatePlan;
+
+    await prisma.admin.update({
+      where: {
+        email: adminEmail,
+      },
+      data: {
+        premiumTemplatePlans: {
+          create: {
+            currency: "INR",
+            description: "Access all the premium templates",
+            interval: 1,
+            name: nameOfPlan,
+            period: "MONTHLY",
+            planID: createdPlan.id,
+            price: price,
+          },
+        },
+      },
+    });
+  } else {
+    return true;
+  }
 }

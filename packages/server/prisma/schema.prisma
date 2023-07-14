@@ -13,14 +13,31 @@ datasource db {
 
 // ADMIN Table
 model Admin {
-  id             Int      @id @default(autoincrement())
-  email          String   @unique
-  fullName       String
-  profilePicture String?
-  password       String
-  reference      String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @default(now())
+  id                   Int                    @id @default(autoincrement())
+  email                String                 @unique
+  fullName             String
+  profilePicture       String?
+  password             String
+  reference            String
+  premiumTemplatePlans PremiumTemplatePlans[]
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @default(now())
+}
+
+// For the premium plans
+model PremiumTemplatePlans {
+  id          Int               @id @default(autoincrement())
+  planID      String @unique
+  name        String @unique
+  price       Float
+  period      SubscriptionCycle
+  interval    Int
+  currency    String
+  description String
+  admin       Admin             @relation(fields: [adminId], references: [id])
+  adminId     Int
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @default(now())
 }
 
 // User Model
@@ -46,14 +63,16 @@ model User {
   internships         Internships[]
   links               Links[]
 
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @default(now())
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @default(now())
   boughtTemplate TemplateBuy[]
 }
 
 // subscription 
 model Subscription {
-  id          Int               @id @default(autoincrement())
+  id          Int                       @id @default(autoincrement())
+  subscriptionID      String
+  subscriptionLink    String
   planName    String
   isActive    Boolean
   expireOn    DateTime
@@ -61,34 +80,33 @@ model Subscription {
   cycle       SubscriptionCycle
   discount    Float
   basePrice   Float
-  user        User              @relation(fields: [userId], references: [id])
-  userId      Int               @unique
+  user        User                      @relation(fields: [userId], references: [id])
+  userId      Int                       @unique
   transaction SubscriptionTransaction[]
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @default(now())
+  createdAt   DateTime                  @default(now())
+  updatedAt   DateTime                  @default(now())
 }
 
 model SubscriptionTransaction {
-  id          Int               @id @default(autoincrement())
-  amount      Float 
-  method      PaymentMethod
-  card        CardPaymentSubscription?
-  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+  id             Int                      @id @default(autoincrement())
+  amount         Float
+  method         PaymentMethod
+  card           CardPaymentSubscription?
+  subscription   Subscription             @relation(fields: [subscriptionId], references: [id])
   subscriptionId Int
 }
 
 model CardPaymentSubscription {
-  
-  id              Int         @id @default(autoincrement())
+  id              Int                     @id @default(autoincrement())
   last4           String
   name            String
   network         String
   type            CardType
   isInternational Boolean
   transaction     SubscriptionTransaction @relation(fields: [transactionId], references: [id])
-  transactionId   Int         @unique
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @default(now())
+  transactionId   Int                     @unique
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @default(now())
 }
 
 enum SubscriptionCycle {
@@ -329,6 +347,15 @@ model NetBankingPayment {
   mobile        String
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @default(now())
+}
+
+// For the resume template buy
+model ResumeTemplateMarketplace {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique // Unique name of the premium template
+  price     Float // amount in paise
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 }
 
 enum CardType {
