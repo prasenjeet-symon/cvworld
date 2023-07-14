@@ -1,6 +1,18 @@
 import { createHmac } from "crypto";
 import express from "express";
-import { OrderPayloadCard, OrderPayloadNetBanking, OrderPayloadUPI, OrderPayloadWallet, PrismaClientSingleton } from "../utils";
+import moment from "moment";
+import {
+  OrderPayloadCard,
+  OrderPayloadNetBanking,
+  OrderPayloadUPI,
+  OrderPayloadWallet,
+  PrismaClientSingleton,
+  SubscriptionActivatedEvent,
+  SubscriptionAuthenticatedEvent,
+  SubscriptionCancelledEvent,
+  SubscriptionChargedEvent,
+  SubscriptionHaltedEvent,
+} from "../utils";
 
 const router = express.Router();
 
@@ -221,6 +233,136 @@ router.post("/razorpay_webhook", async (req, res) => {
         });
         break;
     }
+
+    res.status(200).json({ message: "Success" });
+  }
+
+  if (payload.event === "subscription.authenticated") {
+    // create new subscription if not exit
+    const prisma = PrismaClientSingleton.prisma;
+    const emailOfUser = (payload as SubscriptionAuthenticatedEvent).payload.subscription.entity.notes.email;
+    await prisma.user.update({
+      where: {
+        email: emailOfUser,
+      },
+      data: {
+        subscription: {
+          upsert: {
+            create: {
+              activatedOn: new Date(),
+              basePrice: 0,
+              cycle: "MONTHLY",
+              discount: 0,
+              expireOn: moment().add(1, "month").toDate(),
+              isActive: true,
+              planName: "Earth",
+            },
+            update: {
+              expireOn: moment().add(1, "month").toDate(),
+              isActive: true,
+            },
+          },
+        },
+      },
+    });
+
+    res.status(200).json({ message: "Success" });
+  }
+
+  if (payload.event === "subscription.activated") {
+    // update the subscription to active
+    const emailOfUser = (payload as SubscriptionActivatedEvent).payload.subscription.entity.notes.email;
+    const prisma = PrismaClientSingleton.prisma;
+    await prisma.user.update({
+      where: {
+        email: emailOfUser,
+      },
+      data: {
+        subscription: {
+          update: {
+            isActive: true,
+            expireOn: moment().add(1, "month").toDate(),
+          },
+        },
+      },
+    });
+
+    res.status(200).json({ message: "Success" });
+  }
+
+  if (payload.event === "subscription.charged") {
+    // only credit card is supported
+    const subscriptionPayload = (payload as SubscriptionChargedEvent).payload;
+    const emailOfUser = subscriptionPayload.subscription.entity.notes.email;
+    const prisma = PrismaClientSingleton.prisma;
+
+    await prisma.user.update({
+      where: {
+        email: emailOfUser,
+      },
+      data: {
+        subscription: {
+          update: {
+            isActive: true,
+            expireOn: moment().add(1, "month").toDate(),
+            basePrice: +subscriptionPayload.payment.entity.amount,
+            transaction: {
+              create: {
+                amount: +subscriptionPayload.payment.entity.amount,
+                method: "CARD",
+                card: {
+                  create: {
+                    isInternational: subscriptionPayload.payment.entity.card.international,
+                    last4: subscriptionPayload.payment.entity.card.last4,
+                    name: subscriptionPayload.payment.entity.card.name,
+                    network: subscriptionPayload.payment.entity.card.network,
+                    type: subscriptionPayload.payment.entity.card.type === "debit" ? "DEBIT" : "CREDIT",
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    res.status(200).json({ message: "Success" });
+  }
+
+  if (payload.event === "subscription.cancelled") {
+    const emailOfUser = (payload as SubscriptionCancelledEvent).payload.subscription.entity.notes.email;
+    const prisma = PrismaClientSingleton.prisma;
+    await prisma.user.update({
+      where: {
+        email: emailOfUser,
+      },
+      data: {
+        subscription: {
+          update: {
+            isActive: false,
+          },
+        },
+      },
+    });
+
+    res.status(200).json({ message: "Success" });
+  }
+
+  if (payload.event === "subscription.halted") {
+    const emailOfUser = (payload as SubscriptionHaltedEvent).payload.subscription.entity.notes.email;
+    const prisma = PrismaClientSingleton.prisma;
+    await prisma.user.update({
+      where: {
+        email: emailOfUser,
+      },
+      data: {
+        subscription: {
+          update: {
+            isActive: false,
+          },
+        },
+      },
+    });
 
     res.status(200).json({ message: "Success" });
   }

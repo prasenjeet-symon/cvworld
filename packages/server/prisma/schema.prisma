@@ -63,8 +63,32 @@ model Subscription {
   basePrice   Float
   user        User              @relation(fields: [userId], references: [id])
   userId      Int               @unique
+  transaction SubscriptionTransaction[]
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @default(now())
+}
+
+model SubscriptionTransaction {
+  id          Int               @id @default(autoincrement())
+  amount      Float 
+  method      PaymentMethod
+  card        CardPaymentSubscription?
+  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+  subscriptionId Int
+}
+
+model CardPaymentSubscription {
+  
+  id              Int         @id @default(autoincrement())
+  last4           String
+  name            String
+  network         String
+  type            CardType
+  isInternational Boolean
+  transaction     SubscriptionTransaction @relation(fields: [transactionId], references: [id])
+  transactionId   Int         @unique
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @default(now())
 }
 
 enum SubscriptionCycle {

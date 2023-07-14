@@ -14,6 +14,261 @@ export enum EPaymentMethod {
   upi = 'upi',
 }
 
+export interface SubscriptionHaltedEvent {
+  entity: string;
+  account_id: string;
+  event: string;
+  contains: string[];
+  payload: {
+    subscription: {
+      entity: {
+        id: string;
+        entity: string;
+        plan_id: string;
+        customer_id: string;
+        status: string;
+        type: number;
+        current_start: number;
+        current_end: number;
+        ended_at: number | null;
+        quantity: number;
+        notes: {
+          [key: string]: string;
+        };
+        charge_at: number;
+        start_at: number;
+        end_at: number;
+        auth_attempts: number;
+        total_count: number;
+        paid_count: number;
+        customer_notify: boolean;
+        created_at: number;
+        expire_by: number;
+        short_url: string | null;
+        has_scheduled_changes: boolean;
+        change_scheduled_at: number | null;
+        source: string;
+        offer_id: string;
+        remaining_count: number;
+      };
+    };
+  };
+  created_at: number;
+}
+
+
+export interface SubscriptionCancelledEvent {
+  entity: string;
+  account_id: string;
+  event: string;
+  contains: string[];
+  payload: {
+    subscription: {
+      entity: {
+        id: string;
+        entity: string;
+        plan_id: string;
+        customer_id: string;
+        status: string;
+        type: number;
+        current_start: number;
+        current_end: number;
+        ended_at: number;
+        quantity: number;
+        notes: {
+          [key: string]: string;
+        };
+        charge_at: number | null;
+        start_at: number;
+        end_at: number;
+        auth_attempts: number;
+        total_count: number;
+        paid_count: number;
+        customer_notify: boolean;
+        created_at: number;
+        expire_by: number | null;
+        short_url: string | null;
+        has_scheduled_changes: boolean;
+        change_scheduled_at: number | null;
+        source: string;
+        offer_id: string;
+        remaining_count: number;
+      };
+    };
+  };
+  created_at: number;
+}
+
+
+export interface SubscriptionChargedEvent {
+  entity: string;
+  account_id: string;
+  event: string;
+  contains: string[];
+  payload: {
+    subscription: {
+      entity: {
+        id: string;
+        entity: string;
+        plan_id: string;
+        customer_id: string;
+        status: string;
+        type: number;
+        current_start: number;
+        current_end: number;
+        ended_at: number | null;
+        quantity: number;
+        notes: {
+          [key: string]: string;
+        };
+        charge_at: number;
+        start_at: number;
+        end_at: number;
+        auth_attempts: number;
+        total_count: number;
+        paid_count: number;
+        customer_notify: boolean;
+        created_at: number;
+        expire_by: number | null;
+        short_url: string | null;
+        has_scheduled_changes: boolean;
+        change_scheduled_at: number | null;
+        source: string;
+        offer_id: string;
+        remaining_count: number;
+      };
+    };
+    payment: {
+      entity: {
+        id: string;
+        entity: string;
+        amount: number;
+        currency: string;
+        status: string;
+        order_id: string;
+        invoice_id: string;
+        international: boolean;
+        method: string;
+        amount_refunded: number;
+        amount_transferred: number;
+        refund_status: string | null;
+        captured: string;
+        description: string;
+        card_id: string;
+        card: {
+          id: string;
+          entity: string;
+          name: string;
+          last4: string;
+          network: string;
+          type: string;
+          issuer: string | null;
+          international: boolean;
+          emi: boolean;
+          expiry_month: number;
+          expiry_year: number;
+        };
+        bank: string | null;
+        wallet: string | null;
+        vpa: string | null;
+        email: string;
+        contact: string;
+        customer_id: string;
+        token_id: string | null;
+        notes: any[];
+        fee: number;
+        tax: number;
+        error_code: string | null;
+        error_description: string | null;
+        created_at: number;
+      };
+    };
+  };
+  created_at: number;
+}
+
+
+export interface SubscriptionAuthenticatedEvent {
+  entity: string;
+  account_id: string;
+  event: string;
+  contains: string[];
+  payload: {
+    subscription: {
+      entity: {
+        id: string;
+        entity: string;
+        plan_id: string;
+        customer_id: string;
+        status: string;
+        current_start: number | null;
+        current_end: number | null;
+        ended_at: number | null;
+        quantity: number;
+        notes: any;
+        charge_at: number;
+        start_at: number;
+        end_at: number;
+        auth_attempts: number;
+        total_count: number;
+        paid_count: number;
+        customer_notify: boolean;
+        created_at: number;
+        expire_by: number | null;
+        short_url: string | null;
+        has_scheduled_changes: boolean;
+        change_scheduled_at: number | null;
+        source: string;
+        offer_id: string;
+        remaining_count: number;
+      };
+    };
+  };
+  created_at: number;
+}
+
+export interface SubscriptionActivatedEvent {
+  entity: string;
+  account_id: string;
+  event: string;
+  contains: string[];
+  payload: {
+    subscription: {
+      entity: {
+        id: string;
+        entity: string;
+        plan_id: string;
+        customer_id: string;
+        status: string;
+        current_start: number;
+        current_end: number;
+        ended_at: number | null;
+        quantity: number;
+        notes: {
+          [key: string]: string;
+        };
+        charge_at: number;
+        start_at: number;
+        end_at: number;
+        auth_attempts: number;
+        total_count: number;
+        paid_count: number;
+        customer_notify: boolean;
+        created_at: number;
+        expire_by: number;
+        short_url: string | null;
+        has_scheduled_changes: boolean;
+        change_scheduled_at: number | null;
+        source: string;
+        offer_id: string;
+        remaining_count: number;
+      };
+    };
+  };
+  created_at: number;
+}
+
+
 export interface OrderPayloadNetBanking {
   entity: string;
   account_id: string;
