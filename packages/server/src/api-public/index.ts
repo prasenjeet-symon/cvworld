@@ -84,8 +84,28 @@ router.post("/razorpay_webhook", async (req, res) => {
       return;
     }
 
-    // This template is bought buy the logged in user
     const prisma = PrismaClientSingleton.prisma;
+    // do not repeat the same event
+    const doEventExit = await prisma.user.findUnique({
+      where: {
+        email: emailOfUser,
+      },
+      select: {
+        boughtTemplate: {
+          where: {
+            eventID: (payload as OrderPayloadNetBanking).event,
+          },
+        },
+      },
+    });
+
+    if (doEventExit && doEventExit.boughtTemplate.length !== 0) {
+      res.status(200).json({ message: "Template already bought" });
+      return;
+    }
+
+    // This template is bought buy the logged in user
+
     switch ((payload as OrderPayloadNetBanking).payload.payment.entity.method) {
       case "card":
         const cardTransaction = payload as OrderPayloadCard;
@@ -96,6 +116,7 @@ router.post("/razorpay_webhook", async (req, res) => {
           data: {
             boughtTemplate: {
               create: {
+                eventID: cardTransaction.event,
                 name: templateName,
                 price: cardTransaction.payload.order.entity.amount,
                 transaction: {
@@ -134,6 +155,7 @@ router.post("/razorpay_webhook", async (req, res) => {
           data: {
             boughtTemplate: {
               create: {
+                eventID: netbankingTransaction.event,
                 name: templateName,
                 price: netbankingTransaction.payload.order.entity.amount,
                 transaction: {
@@ -170,6 +192,7 @@ router.post("/razorpay_webhook", async (req, res) => {
           data: {
             boughtTemplate: {
               create: {
+                eventID: upiTransaction.event,
                 name: templateName,
                 price: upiTransaction.payload.order.entity.amount,
                 transaction: {
@@ -206,6 +229,7 @@ router.post("/razorpay_webhook", async (req, res) => {
           data: {
             boughtTemplate: {
               create: {
+                eventID: walletTransaction.event,
                 name: templateName,
                 price: walletTransaction.payload.order.entity.amount,
                 transaction: {
@@ -285,6 +309,29 @@ router.post("/razorpay_webhook", async (req, res) => {
     const emailOfUser = subscriptionPayload.subscription.entity.notes.email;
     const prisma = PrismaClientSingleton.prisma;
 
+    // if already charged return
+    const alreadyCharged = await prisma.user.findUnique({
+      where: {
+        email: emailOfUser,
+      },
+      select: {
+        subscription: {
+          select: {
+            transaction: {
+              where: {
+                eventID: (payload as SubscriptionChargedEvent).event,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (alreadyCharged && alreadyCharged.subscription && alreadyCharged.subscription.transaction.length !== 0) {
+      res.status(200).json({ message: "Already charged" });
+      return;
+    }
+
     await prisma.user.update({
       where: {
         email: emailOfUser,
@@ -296,6 +343,7 @@ router.post("/razorpay_webhook", async (req, res) => {
             expireOn: moment().add(1, "month").toDate(),
             transaction: {
               create: {
+                eventID: (payload as SubscriptionChargedEvent).event,
                 amount: +subscriptionPayload.payment.entity.amount,
                 method: "CARD",
                 card: {

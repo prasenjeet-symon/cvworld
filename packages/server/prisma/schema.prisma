@@ -27,8 +27,8 @@ model Admin {
 // For the premium plans
 model PremiumTemplatePlans {
   id          Int               @id @default(autoincrement())
-  planID      String @unique
-  name        String @unique
+  planID      String            @unique
+  name        String            @unique
   price       Float
   period      SubscriptionCycle
   interval    Int
@@ -70,27 +70,28 @@ model User {
 
 // subscription 
 model Subscription {
-  id          Int                       @id @default(autoincrement())
-  subscriptionID      String
-  subscriptionLink    String
-  planName    String
-  isActive    Boolean
-  expireOn    DateTime
-  activatedOn DateTime
-  cycle       SubscriptionCycle
-  discount    Float
-  basePrice   Float
-  user        User                      @relation(fields: [userId], references: [id])
-  userId      Int                       @unique
-  transaction SubscriptionTransaction[]
-  createdAt   DateTime                  @default(now())
-  updatedAt   DateTime                  @default(now())
+  id               Int                       @id @default(autoincrement())
+  subscriptionID   String
+  subscriptionLink String
+  planName         String
+  isActive         Boolean
+  expireOn         DateTime
+  activatedOn      DateTime
+  cycle            SubscriptionCycle
+  discount         Float
+  basePrice        Float
+  user             User                      @relation(fields: [userId], references: [id])
+  userId           Int                       @unique
+  transaction      SubscriptionTransaction[]
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @default(now())
 }
 
 model SubscriptionTransaction {
   id             Int                      @id @default(autoincrement())
   amount         Float
   method         PaymentMethod
+  eventID        String                   @unique
   card           CardPaymentSubscription?
   subscription   Subscription             @relation(fields: [subscriptionId], references: [id])
   subscriptionId Int
@@ -120,6 +121,7 @@ model Resumes {
   resume    Json
   imageUrl  String
   pdfUrl    String
+  templateName String
   user      User     @relation(fields: [userId], references: [id])
   userId    Int
   createdAt DateTime @default(now())
@@ -280,6 +282,7 @@ model TemplateBuy {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @default(now())
   transaction Transaction?
+  eventID     String       @unique
 }
 
 // for the transaction depend on the template buy

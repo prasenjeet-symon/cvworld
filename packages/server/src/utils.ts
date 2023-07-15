@@ -1894,13 +1894,15 @@ export async function createPremiumTemplatePlan() {
     },
   });
 
-  if (oldPlan) {
+
+  if (oldPlan && oldPlan.premiumTemplatePlans.length !== 0) {
     return true;
   }
 
   // Is already created on razorpay
   const allCreatedPlans = (await instance.plans.all()) as templatePlans;
   if (allCreatedPlans.count === 0 || !!!allCreatedPlans.items.find((p) => p.item.name === nameOfPlan)) {
+    console.log('will create');
     const createdPlan = (await instance.plans.create({
       period: "monthly",
       interval: 1,
@@ -1932,5 +1934,42 @@ export async function createPremiumTemplatePlan() {
     });
   } else {
     return true;
+  }
+}
+/**
+ *
+ * Create initial templates
+ */
+export async function createTemplatesInitial() {
+  const templateNames = [
+    {
+      name: "templt_1",
+      isFree: true,
+      price: 0,
+    },
+    {
+      name: "templt_2",
+      isFree: false,
+      price: 8205, // in paisa
+    },
+  ];
+
+  const prisma = PrismaClientSingleton.prisma;
+
+  for (const template of templateNames) {
+    await prisma.resumeTemplateMarketplace.upsert({
+      where: {
+        name: template.name,
+      },
+      create: {
+        name: template.name,
+        price: template.price,
+      },
+      update: {
+        name: template.name,
+        price: template.price,
+        updatedAt: new Date(),
+      },
+    });
   }
 }

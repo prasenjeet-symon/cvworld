@@ -244,6 +244,15 @@ CV World utilizes Razorpay as the payment gateway for processing transactions.
         - When razorpay was not able to process the payment for any reason this route will be triggered.
     - [x] Subscription Cancelled
         - Using this route user can cancel the monthly subscription.
+- [x] Payments
+    - [x] Is Bought Template
+        - Given the name of the template this route can determine weather that template is bought by the user or not
+    - [x] Marketplace templates
+        - Will give all the free plus premium templates with status of weather they are bought or not by the user. 
+    - [x] create_subscription
+        - Using this route we can create subscription link given the plan name to subscribe to. User can use this link to subscribe to the cv world premium plan.
+    - [x] Generate Order Premium Template
+        - Using this route we can generate order for premium template to be used by the Razorpay.
 
 # Technologies stack
 - Node.js         

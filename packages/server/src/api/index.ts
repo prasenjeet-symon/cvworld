@@ -90,12 +90,12 @@ router.post("/update_resume", async (req, res) => {
 
 /** Generate new resume */
 router.post("/generate", async (req, res) => {
-  if (!("resume" in req.body && "isDummy" in req.body)) {
+  if (!("resume" in req.body && "isDummy" in req.body && "templateName" in req.body)) {
     res.status(400).send("resume and isDummy field is missing");
     return;
   }
 
-  let { resume, isDummy }: { resume: Resume; isDummy: string } = req.body;
+  let { resume, isDummy, templateName }: { resume: Resume; isDummy: string; templateName: string } = req.body;
 
   if (isDummy === "yes") {
     const dummyResume = generateDummyResume();
@@ -126,6 +126,7 @@ router.post("/generate", async (req, res) => {
           imageUrl: imageUrl,
           pdfUrl: pdfUrl,
           resume: JSON.parse(JSON.stringify(resume)),
+          templateName: templateName,
         },
       },
     },
@@ -1468,6 +1469,11 @@ router.post("/get_user", async (req, res) => {
  * Generate the order for the template
  */
 router.post("/generate_order", async (req, res) => {
+  if (!("nameOfTemplate" in req.body)) {
+    res.status(400).json({ message: "nameOfTemplate field is missing" });
+    return;
+  }
+
   const email = res.locals.email;
   const Razorpay = require("razorpay");
   const razorpayKeyID = process.env.RAZORPAY_KEY_ID;
@@ -1496,6 +1502,11 @@ router.post("/generate_order", async (req, res) => {
 
   if (!marketPlaceTemplate) {
     res.status(500).json({ message: "template not found" });
+    return;
+  }
+
+  if (+marketPlaceTemplate.price === 0) {
+    res.status(500).json({ message: "template price is 0" });
     return;
   }
 
@@ -1601,6 +1612,96 @@ router.post("/create_subscription", async (req, res) => {
   });
 
   res.json(subscriptionCreated.short_url);
+});
+
+/**
+ *
+ *
+ * Get templates for marketplace
+ */
+router.post("/get_marketplace_templates", async (req, res) => {
+  const prisma = PrismaClientSingleton.prisma;
+  const email = res.locals.email;
+
+  const boughtTemplate = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+    select: {
+      boughtTemplate: true,
+    },
+  });
+
+  const allTemplates = await prisma.resumeTemplateMarketplace.findMany({});
+
+  const allTemplateFinal = allTemplates.map((p) => {
+    return { ...p, isFree: p.price === 0, isBought: !!boughtTemplate?.boughtTemplate.find((val) => val.name === p.name) };
+  });
+
+  res.json(allTemplateFinal);
+});
+
+/**
+ *
+ *
+ * Is template bought
+ */
+router.post("/is_template_bought", async (req, res) => {
+  if (!("templateName" in req.body)) {
+    res.status(400).json({ message: "templateName field is missing" });
+    return;
+  }
+
+  const email = res.locals.email;
+  const templateName = req.body.templateName;
+  const prisma = PrismaClientSingleton.prisma;
+
+  const template = await prisma.resumeTemplateMarketplace.findUnique({
+    where: {
+      name: templateName,
+    },
+  });
+
+  if (!template) {
+    res.status(500).json({ message: "template not found" });
+    return;
+  }
+
+  const price = template.price;
+  const isFree = price === 0;
+  if (isFree) {
+    res.json({ isBought: true });
+    return;
+  } else {
+    // check if bought
+    const boughtTemplate = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+      select: {
+        boughtTemplate: {
+          where: {
+            name: templateName,
+          },
+        },
+      },
+    });
+
+    if (!boughtTemplate) {
+      res.json({ isBought: false });
+      return;
+    }
+
+    if (boughtTemplate.boughtTemplate.length === 0) {
+      res.json({ isBought: false });
+      return;
+    }
+
+    if (boughtTemplate.boughtTemplate.length !== 0) {
+      res.json({ isBought: true });
+      return;
+    }
+  }
 });
 
 export default router;
