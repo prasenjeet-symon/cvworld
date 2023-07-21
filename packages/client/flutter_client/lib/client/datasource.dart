@@ -26,7 +26,6 @@ class EmploymentHistory {
 
   toJson() {
     var jsonData = {'job': job, 'employer': employer, 'startDate': startDate.toUtc().toIso8601String(), 'endDate': endDate.toUtc().toIso8601String(), 'city': city, 'description': description};
-
     return jsonData;
   }
 
@@ -104,7 +103,6 @@ class Internship {
 
   toJson() {
     var jsonData = {'job': job, 'employer': employer, 'startDate': startDate.toUtc().toIso8601String(), 'endDate': endDate.toUtc().toIso8601String(), 'city': city, 'description': description};
-
     return jsonData;
   }
 
@@ -135,7 +133,6 @@ class Courses {
 
   toJson() {
     var jsonData = {'course': course, 'institution': institution, 'startDate': startDate.toUtc().toIso8601String(), 'endDate': endDate.toUtc().toIso8601String()};
-
     return jsonData;
   }
 
@@ -241,7 +238,7 @@ class Skills {
   }
 
   factory Skills.fromJson(Map<String, dynamic> json) {
-    return Skills(json['skill'], json['level']);
+    return Skills(json['skill'], double.parse(json['level'].toString()));
   }
 }
 
@@ -260,7 +257,7 @@ class Languages {
   }
 
   factory Languages.fromJson(Map<String, dynamic> json) {
-    return Languages(json['language'], json['level']);
+    return Languages(json['language'], double.parse(json['level'].toString()));
   }
 }
 
@@ -378,6 +375,7 @@ class GeneratedResume {
   final DateTime updatedAt;
   final Resume resume;
   final ResumeLink resumeLink;
+  final String templateName;
 
   GeneratedResume(
     this.id,
@@ -386,6 +384,7 @@ class GeneratedResume {
     this.updatedAt,
     this.resume,
     this.resumeLink,
+    this.templateName,
   );
 
   factory GeneratedResume.fromJson(Map<String, dynamic> json) {
@@ -396,11 +395,21 @@ class GeneratedResume {
       DateTime.parse(json['updatedAt']),
       Resume.fromJson(json['resume']),
       ResumeLink(DatabaseService().publicResource(json['imageUrl']), DatabaseService().publicResource(json['pdfUrl'])),
+      json['templateName'],
     );
   }
 
   toJson() {
-    var jsonData = {'id': id, 'userId': userId, 'createdAt': createdAt.toUtc().toIso8601String(), 'updatedAt': updatedAt.toUtc().toIso8601String(), 'resume': resume.toJson(), 'imageUrl': resumeLink.imageUrl, 'pdfUrl': resumeLink.pdfUrl};
+    var jsonData = {
+      'id': id,
+      'userId': userId,
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
+      'resume': resume.toJson(),
+      'imageUrl': resumeLink.imageUrl,
+      'pdfUrl': resumeLink.pdfUrl,
+      'templateName': templateName
+    };
     return jsonData;
   }
 }
@@ -435,7 +444,6 @@ class IsLoggedIn {
 
   toJson() {
     var jsonData = {'userId': userId, 'email': email, 'isAdmin': isAdmin};
-
     return jsonData;
   }
 }
@@ -457,7 +465,6 @@ class GenerateNewResume {
 
   toJson() {
     var jsonData = {'imageUrl': imageUrl, 'pdfUrl': pdfUrl, 'id': id};
-
     return jsonData;
   }
 }
@@ -546,9 +553,9 @@ class UserDetails {
       'drivingLicense': drivingLicense,
       'nationality': nationality,
       'placeOfBirth': placeOfBirth,
-      'dateOfBirth': toUtcJsonDateTimeFromDateTime(dateOfBirth),
-      'createdAt': toUtcJsonDateTimeFromDateTime(createdAt),
-      'updatedAt': toUtcJsonDateTimeFromDateTime(updatedAt),
+      'dateOfBirth': dateOfBirth.toUtc().toIso8601String(),
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
     };
 
     return jsonData;
@@ -1055,8 +1062,8 @@ class UserSubscription {
       DateTime.parse(json['expireOn']),
       DateTime.parse(json['activatedOn']),
       json['cycle'],
-      json['discount'],
-      json['basePrice'],
+      double.parse(json['discount'].toString()),
+      double.parse(json['basePrice'].toString()),
       DateTime.parse(json['createdAt']),
       DateTime.parse(json['updatedAt']),
     );
@@ -1215,6 +1222,136 @@ class ContactUs {
   }
 }
 
+// For is bought response
+class IsBought {
+  final bool isBought;
+
+  IsBought(this.isBought);
+
+  factory IsBought.fromJson(Map<String, dynamic> json) {
+    return IsBought(json['isBought']);
+  }
+
+  toJson() {
+    var jsonData = {'isBought': isBought};
+    return jsonData;
+  }
+}
+
+// For the template marketplace
+class TemplateMarketPlace {
+  final int id;
+  final String name;
+  final double price;
+  final String previewImgUrl;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final bool isFree;
+  final bool isBought;
+
+  TemplateMarketPlace({
+    required this.id,
+    required this.name,
+    required this.price,
+    required this.previewImgUrl,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.isFree,
+    required this.isBought,
+  });
+
+  factory TemplateMarketPlace.fromJson(Map<String, dynamic> json) {
+    return TemplateMarketPlace(
+      id: json['id'],
+      name: json['name'],
+      price: double.parse(json['price'].toString()),
+      previewImgUrl: DatabaseService().publicResource(json['previewImgUrl']),
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: DateTime.parse(json['updatedAt']),
+      isFree: json['isFree'],
+      isBought: json['isBought'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'price': price,
+      'previewImgUrl': previewImgUrl,
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
+      'isFree': isFree,
+      'isBought': isBought,
+    };
+  }
+}
+
+// For the order
+class TemplateOrder {
+  final String id;
+  final String entity;
+  final double amount;
+  final double amountPaid;
+  final double amountDue;
+  final String currency;
+  final String? receipt;
+  final String? offerId;
+  final String status;
+  final int attempts;
+  final Map<String, dynamic> notes;
+  final DateTime createdAt;
+
+  TemplateOrder({
+    required this.id,
+    required this.entity,
+    required this.amount,
+    required this.amountPaid,
+    required this.amountDue,
+    required this.currency,
+    this.receipt,
+    this.offerId,
+    required this.status,
+    required this.attempts,
+    required this.notes,
+    required this.createdAt,
+  });
+
+  factory TemplateOrder.fromJson(Map<String, dynamic> json) {
+    return TemplateOrder(
+      id: json['id'],
+      entity: json['entity'],
+      amount: double.parse(json['amount'].toString()),
+      amountPaid: double.parse(json['amount_paid'].toString()),
+      amountDue: double.parse(json['amount_due'].toString()),
+      currency: json['currency'],
+      receipt: json['receipt'],
+      offerId: json['offer_id'],
+      status: json['status'],
+      attempts: json['attempts'],
+      notes: json['notes'],
+      createdAt: DateTime.fromMillisecondsSinceEpoch(json['created_at'] * 1000),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'entity': entity,
+      'amount': amount,
+      'amount_paid': amountPaid,
+      'amount_due': amountDue,
+      'currency': currency,
+      'receipt': receipt,
+      'offer_id': offerId,
+      'status': status,
+      'attempts': attempts,
+      'notes': notes,
+      'created_at': createdAt.millisecondsSinceEpoch ~/ 1000,
+    };
+  }
+}
+
 ///
 ///
 ///
@@ -1270,7 +1407,8 @@ class JwtClient extends http.BaseClient {
 ///
 ///
 class DatabaseService {
-  String origin = 'http://localhost:3001';
+  // String origin = 'http://localhost:3001';
+  String origin = 'http://localhost:8080';
   late Uri authRoute;
   late Uri apiRoute;
   late Uri signInRoute;
@@ -1355,6 +1493,16 @@ class DatabaseService {
   late Uri continueWithGoogleRoute;
   // server/api_public/contact_us
   late Uri contactUsRoute;
+  // is_template_bought
+  late Uri isTemplateBoughtRoute;
+  // get_marketplace_templates
+  late Uri getMarketplaceTemplatesRoute;
+  // generate_order
+  late Uri generateOrderRoute;
+  // create_subscription
+  late Uri createSubscriptionRoute;
+  // cancel_subscription
+  late Uri cancelSubscriptionRoute;
 
   DatabaseService() {
     authRoute = Uri.parse('$origin/server/auth');
@@ -1403,6 +1551,11 @@ class DatabaseService {
     deleteResumeRoute = Uri.parse('$origin/server/api/delete_resume');
     continueWithGoogleRoute = Uri.parse('$origin/server/auth/continue_with_google');
     contactUsRoute = Uri.parse('$origin/server/api_public/contact_us');
+    isTemplateBoughtRoute = Uri.parse('$origin/server/api/is_template_bought');
+    getMarketplaceTemplatesRoute = Uri.parse('$origin/server/api/get_marketplace_templates');
+    generateOrderRoute = Uri.parse('$origin/server/api/generate_order');
+    createSubscriptionRoute = Uri.parse('$origin/server/api/create_subscription');
+    cancelSubscriptionRoute = Uri.parse('$origin/server/api/cancel_subscription');
   }
 
   publicResource(String path) {
@@ -1582,11 +1735,11 @@ class DatabaseService {
   }
 
   /// Generate the resume
-  Future<GenerateNewResume?> generateResume(Resume resume) async {
+  Future<GenerateNewResume?> generateResume(Resume resume, String templateName) async {
     var payload = resume.toJson();
     var client = JwtClient();
 
-    var response = await client.post(generateResumeRoute, body: json.encode({'resume': payload, 'isDummy': 'no'}));
+    var response = await client.post(generateResumeRoute, body: json.encode({'templateName': templateName, 'resume': payload, 'isDummy': 'no'}));
     if (response.statusCode == 200) {
       client.dispose();
 
@@ -1993,9 +2146,7 @@ class DatabaseService {
   Future<DeleteDocuments?> deleteUserEducation(DeleteDocuments delete) async {
     var payload = delete.toJson();
     var client = JwtClient();
-
     var response = await client.post(deleteUserEducationRoute, body: json.encode(payload));
-
     if (response.statusCode == 200) {
       client.dispose();
       var responseData = DeleteDocuments.fromJson(json.decode(response.body));
@@ -2013,12 +2164,10 @@ class DatabaseService {
   // get_user_employment_histories
   Future<List<UserEmployment>?> fetchUserEmploymentHistories() async {
     var client = JwtClient();
-
     var response = await client.post(getUserEmploymentHistoriesRoute);
     if (response.statusCode == 200) {
       var responseData = (json.decode(response.body) as List<dynamic>);
       var finalData = responseData.map((e) => UserEmployment.fromJson(e)).toList();
-
       client.dispose();
       return finalData;
     } else {
@@ -2035,9 +2184,7 @@ class DatabaseService {
   Future<UserEmployment?> addUpdateUserEmploymentHistory(UserEmployment userEmployment) async {
     var payload = userEmployment.toJson();
     var client = JwtClient();
-
     var response = await client.post(addUpdateUserEmploymentHistoryRoute, body: json.encode({"employmentHistory": payload}));
-
     if (response.statusCode == 200) {
       client.dispose();
       var responseData = UserEmployment.fromJson(json.decode(response.body));
@@ -2056,9 +2203,7 @@ class DatabaseService {
   Future<DeleteDocuments?> deleteUserEmploymentHistory(DeleteDocuments delete) async {
     var payload = delete.toJson();
     var client = JwtClient();
-
     var response = await client.post(deleteUserEmploymentHistoryRoute, body: json.encode(payload));
-
     if (response.statusCode == 200) {
       client.dispose();
       var responseData = DeleteDocuments.fromJson(json.decode(response.body));
@@ -2076,7 +2221,6 @@ class DatabaseService {
   // get_user_internships
   Future<List<UserInternship>?> fetchUserInternships() async {
     var client = JwtClient();
-
     var response = await client.post(getUserInternshipsRoute);
     if (response.statusCode == 200) {
       var responseData = (json.decode(response.body) as List<dynamic>);
@@ -2097,11 +2241,9 @@ class DatabaseService {
   // add_update_user_internship
   Future<UserInternship?> addUpdateUserInternship(UserInternship userInternship) async {
     var payload = userInternship.toJson();
-
     var client = JwtClient();
 
     var response = await client.post(addUpdateUserInternshipRoute, body: json.encode({"internship": payload}));
-
     if (response.statusCode == 200) {
       client.dispose();
       var responseData = UserInternship.fromJson(json.decode(response.body));
@@ -2245,7 +2387,6 @@ class DatabaseService {
     var client = JwtClient();
 
     var response = await client.post(deleteUserSubscriptionRoute, body: json.encode(payload));
-
     if (response.statusCode == 200) {
       client.dispose();
       var responseData = DeleteDocuments.fromJson(json.decode(response.body));
@@ -2267,7 +2408,6 @@ class DatabaseService {
     var response = await client.post(getUserRoute);
     if (response.statusCode == 200) {
       client.dispose();
-      print(json.decode(response.body));
       var responseData = User.fromJson(json.decode(response.body));
       return responseData;
     } else {
@@ -2352,12 +2492,105 @@ class DatabaseService {
       var responseData = ContactUs.fromJson(json.decode(response.body));
       return responseData;
     } else {
-      print(response.body);
+      if (kDebugMode) {
+        print(response.body);
+      }
+
       if (kDebugMode) {
         print('Something went wrong while sending contact us');
       }
 
       return null;
+    }
+  }
+
+  // isTemplateBoughtRoute
+  Future<IsBought?> isTemplateBought(String templateName) async {
+    var client = JwtClient();
+    var response = await client.post(isTemplateBoughtRoute, body: json.encode({'templateName': templateName}));
+    if (response.statusCode == 200) {
+      var responseData = IsBought.fromJson(json.decode(response.body));
+      client.dispose();
+      return responseData;
+    } else {
+      client.dispose();
+      if (kDebugMode) {
+        print('Something went wrong while checking if template is bought');
+      }
+
+      return null;
+    }
+  }
+
+  // getMarketplaceTemplatesRoute
+  Future<List<TemplateMarketPlace>?> getMarketplaceTemplates() async {
+    var client = JwtClient();
+    var response = await client.post(getMarketplaceTemplatesRoute);
+    if (response.statusCode == 200) {
+      var responseData = (json.decode(response.body) as List<dynamic>);
+      var finalData = responseData.map((e) => TemplateMarketPlace.fromJson(e)).toList();
+      client.dispose();
+      return finalData;
+    } else {
+      client.dispose();
+      if (kDebugMode) {
+        print('Something went wrong while fetching marketplace templates');
+      }
+
+      return null;
+    }
+  }
+
+  // generateOrderRoute
+  Future<TemplateOrder?> generateOrder(String nameOfTemplate) async {
+    var client = JwtClient();
+    var response = await client.post(generateOrderRoute, body: json.encode({'nameOfTemplate': nameOfTemplate}));
+    if (response.statusCode == 200) {
+      var responseData = TemplateOrder.fromJson(json.decode(response.body));
+      client.dispose();
+      return responseData;
+    } else {
+      client.dispose();
+      if (kDebugMode) {
+        print('Something went wrong while generating order');
+      }
+
+      return null;
+    }
+  }
+
+  // createSubscriptionRoute
+  Future<String?> createSubscription(String planName) async {
+    var client = JwtClient();
+    var response = await client.post(createSubscriptionRoute, body: json.encode({'planName': planName}));
+    if (response.statusCode == 200) {
+      var responseData = DatabaseService().publicResource(json.decode(response.body));
+      client.dispose();
+      return responseData;
+    } else {
+      client.dispose();
+      if (kDebugMode) {
+        print('Something went wrong while creating subscription');
+      }
+
+      return null;
+    }
+  }
+
+  // cancel_subscription
+  Future<void> cancelSubscription() async {
+    var client = JwtClient();
+    var response = await client.post(cancelSubscriptionRoute);
+    if (response.statusCode == 200) {
+      client.dispose();
+      return;
+    } else {
+      client.dispose();
+      if (kDebugMode) {
+        print('Something went wrong while canceling subscription');
+      }
+
+      return;
     }
   }
 }

@@ -2,6 +2,7 @@ import { createHmac } from "crypto";
 import express from "express";
 import moment from "moment";
 import {
+  Order,
   OrderPayloadCard,
   OrderPayloadNetBanking,
   OrderPayloadUPI,
@@ -12,7 +13,10 @@ import {
   SubscriptionCancelledEvent,
   SubscriptionChargedEvent,
   SubscriptionHaltedEvent,
+  authenticateUser,
 } from "../utils";
+import { buyTemplate } from "../views/buy-template";
+import { paymentSuccess } from "../views/payment-success";
 
 const router = express.Router();
 
@@ -401,5 +405,17 @@ router.post("/razorpay_webhook", async (req, res) => {
     res.status(200).json({ message: "Success" });
   }
 });
+
+// Get | Payment successful
+router.get("/payment_success", async (req, res) => {
+  const razorpay_payment_id = req.query.razorpay_payment_id as string;
+  const razorpay_order_id = req.query.razorpay_order_id as string;
+  const priceInPaisa = req.query.price as string;
+  const priceInRupees = (+priceInPaisa/100).toFixed(2);
+
+  // set HTML
+  res.set("Content-Type", "text/html");
+  res.send(paymentSuccess(+priceInRupees, razorpay_order_id, razorpay_payment_id));
+})
 
 export default router;

@@ -117,15 +117,15 @@ enum SubscriptionCycle {
 
 // for the resume
 model Resumes {
-  id        Int      @id @default(autoincrement())
-  resume    Json
-  imageUrl  String
-  pdfUrl    String
+  id           Int      @id @default(autoincrement())
+  resume       Json
+  imageUrl     String
+  pdfUrl       String
   templateName String
-  user      User     @relation(fields: [userId], references: [id])
-  userId    Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
 }
 
 // for the user personal details
@@ -354,11 +354,12 @@ model NetBankingPayment {
 
 // For the resume template buy
 model ResumeTemplateMarketplace {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique // Unique name of the premium template
-  price     Float // amount in paise
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id            Int      @id @default(autoincrement())
+  name          String   @unique // Unique name of the premium template
+  price         Float // amount in paise
+  previewImgUrl String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
 }
 
 enum CardType {

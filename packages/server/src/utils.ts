@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import express, { NextFunction, Request, Response } from "express";
 import { v4 } from "uuid";
 import router from "./api";
+import routerAdmin from "./api-admin/index";
 import routerPublic from "./api-public";
 import routerMedia from "./api/media";
 import routerAuth from "./auth";
@@ -12,6 +13,21 @@ export enum EPaymentMethod {
   card = "card",
   wallet = "wallet",
   upi = "upi",
+}
+
+export interface Order {
+  id: string;
+  entity: string;
+  amount: number;
+  amountPaid: number;
+  amountDue: number;
+  currency: string;
+  receipt?: string | null;
+  offerId?: string | null;
+  status: string;
+  attempts: number;
+  notes: { [key: string]: any };
+  createdAt: Date;
 }
 
 export interface Subscription {
@@ -853,7 +869,7 @@ export const authenticateUser = (req: Request, res: Response, next: NextFunction
   const jwt = require("jsonwebtoken");
   // Get the authentication token from the request headers, query parameters, or cookies
   // Example: Bearer <token>
-  const token = req.headers.authorization ? req.headers.authorization.split(" ")[1] : "";
+  const token = req.headers.authorization ? req.headers.authorization.split(" ")[1] : req.query.token;
 
   // Verify and decode the token
   try {
@@ -1092,6 +1108,7 @@ export function createServer() {
   app.use("/server/api_public", routerPublic);
   app.use("/server/api", authenticateUser, router);
   app.use("/server/api/media", authenticateUser, routerMedia);
+  app.use("/server/api_admin", routerAdmin);
 
   app.get("/server/", (req, res) => {
     res.send({ message: "Hello World" });
@@ -1762,10 +1779,10 @@ export function generateResumeHTML(resume: Resume) {
 }
 
 /** Generate the PDF */
-export async function generatePDF(resume: Resume, resumeUUID?: string) {
+export async function generatePDF(resume: Resume, resumeMaker: null | ((resume: Resume) => string) = null, resumeUUID?: string) {
   const browser = (await BrowserPuppeteer.browser()).browserInstance;
   const page = await browser.newPage();
-  const resumeHTML = generateResumeHTML(resume);
+  const resumeHTML = resumeMaker ? resumeMaker(resume) : generateResumeHTML(resume);
   await page.setContent(resumeHTML);
   await page.waitForNetworkIdle({ idleTime: 1000 });
 
@@ -1779,10 +1796,10 @@ export async function generatePDF(resume: Resume, resumeUUID?: string) {
 }
 
 /** Generate the Image of the resume */
-export async function generateImage(resume: Resume, resumeUUID?: string) {
+export async function generateImage(resume: Resume, resumeMaker: null | ((resume: Resume) => string) = null, resumeUUID?: string) {
   const browser = (await BrowserPuppeteer.browser()).browserInstance;
   const page = await browser.newPage();
-  const resumeHTML = generateResumeHTML(resume);
+  const resumeHTML = resumeMaker ? resumeMaker(resume) : generateResumeHTML(resume);
   await page.setContent(resumeHTML);
   await page.waitForSelector(".resume");
   await page.waitForNetworkIdle({ idleTime: 1000 });
@@ -1872,7 +1889,7 @@ export function razorpayPrice(price: number) {
  * Create new premium resume template
  */
 export async function createPremiumTemplatePlan() {
-  const nameOfPlan = "Earth";
+  const nameOfPlan = "Mars";
   const price = razorpayPrice(820.84); // 10 Dollar
   const Razorpay = require("razorpay");
   const razorpayKeyID = process.env.RAZORPAY_KEY_ID;
@@ -1894,7 +1911,6 @@ export async function createPremiumTemplatePlan() {
     },
   });
 
-
   if (oldPlan && oldPlan.premiumTemplatePlans.length !== 0) {
     return true;
   }
@@ -1902,7 +1918,7 @@ export async function createPremiumTemplatePlan() {
   // Is already created on razorpay
   const allCreatedPlans = (await instance.plans.all()) as templatePlans;
   if (allCreatedPlans.count === 0 || !!!allCreatedPlans.items.find((p) => p.item.name === nameOfPlan)) {
-    console.log('will create');
+    console.log("will create");
     const createdPlan = (await instance.plans.create({
       period: "monthly",
       interval: 1,
@@ -1936,40 +1952,32 @@ export async function createPremiumTemplatePlan() {
     return true;
   }
 }
+
 /**
- *
- * Create initial templates
+ * Create localtunnel for the testing webhook
  */
-export async function createTemplatesInitial() {
-  const templateNames = [
-    {
-      name: "templt_1",
-      isFree: true,
-      price: 0,
-    },
-    {
-      name: "templt_2",
-      isFree: false,
-      price: 8205, // in paisa
-    },
-  ];
+export async function createLocaltunnel(port: number) {
+  const localtunnel = require("localtunnel");
+  const tunnel = await localtunnel({ port: port, subdomain: "cvworld-cvw-cvw-cvw-cvw" });
 
-  const prisma = PrismaClientSingleton.prisma;
+  tunnel.on("error", (err: any) => {
+    console.log(err);
+  });
 
-  for (const template of templateNames) {
-    await prisma.resumeTemplateMarketplace.upsert({
-      where: {
-        name: template.name,
-      },
-      create: {
-        name: template.name,
-        price: template.price,
-      },
-      update: {
-        name: template.name,
-        price: template.price,
-        updatedAt: new Date(),
-      },
-    });
-  }
+  tunnel.on("close", () => {
+    console.log("Tunnel closed");
+  });
+
+  return tunnel.url;
+}
+
+/** Get the base URL of server */
+export function getBaseUrl() {
+  const baseUrl = process.env.BASE_URL;
+  return baseUrl;
+}
+
+export function getResourcePath(url: string) {
+  const resourcesPath = getBaseUrl() + "/" + url;
+  return resourcesPath;
 }

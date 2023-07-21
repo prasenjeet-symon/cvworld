@@ -1,4 +1,6 @@
 // ignore: file_names
+import 'dart:js_interop';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
@@ -66,6 +68,31 @@ class _ResumeViewerState extends State<ResumeViewer> {
   late GeneratedResume? resume;
   bool isLoading = true;
   bool isError = false;
+  bool canDownload = false;
+
+  // is Bought
+  Future<bool> isBought(GeneratedResume resume) async {
+    var isBought = await DatabaseService().isTemplateBought(resume.templateName);
+    if (isBought.isDefinedAndNotNull) {
+      return isBought!.isBought;
+    } else {
+      return false;
+    }
+  }
+
+  // is subscriber
+  Future<bool> isSubscriber() async {
+    var user = await DatabaseService().fetchUser();
+    if (user.isDefinedAndNotNull) {
+      if (user!.subscription.isDefinedAndNotNull && user.subscription!.isActive) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
 
   Future<void> fetchSingleResume() async {
     isLoading = true;
@@ -82,10 +109,26 @@ class _ResumeViewerState extends State<ResumeViewer> {
     setState(() {});
   }
 
+  // initial setup
+  Future<void> init() async {
+    fetchSingleResume().then((value) {
+      return isSubscriber();
+    }).then((value) {
+      if (value) {
+        return Future(() => true);
+      } else {
+        return isBought(resume!);
+      }
+    }).then((value) {
+      canDownload = value;
+      setState(() {});
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    fetchSingleResume();
+    init();
   }
 
   @override
@@ -113,7 +156,9 @@ class _ResumeViewerState extends State<ResumeViewer> {
                 ),
                 Container(
                   margin: const EdgeInsets.fromLTRB(0, 45, 0, 50),
-                  child: Image.network(resume!.resumeLink.imageUrl, ),
+                  child: Image.network(
+                    resume!.resumeLink.imageUrl,
+                  ),
                 ),
                 Row(
                   children: [
@@ -122,14 +167,18 @@ class _ResumeViewerState extends State<ResumeViewer> {
                       width: 100,
                       margin: const EdgeInsets.fromLTRB(0, 0, 20, 0),
                       child: EditButton(onPressed: () {
-                        context.pushRoute(CvMakerRoute(resumeID: widget.resumeID));
+                        context.pushRoute(CvMakerRoute(resumeID: widget.resumeID, templateName: 'Edit'));
                       }),
                     ),
                     SizedBox(
                       width: 200,
-                      child: DownloadButton(onPressed: () {
-                        downloadFile(resume!.resumeLink.pdfUrl, resume!.resumeLink.pdfUrl);
-                      }),
+                      child: canDownload
+                          ? DownloadButton(onPressed: () {
+                              downloadFile(resume!.resumeLink.pdfUrl, resume!.resumeLink.pdfUrl);
+                            })
+                          : BuyButton(
+                              onPressed: () {},
+                            ),
                     )
                   ],
                 )
@@ -208,6 +257,30 @@ class EditButton extends StatelessWidget {
           Icon(Icons.edit, color: Colors.blue),
           SizedBox(width: 8.0),
           Text('Edit', style: TextStyle(color: Colors.blue, fontSize: 16.0)),
+        ],
+      ),
+    );
+  }
+}
+
+// Buy Now Button
+
+class BuyButton extends StatelessWidget {
+  final void Function() onPressed;
+
+  const BuyButton({super.key, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, padding: const EdgeInsets.fromLTRB(20, 25, 20, 25)),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.download, color: Colors.white),
+          SizedBox(width: 8.0),
+          Text('Buy Now', style: TextStyle(color: Colors.white, fontSize: 16.0)),
         ],
       ),
     );

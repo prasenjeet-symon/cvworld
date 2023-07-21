@@ -19,8 +19,9 @@ import 'package:flutter_client/routes/router.gr.dart';
 @RoutePage()
 class CvMakerScreen extends StatelessWidget {
   final int? resumeID;
+  final String? templateName;
 
-  const CvMakerScreen({super.key, @PathParam() required this.resumeID});
+  const CvMakerScreen({super.key, @PathParam() required this.resumeID, @PathParam() required this.templateName});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +34,7 @@ class CvMakerScreen extends StatelessWidget {
               if (constraints.maxWidth < 600) {
                 return const CvMakerMobileScreen();
               } else {
-                return CvMakerDesktopScreen(resumeID: resumeID == 0 ? null : resumeID!);
+                return CvMakerDesktopScreen(resumeID: resumeID == 0 ? null : resumeID!, templateName: templateName!);
               }
             })
           ],
@@ -45,7 +46,9 @@ class CvMakerScreen extends StatelessWidget {
 
 class CvMakerDesktopScreen extends StatefulWidget {
   final int? resumeID;
-  const CvMakerDesktopScreen({super.key, required this.resumeID});
+  final String? templateName;
+
+  const CvMakerDesktopScreen({super.key, required this.resumeID, required this.templateName});
 
   @override
   State<CvMakerDesktopScreen> createState() => _CvMakerDesktopScreenState();
@@ -203,6 +206,7 @@ class _CvMakerDesktopScreenState extends State<CvMakerDesktopScreen> {
     oldResume = oldResumeFetched;
     isLoading = false;
     setState(() {});
+    return;
   }
 
   void showLoadingDialog(BuildContext context) {
@@ -234,7 +238,10 @@ class _CvMakerDesktopScreenState extends State<CvMakerDesktopScreen> {
 
     if (oldResume.isNull || oldResume.isUndefined) {
       var payload = getData();
-      var generatedResume = await DatabaseService().generateResume(payload);
+      var generatedResume = await DatabaseService().generateResume(
+        payload,
+        widget.templateName ?? '',
+      );
       // ignore: use_build_context_synchronously
       hideLoadingDialog(ctx);
       // ignore: use_build_context_synchronously
@@ -253,27 +260,27 @@ class _CvMakerDesktopScreenState extends State<CvMakerDesktopScreen> {
   void initState() {
     super.initState();
 
-    if (widget.resumeID.isDefinedAndNotNull) {
-      canShowCourses = true;
-      addCourse();
-    }
+    fetchResume().then((value) {
+      if (widget.resumeID.isDefinedAndNotNull) {
+        canShowCourses = true;
+        addCourse();
+      }
 
-    if (widget.resumeID.isDefinedAndNotNull) {
-      canShowInternship = true;
-      addInternship();
-    }
+      if (widget.resumeID.isDefinedAndNotNull) {
+        canShowInternship = true;
+        addInternship();
+      }
 
-    if (widget.resumeID.isDefinedAndNotNull) {
-      canShowHobbies = true;
-      addHobbies();
-    }
+      if (widget.resumeID.isDefinedAndNotNull) {
+        canShowHobbies = true;
+        addHobbies();
+      }
 
-    if (widget.resumeID.isDefinedAndNotNull) {
-      canShowLanguage = true;
-      addLanguage();
-    }
-
-    fetchResume();
+      if (widget.resumeID.isDefinedAndNotNull) {
+        canShowLanguage = true;
+        addLanguage();
+      }
+    });
   }
 
   @override
@@ -288,7 +295,7 @@ class _CvMakerDesktopScreenState extends State<CvMakerDesktopScreen> {
           top: 10,
           left: 10,
           child: BackButtonApp(onPressed: () {
-            context.popRoute(CvMakerRoute(resumeID: widget.resumeID));
+            context.popRoute(CvMakerRoute(resumeID: widget.resumeID, templateName: widget.templateName));
           }),
         ),
         Positioned(bottom: 30, left: 1, width: 450, child: Image.asset('assets/add-name-image.png', fit: BoxFit.cover)),

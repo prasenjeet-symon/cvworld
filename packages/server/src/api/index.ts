@@ -1,7 +1,8 @@
 import express from "express";
 import { rmSync } from "fs";
 import path from "path";
-import { PrismaClientSingleton, Resume, Subscription, generateDummyResume, generateImage, generatePDF, sanitizePrismaData } from "../utils";
+import { Order, PrismaClientSingleton, Resume, Subscription, generateDummyResume, generateImage, generatePDF, sanitizePrismaData } from "../utils";
+import { buyTemplate } from "../views/buy-template";
 const router = express.Router();
 
 router.get("/", (req, res) => res.send("Hello World!"));
@@ -51,7 +52,15 @@ router.post("/update_resume", async (req, res) => {
   rmSync(oldImageFilePath);
   rmSync(oldPdfFilePath);
 
-  const [imageUrl, pdfUrl] = await Promise.all([generateImage(resume), generatePDF(resume)]);
+  const templateName = oldResume.resumes[0].templateName;
+  const loadTemplate = async () => {
+    const template = await import(`../templates/${templateName}`);
+    return template as unknown as { default: (resume: Resume) => string };
+  };
+
+  const template = await loadTemplate();
+
+  const [imageUrl, pdfUrl] = await Promise.all([generateImage(resume, template.default), generatePDF(resume, template.default)]);
 
   if (!imageUrl || !pdfUrl) {
     res.status(500).send("Something went wrong");
@@ -85,6 +94,7 @@ router.post("/update_resume", async (req, res) => {
     updatedAt: oldResume.resumes[0].updatedAt,
     id: resumeID,
     resume: resume,
+    templateName: oldResume.resumes[0].templateName,
   });
 });
 
@@ -107,7 +117,19 @@ router.post("/generate", async (req, res) => {
     return;
   }
 
-  const [imageUrl, pdfUrl] = await Promise.all([generateImage(resume), generatePDF(resume)]);
+  if (!templateName) {
+    res.status(400).send("templateName field is missing");
+    return;
+  }
+
+  const loadTemplate = async () => {
+    const template = await import(`../templates/${templateName}`);
+    return template as unknown as { default: (resume: Resume) => string };
+  };
+
+  const template = await loadTemplate();
+
+  const [imageUrl, pdfUrl] = await Promise.all([generateImage(resume, template.default), generatePDF(resume, template.default)]);
 
   if (!imageUrl || !pdfUrl) {
     res.status(500).send("Something went wrong");
@@ -1702,6 +1724,113 @@ router.post("/is_template_bought", async (req, res) => {
       return;
     }
   }
+});
+
+/**
+ * Cancel the subscription
+ */
+router.post("/cancel_subscription", async (req, res) => {
+  const email = res.locals.email;
+  const prisma = PrismaClientSingleton.prisma;
+
+  const subscriptionOld = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+    select: {
+      subscription: true,
+    },
+  });
+
+  if (!subscriptionOld || !subscriptionOld.subscription) {
+    res.status(500).json({ message: "subscription not found" });
+    return;
+  }
+
+  const subsID = subscriptionOld.subscription.subscriptionID;
+
+  // delete from the razorpay
+  const Razorpay = require("razorpay");
+  const instance = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_KEY_SECRET });
+  await instance.subscriptions.cancel(subsID, { cancel_at_cycle_end: 1 });
+
+  res.json({ message: "subscription cancelled" });
+});
+
+
+// For the buy template get req with auth token and template name
+router.get("/template/:name", async (req, res) => {
+  const templateName = req.params.name;
+  const email = res.locals.email;
+
+  const Razorpay = require("razorpay");
+  const razorpayKeyID = process.env.RAZORPAY_KEY_ID;
+  const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET;
+  const nameOfTemplate = templateName;
+  const instance = new Razorpay({ key_id: razorpayKeyID, key_secret: razorpayKeySecret });
+  const prisma = PrismaClientSingleton.prisma;
+
+  const marketPlaceTemplate = await prisma.resumeTemplateMarketplace.findUnique({
+    where: {
+      name: nameOfTemplate,
+    },
+  });
+
+  // get the current user
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+  });
+
+  if (!user) {
+    res.status(500).json({ message: "user not found" });
+    return;
+  }
+
+  if (!marketPlaceTemplate) {
+    res.status(500).json({ message: "template not found" });
+    return;
+  }
+
+  if (+marketPlaceTemplate.price === 0) {
+    res.status(500).json({ message: "template price is 0" });
+    return;
+  }
+
+  // is already bought
+  const boughtTemplate = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+    select: {
+      boughtTemplate: {
+        where: {
+          name: nameOfTemplate,
+        },
+      },
+    },
+  });
+
+  if (boughtTemplate && boughtTemplate.boughtTemplate.length !== 0) {
+    res.status(500).json({ message: "template already bought" });
+    return;
+  }
+  
+  // generate the order
+  const order: Order = await instance.orders.create({
+    amount: +marketPlaceTemplate.price,
+    currency: "INR",
+    payment_capture: 1,
+    notes: {
+      email: user.email,
+      templateName: nameOfTemplate,
+    },
+  });
+
+  // return the web page
+  res.set("Content-Type", "text/html"); 
+  res.send(buyTemplate(marketPlaceTemplate.previewImgUrl, order.amount, order.id, user.fullName, "", user.email));
 });
 
 export default router;

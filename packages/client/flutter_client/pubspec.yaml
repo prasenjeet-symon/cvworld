@@ -47,6 +47,8 @@ dependencies:
   url_launcher: ^6.1.11
   rxdart: ^0.27.7
   google_sign_in: ^6.1.4
+  money_formatter: ^0.0.4
+  razorpay_web: ^1.4.2
 
 dev_dependencies:
   flutter_test:

@@ -12,6 +12,7 @@ class Constants {
   static const String appVersion = '1.0';
   static const int debounceTime = 1000;
   static const googleClientId = '599994784077-8b5i8jsi9s75ddqv8p8v1031gk2mise7.apps.googleusercontent.com';
+  static const String razorpayKeyID = 'rzp_test_nkLYI55QVnJlaQ';
 }
 
 double pageWidth(BuildContext context) {

@@ -14,6 +14,7 @@ class AppRouter extends $AppRouter {
         AutoRoute(path: '/dashboard/account-setting', maintainState: false, page: AccountSettingPage.page, guards: [AuthGuard()]),
         AutoRoute(path: '/dashboard', page: Dashboard.page, maintainState: false, guards: [AuthGuard()]),
         AutoRoute(path: '/dashboard/view-resume/:resumeID', page: ViewResume.page, maintainState: false, guards: [AuthGuard()]),
-        AutoRoute(path: '/cv-maker/:resumeID', page: CvMakerRoute.page, maintainState: false, guards: [AuthGuard()]),
+        AutoRoute(path: '/cv-maker/:resumeID/:templateName', page: CvMakerRoute.page, maintainState: false, guards: [AuthGuard()]),
+        AutoRoute(path: '/choose-template', page: MarketPlacePage.page, maintainState: false, guards: []),
       ];
 }

@@ -27,7 +27,7 @@ class DashboardBody extends StatelessWidget {
                   child: Row(
                     children: [
                       const Expanded(child: Text('Resumes', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 27))),
-                      TextButton(style: TextButton.styleFrom(padding: const EdgeInsets.fromLTRB(40, 20, 40, 20)), onPressed: () => context.pushRoute(CvMakerRoute(resumeID: 0)), child: const Row(children: [Icon(Icons.add), Text('Create')]))
+                      TextButton(style: TextButton.styleFrom(padding: const EdgeInsets.fromLTRB(40, 20, 40, 20)), onPressed: () => context.pushRoute(const MarketPlacePage()), child: const Row(children: [Icon(Icons.add), Text('Create')]))
                     ],
                   ),
                 ),
@@ -89,7 +89,7 @@ class _DashboardBodyContentState extends State<DashboardBodyContent> {
 
   editResume(BuildContext ctx, int id) {
     // ignore: use_build_context_synchronously
-    ctx.pushRoute(CvMakerRoute(resumeID: id));
+    ctx.pushRoute(CvMakerRoute(resumeID: id, templateName: 'Edit'));
   }
 
   @override
@@ -134,14 +134,15 @@ class _DashboardBodyContentState extends State<DashboardBodyContent> {
             Container(
               margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
               child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(padding: const EdgeInsets.fromLTRB(20, 15, 20, 15)),
-                  onPressed: () => {context.pushRoute(CvMakerRoute(resumeID: 0))},
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [Icon(Icons.add), Text('Create')],
-                  )),
+                style: ElevatedButton.styleFrom(padding: const EdgeInsets.fromLTRB(20, 15, 20, 15)),
+                onPressed: () => {context.pushRoute(const MarketPlacePage())},
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [Icon(Icons.add), Text('Create')],
+                ),
+              ),
             )
           ],
         ),
@@ -226,7 +227,7 @@ class _CreatedResumeItemState extends State<CreatedResumeItem> {
               Container(
                 margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                 child: TextButton.icon(
-                  onPressed: () => widget.downloadFunction(widget.resume.id),
+                  onPressed: () => context.pushRoute(ViewResume(resumeID: widget.resume.id)),
                   icon: const Icon(Icons.download),
                   label: const Text('Download Resume'),
                 ),
