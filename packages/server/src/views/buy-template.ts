@@ -1,4 +1,4 @@
-import { getResourcePath } from "../utils"
+import { getBaseUrl, getResourcePath } from "../utils"
 
 export function buyTemplate(imageUrl: string, price : number, orderId: string, fullName: string, mobileNumber: string, email: string) {
   return `
@@ -91,7 +91,9 @@ export function buyTemplate(imageUrl: string, price : number, orderId: string, f
                 // This function will be called after successful payment
                 console.log("Payment successful!", response);
                 // redirect to success page
-                window.location.href = "${getResourcePath('server/api_public/payment_success?razorpay_payment_id=' + `response.razorpay_payment_id` + '&razorpay_order_id=' + `response.razorpay_order_id` + '&razorpay_signature=' + `response.razorpay_signature` + '&price=' + `${price}`)}";
+                const {razorpay_payment_id, razorpay_order_id, razorpay_signature } = response;
+                const URL = "${getBaseUrl()}" + "/" + "server/api_public/payment_success?razorpay_payment_id=" + razorpay_payment_id + "&razorpay_order_id=" + razorpay_order_id + "&razorpay_signature=" + razorpay_signature + "&price=" + ${price};
+                window.location.href = URL;
             },
             "prefill": {
                 "name": "${fullName}",

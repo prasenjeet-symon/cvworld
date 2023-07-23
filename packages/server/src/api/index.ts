@@ -1833,4 +1833,26 @@ router.get("/template/:name", async (req, res) => {
   res.send(buyTemplate(marketPlaceTemplate.previewImgUrl, order.amount, order.id, user.fullName, "", user.email));
 });
 
+/** Get single the premium plan */
+router.post("/get_premium_plan", async (req, res) => {
+   const email = res.locals.email;
+   const prisma = PrismaClientSingleton.prisma;
+
+   const targetPlan = await prisma.admin.findUnique({
+     where: {
+       email: process.env.ADMIN_EMAIL || "",
+     },
+     select: {
+       premiumTemplatePlans: true,
+     },
+   });
+
+   if (!(targetPlan && targetPlan.premiumTemplatePlans.length !== 0)) {
+     res.status(500).json({ message: "plan not found" });
+     return;
+   }
+
+   res.json(targetPlan.premiumTemplatePlans[0]);
+});
+
 export default router;

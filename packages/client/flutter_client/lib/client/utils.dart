@@ -57,6 +57,14 @@ void downloadFile(String url, String fileName) {
   anchor.click();
 }
 
+///
+/// Open link in browser
+void openLinkInBrowser(String url) async {
+  final anchor = AnchorElement(href: DatabaseService().publicResource(url));
+  anchor.target = '_blank';
+  anchor.click();
+}
+
 Future<void> logOutUser(BuildContext context) async {
   const storage = FlutterSecureStorage();
   await storage.delete(key: 'JWT');

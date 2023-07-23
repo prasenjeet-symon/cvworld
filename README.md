@@ -254,6 +254,26 @@ CV World utilizes Razorpay as the payment gateway for processing transactions.
     - [x] Generate Order Premium Template
         - Using this route we can generate order for premium template to be used by the Razorpay.
 
+### Flutter ( client )
+- [x] Make market place page
+    - Using this page user can easily choose the template to use for resume and also can buy the premium template on the go. This page will also highlight the template that is bought by the user.
+- [x] Connect all the payments related routes and finalize the payment integration.
+    - Finalize the payment integration using Razorpay.
+
+<!-- Note  -->
+> **_NOTE:_** The payment and subscription integration is complete. Website is working properly and user can use this to generate new template by choosing the free templates or can buy the premium templates on the go . User cal also subscribe to the monthly subscription plan to get all the templates.
+
+### Mobile Application
+- [ ] Make the tutorial page
+    - Using this page user can learn how to use the application and it's benefits. usually 3 to 5 slides will be shown.
+- [x] Make the sign up page with google and email based authentication.
+    - Using this route user can create a new account using either their email and password or their Google account.
+- [x] Make the login page with google and email based authentication.
+    - Using this route user can log in to their existing accounts using either their email and password or their Google account.
+- [ ] Make the dashboard page.
+    - Using this page user can view all the created resumes. User can delete any created resume. User can view the resume and can download or buy that if template used is premium with monthly subscription.
+- [ ] Make the resume view page.
+    - Using this page user can view all the created resumes in the full screen mode and can also navigate to edit page. User can either download or buy that if template used is premium with no monthly subscription.
 # Technologies stack
 - Node.js         
 - Express.js       

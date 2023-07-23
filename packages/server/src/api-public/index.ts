@@ -2,7 +2,6 @@ import { createHmac } from "crypto";
 import express from "express";
 import moment from "moment";
 import {
-  Order,
   OrderPayloadCard,
   OrderPayloadNetBanking,
   OrderPayloadUPI,
@@ -12,10 +11,8 @@ import {
   SubscriptionAuthenticatedEvent,
   SubscriptionCancelledEvent,
   SubscriptionChargedEvent,
-  SubscriptionHaltedEvent,
-  authenticateUser,
+  SubscriptionHaltedEvent
 } from "../utils";
-import { buyTemplate } from "../views/buy-template";
 import { paymentSuccess } from "../views/payment-success";
 
 const router = express.Router();
@@ -97,7 +94,7 @@ router.post("/razorpay_webhook", async (req, res) => {
       select: {
         boughtTemplate: {
           where: {
-            eventID: (payload as OrderPayloadNetBanking).event,
+            eventID: (payload as OrderPayloadNetBanking).payload.payment.entity.id,
           },
         },
       },
@@ -120,7 +117,7 @@ router.post("/razorpay_webhook", async (req, res) => {
           data: {
             boughtTemplate: {
               create: {
-                eventID: cardTransaction.event,
+                eventID: cardTransaction.payload.payment.entity.id,
                 name: templateName,
                 price: cardTransaction.payload.order.entity.amount,
                 transaction: {
@@ -159,7 +156,7 @@ router.post("/razorpay_webhook", async (req, res) => {
           data: {
             boughtTemplate: {
               create: {
-                eventID: netbankingTransaction.event,
+                eventID: netbankingTransaction.payload.payment.entity.id,
                 name: templateName,
                 price: netbankingTransaction.payload.order.entity.amount,
                 transaction: {
@@ -196,7 +193,7 @@ router.post("/razorpay_webhook", async (req, res) => {
           data: {
             boughtTemplate: {
               create: {
-                eventID: upiTransaction.event,
+                eventID: upiTransaction.payload.payment.entity.id,
                 name: templateName,
                 price: upiTransaction.payload.order.entity.amount,
                 transaction: {
@@ -233,7 +230,7 @@ router.post("/razorpay_webhook", async (req, res) => {
           data: {
             boughtTemplate: {
               create: {
-                eventID: walletTransaction.event,
+                eventID: walletTransaction.payload.payment.entity.id,
                 name: templateName,
                 price: walletTransaction.payload.order.entity.amount,
                 transaction: {
@@ -323,7 +320,7 @@ router.post("/razorpay_webhook", async (req, res) => {
           select: {
             transaction: {
               where: {
-                eventID: (payload as SubscriptionChargedEvent).event,
+                eventID: (payload as SubscriptionChargedEvent).payload.payment.entity.id,
               },
             },
           },
@@ -336,35 +333,67 @@ router.post("/razorpay_webhook", async (req, res) => {
       return;
     }
 
-    await prisma.user.update({
-      where: {
-        email: emailOfUser,
-      },
-      data: {
-        subscription: {
-          update: {
-            isActive: true,
-            expireOn: moment().add(1, "month").toDate(),
-            transaction: {
-              create: {
-                eventID: (payload as SubscriptionChargedEvent).event,
-                amount: +subscriptionPayload.payment.entity.amount,
-                method: "CARD",
-                card: {
-                  create: {
-                    isInternational: subscriptionPayload.payment.entity.card.international,
-                    last4: subscriptionPayload.payment.entity.card.last4,
-                    name: subscriptionPayload.payment.entity.card.name,
-                    network: subscriptionPayload.payment.entity.card.network,
-                    type: subscriptionPayload.payment.entity.card.type === "debit" ? "DEBIT" : "CREDIT",
+    if(subscriptionPayload.payment.entity.method !== "card") {
+      // UPI
+      await prisma.user.update({
+        where: {
+          email: emailOfUser,
+        },
+        data: {
+          subscription: {
+            update: {
+              isActive: true,
+              expireOn: moment().add(1, "month").toDate(),
+              transaction: {
+                create: {
+                  eventID: (payload as SubscriptionChargedEvent).payload.payment.entity.id,
+                  amount: +subscriptionPayload.payment.entity.amount,
+                  method: "UPI",
+                  upi: {
+                    create: {
+                      email: subscriptionPayload.payment.entity.email,
+                      mobile: subscriptionPayload.payment.entity.contact,
+                      vpa: subscriptionPayload.payment.entity.vpa || "",
+                    }
+                  }
+                },
+              }
+            }
+          }
+        }
+      })
+    } else {
+      // card
+      await prisma.user.update({
+        where: {
+          email: emailOfUser,
+        },
+        data: {
+          subscription: {
+            update: {
+              isActive: true,
+              expireOn: moment().add(1, "month").toDate(),
+              transaction: {
+                create: {
+                  eventID: (payload as SubscriptionChargedEvent).payload.payment.entity.id,
+                  amount: +subscriptionPayload.payment.entity.amount,
+                  method: "CARD",
+                  card: {
+                    create: {
+                      isInternational: subscriptionPayload.payment.entity.card.international,
+                      last4: subscriptionPayload.payment.entity.card.last4,
+                      name: subscriptionPayload.payment.entity.card.name,
+                      network: subscriptionPayload.payment.entity.card.network,
+                      type: subscriptionPayload.payment.entity.card.type === "debit" ? "DEBIT" : "CREDIT",
+                    },
                   },
                 },
               },
             },
           },
         },
-      },
-    });
+      });
+    }
 
     res.status(200).json({ message: "Success" });
   }

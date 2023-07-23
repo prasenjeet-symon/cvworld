@@ -49,6 +49,7 @@ dependencies:
   google_sign_in: ^6.1.4
   money_formatter: ^0.0.4
   razorpay_web: ^1.4.2
+  flutter_inappwebview: ^5.7.2+3
 
 dev_dependencies:
   flutter_test:

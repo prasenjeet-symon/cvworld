@@ -93,8 +93,21 @@ model SubscriptionTransaction {
   method         PaymentMethod
   eventID        String                   @unique
   card           CardPaymentSubscription?
+  upi            UPIPaymentSubscription?
   subscription   Subscription             @relation(fields: [subscriptionId], references: [id])
   subscriptionId Int
+}
+
+// UPI payment subscription
+model UPIPaymentSubscription {
+  id            Int         @id @default(autoincrement())
+  transaction     SubscriptionTransaction @relation(fields: [transactionId], references: [id])
+  transactionId   Int                     @unique
+  vpa           String
+  email         String
+  mobile        String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @default(now())
 }
 
 model CardPaymentSubscription {

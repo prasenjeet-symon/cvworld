@@ -1,5 +1,10 @@
+import 'dart:async';
+import 'dart:js_interop';
+
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/dashboard/header.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/courses-section.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/education-section.dart';
@@ -12,6 +17,7 @@ import 'package:flutter_client/client/pages/make-cv-pages/professional-summry-se
 import 'package:flutter_client/client/pages/make-cv-pages/skills-section.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/website-links-section.dart';
 import 'package:flutter_client/client/utils.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 @RoutePage()
 class AccountSettingPage extends StatefulWidget {
@@ -69,8 +75,8 @@ class _AccountSettingDesktopState extends State<AccountSettingDesktop> {
                               }),
                               Expanded(child: SizedBox()),
                             ])),
-                        PricingPlanCard(),
-                        AccountCard(),
+                        const PricingPlanCard(),
+                        const AccountCard(),
                       ],
                     ),
                   ),
@@ -92,11 +98,87 @@ class _AccountSettingDesktopState extends State<AccountSettingDesktop> {
  * 
  * 
  */
-class PricingPlanCard extends StatelessWidget {
+class PricingPlanCard extends StatefulWidget {
   const PricingPlanCard({super.key});
 
   @override
+  State<PricingPlanCard> createState() => _PricingPlanCardState();
+}
+
+class _PricingPlanCardState extends State<PricingPlanCard> {
+  SubscriptionPlan? subscriptionPlan;
+  User? user;
+  bool isLoading = true;
+  late Timer? timer;
+
+  // Fetch the user
+  Future<void> fetchUser() async {
+    user = await DatabaseService().fetchUser();
+  }
+
+  /// Fetch all the plans
+  Future<void> fetchAllPlans() async {
+    var subsPlan = await DatabaseService().getPremiumPlan();
+    subscriptionPlan = subsPlan;
+    return;
+  }
+
+  /// Subscribe to premium
+  Future<String?> subscribeToPremium(SubscriptionPlan plan) async {
+    isLoading = true;
+    setState(() {});
+    var link = await DatabaseService().createSubscription(plan.name);
+    isLoading = false;
+    setState(() {});
+    return link;
+  }
+
+  /// init the subs checking
+  Future<void> startTick() async {
+    Timer.periodic(const Duration(seconds: 1), (Timer timer) async {
+      // This function will be called every 5 second
+      this.timer = timer;
+      await fetchUser();
+      setState(() {});
+    });
+  }
+
+  /// Subscribe to premium
+  Future<void> subscribeNow() async {
+    startTick();
+    if (kIsWeb) {
+      // open the new tab
+      var link = await subscribeToPremium(subscriptionPlan!);
+      openLinkInBrowser(link ?? '');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    isLoading = true;
+    setState(() {});
+    fetchUser().then((value) => fetchAllPlans()).then(
+          (value) => setState(
+            () {
+              isLoading = false;
+            },
+          ),
+        );
+  }
+
+  @override
+  void dispose() {
+    timer!.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return Container(
       margin: const EdgeInsets.fromLTRB(0, 45, 0, 45),
       child: Column(
@@ -109,45 +191,85 @@ class PricingPlanCard extends StatelessWidget {
               style: TextStyle(fontSize: 15, color: Colors.black.withOpacity(0.6), fontWeight: FontWeight.w500),
             ),
           ),
-          Container(
-            color: Colors.black.withOpacity(0.03),
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 50,
-                  height: 50,
-                  child: Image.asset('assets/renew.png'),
-                ),
-                Expanded(
-                    child: Container(
-                  margin: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+          user.isDefinedAndNotNull && user!.subscription.isDefinedAndNotNull && user!.subscription!.isActive
+              ? Container(
+                  color: Colors.black.withOpacity(0.03),
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                  child: Row(
                     children: [
-                      const Text(
-                        'Free Plan',
-                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 18),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                      SizedBox(width: 50, height: 50, child: Image.asset('assets/tasks.png')),
+                      Expanded(
+                          child: Container(
+                        margin: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              user!.subscription!.planName,
+                              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 18),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                              child: const Text(
+                                'You are on premium plan. You can use any resume template',
+                                style: TextStyle(color: Colors.black54),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )),
+                      TextButton(
+                        onPressed: () {},
                         child: const Text(
-                          'You are on the free plan. You can save your data and search for jobs. Upgrade for PDF downloads & premium features.',
-                          style: TextStyle(color: Colors.black54),
+                          'Cancel',
+                          style: TextStyle(fontSize: 16),
                         ),
                       ),
                     ],
                   ),
-                )),
-                TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      'Upgrade',
-                      style: TextStyle(fontSize: 16),
-                    ))
-              ],
-            ),
-          )
+                )
+              : Container(
+                  color: Colors.black.withOpacity(0.03),
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: Image.asset('assets/renew.png'),
+                      ),
+                      Expanded(
+                          child: Container(
+                        margin: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Free Plan',
+                              style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 18),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                              child: const Text(
+                                'You are on the free plan. You can use free resume template only.Upgrade for PDF downloads & premium templates.',
+                                style: TextStyle(color: Colors.black54),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )),
+                      TextButton(
+                        onPressed: () {
+                          subscribeNow();
+                        },
+                        child: const Text(
+                          'Upgrade',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
         ],
       ),
     );

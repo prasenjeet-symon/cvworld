@@ -1,4 +1,5 @@
 // ignore: file_names
+import 'dart:async';
 import 'dart:js_interop';
 
 import 'package:auto_route/auto_route.dart';
@@ -69,6 +70,7 @@ class _ResumeViewerState extends State<ResumeViewer> {
   bool isLoading = true;
   bool isError = false;
   bool canDownload = false;
+  late Timer timer;
 
   // is Bought
   Future<bool> isBought(GeneratedResume resume) async {
@@ -132,6 +134,25 @@ class _ResumeViewerState extends State<ResumeViewer> {
   }
 
   @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
+
+  // Buy Now
+  Future<void> buyTemplate() async {
+    var url = await DatabaseService().buyTemplate(resume!.templateName);
+    if (url.isDefinedAndNotNull) {
+      Timer.periodic(const Duration(seconds: 5), (timer) {
+        timer = timer;
+        init();
+      });
+
+      openLinkInBrowser(url.toString());
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (isLoading) {
       return const Center(child: Padding(padding: EdgeInsets.all(50), child: CircularProgressIndicator()));
@@ -177,7 +198,9 @@ class _ResumeViewerState extends State<ResumeViewer> {
                               downloadFile(resume!.resumeLink.pdfUrl, resume!.resumeLink.pdfUrl);
                             })
                           : BuyButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                buyTemplate();
+                              },
                             ),
                     )
                   ],

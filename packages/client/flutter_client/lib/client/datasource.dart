@@ -1352,6 +1352,66 @@ class TemplateOrder {
   }
 }
 
+class SubscriptionPlan {
+  final int id;
+  final String planID;
+  final String name;
+  final double price;
+  final String period;
+  final int interval;
+  final String currency;
+  final String description;
+  final int adminId;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  SubscriptionPlan({
+    required this.id,
+    required this.planID,
+    required this.name,
+    required this.price,
+    required this.period,
+    required this.interval,
+    required this.currency,
+    required this.description,
+    required this.adminId,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory SubscriptionPlan.fromJson(Map<String, dynamic> json) {
+    return SubscriptionPlan(
+      id: json['id'],
+      planID: json['planID'],
+      name: json['name'],
+      price: double.parse(json['price'].toString()),
+      period: json['period'],
+      interval: int.parse(json['interval'].toString()),
+      currency: json['currency'],
+      description: json['description'],
+      adminId: int.parse(json['adminId'].toString()),
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: DateTime.parse(json['updatedAt']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'planID': planID,
+      'name': name,
+      'price': price,
+      'period': period,
+      'interval': interval,
+      'currency': currency,
+      'description': description,
+      'adminId': adminId,
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
+    };
+  }
+}
+
 ///
 ///
 ///
@@ -1503,6 +1563,10 @@ class DatabaseService {
   late Uri createSubscriptionRoute;
   // cancel_subscription
   late Uri cancelSubscriptionRoute;
+  // get_premium_plan
+  late Uri getPremiumPlanRoute;
+  // server/api/template/templt_p_1?token={{TOKEN}}
+  late Uri getTemplateRoute;
 
   DatabaseService() {
     authRoute = Uri.parse('$origin/server/auth');
@@ -1556,6 +1620,7 @@ class DatabaseService {
     generateOrderRoute = Uri.parse('$origin/server/api/generate_order');
     createSubscriptionRoute = Uri.parse('$origin/server/api/create_subscription');
     cancelSubscriptionRoute = Uri.parse('$origin/server/api/cancel_subscription');
+    getPremiumPlanRoute = Uri.parse('$origin/server/api/get_premium_plan');
   }
 
   publicResource(String path) {
@@ -2592,5 +2657,34 @@ class DatabaseService {
 
       return;
     }
+  }
+
+  // get_premium_plan
+  Future<SubscriptionPlan?> getPremiumPlan() async {
+    var client = JwtClient();
+    var response = await client.post(getPremiumPlanRoute);
+    if (response.statusCode == 200) {
+      var responseData = SubscriptionPlan.fromJson(json.decode(response.body));
+      client.dispose();
+      return responseData;
+    } else {
+      client.dispose();
+      if (kDebugMode) {
+        print('Something went wrong while fetching premium plan');
+      }
+
+      return null;
+    }
+  }
+
+  Future<Uri> buyTemplate(String templateName) async {
+    var token = await getToken();
+    var url = Uri.parse('$origin/server/api/template/$templateName');
+
+    // Create a new Map to hold the query parameters and include the 'token'
+    var queryParams = {'token': token};
+    url = url.replace(queryParameters: queryParams);
+
+    return url;
   }
 }
