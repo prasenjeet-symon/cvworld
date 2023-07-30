@@ -8,38 +8,55 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:auto_route/auto_route.dart' as _i10;
-import 'package:flutter/material.dart' as _i11;
+import 'package:auto_route/auto_route.dart' as _i11;
+import 'package:flutter/material.dart' as _i12;
 import 'package:flutter_client/client/pages/contact-us-page/contact-us-page.dart'
-    as _i8;
-import 'package:flutter_client/client/pages/dashboard/account-setting.dart'
     as _i1;
-import 'package:flutter_client/client/pages/dashboard/dashboard.dart' as _i2;
-import 'package:flutter_client/client/pages/dashboard/market-place.dart' as _i9;
-import 'package:flutter_client/client/pages/dashboard/view-resume.dart' as _i3;
-import 'package:flutter_client/client/pages/home-page/home-page.dart' as _i4;
-import 'package:flutter_client/client/pages/make-cv-pages/cv-maker-page.dart'
+import 'package:flutter_client/client/pages/dashboard/account-setting/account-setting.dart'
+    as _i2;
+import 'package:flutter_client/client/pages/dashboard/dashboard/dashboard.dart'
+    as _i3;
+import 'package:flutter_client/client/pages/dashboard/market-place/market-place.dart'
+    as _i4;
+import 'package:flutter_client/client/pages/dashboard/view-resume/view-resume.dart'
     as _i5;
-import 'package:flutter_client/client/pages/signin-page/signin-page.dart'
-    as _i6;
-import 'package:flutter_client/client/pages/signup-page/signup-page.dart'
+import 'package:flutter_client/client/pages/home-page/home-page.dart' as _i6;
+import 'package:flutter_client/client/pages/intro-slides/intro-slides.dart'
     as _i7;
+import 'package:flutter_client/client/pages/make-cv-pages/cv-maker-page.dart'
+    as _i8;
+import 'package:flutter_client/client/pages/signin-page/signin-page.dart'
+    as _i9;
+import 'package:flutter_client/client/pages/signup-page/signup-page.dart'
+    as _i10;
 
-abstract class $AppRouter extends _i10.RootStackRouter {
+abstract class $AppRouter extends _i11.RootStackRouter {
   $AppRouter({super.navigatorKey});
 
   @override
-  final Map<String, _i10.PageFactory> pagesMap = {
-    AccountSettingPage.name: (routeData) {
-      return _i10.AutoRoutePage<dynamic>(
+  final Map<String, _i11.PageFactory> pagesMap = {
+    ContactUsPage.name: (routeData) {
+      return _i11.AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const _i1.AccountSettingPage(),
+        child: const _i1.ContactUsPage(),
+      );
+    },
+    AccountSettingPage.name: (routeData) {
+      return _i11.AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const _i2.AccountSettingPage(),
       );
     },
     Dashboard.name: (routeData) {
-      return _i10.AutoRoutePage<dynamic>(
+      return _i11.AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const _i2.Dashboard(),
+        child: const _i3.Dashboard(),
+      );
+    },
+    MarketPlacePage.name: (routeData) {
+      return _i11.AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const _i4.MarketPlacePage(),
       );
     },
     ViewResume.name: (routeData) {
@@ -47,18 +64,24 @@ abstract class $AppRouter extends _i10.RootStackRouter {
       final args = routeData.argsAs<ViewResumeArgs>(
           orElse: () =>
               ViewResumeArgs(resumeID: pathParams.getInt('resumeID')));
-      return _i10.AutoRoutePage<dynamic>(
+      return _i11.AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: _i3.ViewResume(
+        child: _i5.ViewResume(
           key: args.key,
           resumeID: args.resumeID,
         ),
       );
     },
     HomeRoute.name: (routeData) {
-      return _i10.AutoRoutePage<dynamic>(
+      return _i11.AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const _i4.HomeScreen(),
+        child: const _i6.HomeScreen(),
+      );
+    },
+    IntroSliderPage.name: (routeData) {
+      return _i11.AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const _i7.IntroSliderPage(),
       );
     },
     CvMakerRoute.name: (routeData) {
@@ -68,9 +91,9 @@ abstract class $AppRouter extends _i10.RootStackRouter {
                 resumeID: pathParams.optInt('resumeID'),
                 templateName: pathParams.optString('templateName'),
               ));
-      return _i10.AutoRoutePage<dynamic>(
+      return _i11.AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: _i5.CvMakerScreen(
+        child: _i8.CvMakerScreen(
           key: args.key,
           resumeID: args.resumeID,
           templateName: args.templateName,
@@ -78,36 +101,38 @@ abstract class $AppRouter extends _i10.RootStackRouter {
       );
     },
     SignInRoute.name: (routeData) {
-      return _i10.AutoRoutePage<dynamic>(
+      return _i11.AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const _i6.SignInScreen(),
+        child: const _i9.SignInScreen(),
       );
     },
     SignUpRoute.name: (routeData) {
-      return _i10.AutoRoutePage<dynamic>(
+      return _i11.AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const _i7.SignUpScreen(),
-      );
-    },
-    ContactUsPage.name: (routeData) {
-      return _i10.AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: const _i8.ContactUsPage(),
-      );
-    },
-    MarketPlacePage.name: (routeData) {
-      return _i10.AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: const _i9.MarketPlacePage(),
+        child: const _i10.SignUpScreen(),
       );
     },
   };
 }
 
 /// generated route for
-/// [_i1.AccountSettingPage]
-class AccountSettingPage extends _i10.PageRouteInfo<void> {
-  const AccountSettingPage({List<_i10.PageRouteInfo>? children})
+/// [_i1.ContactUsPage]
+class ContactUsPage extends _i11.PageRouteInfo<void> {
+  const ContactUsPage({List<_i11.PageRouteInfo>? children})
+      : super(
+          ContactUsPage.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'ContactUsPage';
+
+  static const _i11.PageInfo<void> page = _i11.PageInfo<void>(name);
+}
+
+/// generated route for
+/// [_i2.AccountSettingPage]
+class AccountSettingPage extends _i11.PageRouteInfo<void> {
+  const AccountSettingPage({List<_i11.PageRouteInfo>? children})
       : super(
           AccountSettingPage.name,
           initialChildren: children,
@@ -115,13 +140,13 @@ class AccountSettingPage extends _i10.PageRouteInfo<void> {
 
   static const String name = 'AccountSettingPage';
 
-  static const _i10.PageInfo<void> page = _i10.PageInfo<void>(name);
+  static const _i11.PageInfo<void> page = _i11.PageInfo<void>(name);
 }
 
 /// generated route for
-/// [_i2.Dashboard]
-class Dashboard extends _i10.PageRouteInfo<void> {
-  const Dashboard({List<_i10.PageRouteInfo>? children})
+/// [_i3.Dashboard]
+class Dashboard extends _i11.PageRouteInfo<void> {
+  const Dashboard({List<_i11.PageRouteInfo>? children})
       : super(
           Dashboard.name,
           initialChildren: children,
@@ -129,16 +154,30 @@ class Dashboard extends _i10.PageRouteInfo<void> {
 
   static const String name = 'Dashboard';
 
-  static const _i10.PageInfo<void> page = _i10.PageInfo<void>(name);
+  static const _i11.PageInfo<void> page = _i11.PageInfo<void>(name);
 }
 
 /// generated route for
-/// [_i3.ViewResume]
-class ViewResume extends _i10.PageRouteInfo<ViewResumeArgs> {
+/// [_i4.MarketPlacePage]
+class MarketPlacePage extends _i11.PageRouteInfo<void> {
+  const MarketPlacePage({List<_i11.PageRouteInfo>? children})
+      : super(
+          MarketPlacePage.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'MarketPlacePage';
+
+  static const _i11.PageInfo<void> page = _i11.PageInfo<void>(name);
+}
+
+/// generated route for
+/// [_i5.ViewResume]
+class ViewResume extends _i11.PageRouteInfo<ViewResumeArgs> {
   ViewResume({
-    _i11.Key? key,
+    _i12.Key? key,
     required int resumeID,
-    List<_i10.PageRouteInfo>? children,
+    List<_i11.PageRouteInfo>? children,
   }) : super(
           ViewResume.name,
           args: ViewResumeArgs(
@@ -151,8 +190,8 @@ class ViewResume extends _i10.PageRouteInfo<ViewResumeArgs> {
 
   static const String name = 'ViewResume';
 
-  static const _i10.PageInfo<ViewResumeArgs> page =
-      _i10.PageInfo<ViewResumeArgs>(name);
+  static const _i11.PageInfo<ViewResumeArgs> page =
+      _i11.PageInfo<ViewResumeArgs>(name);
 }
 
 class ViewResumeArgs {
@@ -161,7 +200,7 @@ class ViewResumeArgs {
     required this.resumeID,
   });
 
-  final _i11.Key? key;
+  final _i12.Key? key;
 
   final int resumeID;
 
@@ -172,9 +211,9 @@ class ViewResumeArgs {
 }
 
 /// generated route for
-/// [_i4.HomeScreen]
-class HomeRoute extends _i10.PageRouteInfo<void> {
-  const HomeRoute({List<_i10.PageRouteInfo>? children})
+/// [_i6.HomeScreen]
+class HomeRoute extends _i11.PageRouteInfo<void> {
+  const HomeRoute({List<_i11.PageRouteInfo>? children})
       : super(
           HomeRoute.name,
           initialChildren: children,
@@ -182,17 +221,31 @@ class HomeRoute extends _i10.PageRouteInfo<void> {
 
   static const String name = 'HomeRoute';
 
-  static const _i10.PageInfo<void> page = _i10.PageInfo<void>(name);
+  static const _i11.PageInfo<void> page = _i11.PageInfo<void>(name);
 }
 
 /// generated route for
-/// [_i5.CvMakerScreen]
-class CvMakerRoute extends _i10.PageRouteInfo<CvMakerRouteArgs> {
+/// [_i7.IntroSliderPage]
+class IntroSliderPage extends _i11.PageRouteInfo<void> {
+  const IntroSliderPage({List<_i11.PageRouteInfo>? children})
+      : super(
+          IntroSliderPage.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'IntroSliderPage';
+
+  static const _i11.PageInfo<void> page = _i11.PageInfo<void>(name);
+}
+
+/// generated route for
+/// [_i8.CvMakerScreen]
+class CvMakerRoute extends _i11.PageRouteInfo<CvMakerRouteArgs> {
   CvMakerRoute({
-    _i11.Key? key,
+    _i12.Key? key,
     required int? resumeID,
     required String? templateName,
-    List<_i10.PageRouteInfo>? children,
+    List<_i11.PageRouteInfo>? children,
   }) : super(
           CvMakerRoute.name,
           args: CvMakerRouteArgs(
@@ -209,8 +262,8 @@ class CvMakerRoute extends _i10.PageRouteInfo<CvMakerRouteArgs> {
 
   static const String name = 'CvMakerRoute';
 
-  static const _i10.PageInfo<CvMakerRouteArgs> page =
-      _i10.PageInfo<CvMakerRouteArgs>(name);
+  static const _i11.PageInfo<CvMakerRouteArgs> page =
+      _i11.PageInfo<CvMakerRouteArgs>(name);
 }
 
 class CvMakerRouteArgs {
@@ -220,7 +273,7 @@ class CvMakerRouteArgs {
     required this.templateName,
   });
 
-  final _i11.Key? key;
+  final _i12.Key? key;
 
   final int? resumeID;
 
@@ -233,9 +286,9 @@ class CvMakerRouteArgs {
 }
 
 /// generated route for
-/// [_i6.SignInScreen]
-class SignInRoute extends _i10.PageRouteInfo<void> {
-  const SignInRoute({List<_i10.PageRouteInfo>? children})
+/// [_i9.SignInScreen]
+class SignInRoute extends _i11.PageRouteInfo<void> {
+  const SignInRoute({List<_i11.PageRouteInfo>? children})
       : super(
           SignInRoute.name,
           initialChildren: children,
@@ -243,13 +296,13 @@ class SignInRoute extends _i10.PageRouteInfo<void> {
 
   static const String name = 'SignInRoute';
 
-  static const _i10.PageInfo<void> page = _i10.PageInfo<void>(name);
+  static const _i11.PageInfo<void> page = _i11.PageInfo<void>(name);
 }
 
 /// generated route for
-/// [_i7.SignUpScreen]
-class SignUpRoute extends _i10.PageRouteInfo<void> {
-  const SignUpRoute({List<_i10.PageRouteInfo>? children})
+/// [_i10.SignUpScreen]
+class SignUpRoute extends _i11.PageRouteInfo<void> {
+  const SignUpRoute({List<_i11.PageRouteInfo>? children})
       : super(
           SignUpRoute.name,
           initialChildren: children,
@@ -257,33 +310,5 @@ class SignUpRoute extends _i10.PageRouteInfo<void> {
 
   static const String name = 'SignUpRoute';
 
-  static const _i10.PageInfo<void> page = _i10.PageInfo<void>(name);
-}
-
-/// generated route for
-/// [_i8.ContactUsPage]
-class ContactUsPage extends _i10.PageRouteInfo<void> {
-  const ContactUsPage({List<_i10.PageRouteInfo>? children})
-      : super(
-          ContactUsPage.name,
-          initialChildren: children,
-        );
-
-  static const String name = 'ContactUsPage';
-
-  static const _i10.PageInfo<void> page = _i10.PageInfo<void>(name);
-}
-
-/// generated route for
-/// [_i9.MarketPlacePage]
-class MarketPlacePage extends _i10.PageRouteInfo<void> {
-  const MarketPlacePage({List<_i10.PageRouteInfo>? children})
-      : super(
-          MarketPlacePage.name,
-          initialChildren: children,
-        );
-
-  static const String name = 'MarketPlacePage';
-
-  static const _i10.PageInfo<void> page = _i10.PageInfo<void>(name);
+  static const _i11.PageInfo<void> page = _i11.PageInfo<void>(name);
 }

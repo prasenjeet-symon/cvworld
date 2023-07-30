@@ -1,24 +1,26 @@
-// ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
+import 'package:flutter_client/client/utils.dart';
 
 class SideBySideInputs extends StatelessWidget {
   final List<CustomInputField> inputFields;
 
   const SideBySideInputs({super.key, required this.inputFields});
 
-  List<Expanded> buildInput(BuildContext context) {
-    final maxWidth = MediaQuery.of(context).size.width;
+  List<Flexible> buildInput(BuildContext context) {
+    final bool isMobile = MediaQuery.of(context).size.width < Constants.breakPoint;
     return inputFields
         .asMap()
         .map((key, value) {
           return MapEntry(
               key,
-              Expanded(
+              Flexible(
                 child: Container(
-                  margin: key > 0 && maxWidth > 600
-                      ? const EdgeInsets.fromLTRB(15, 0, 0, 0)
-                      : const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                  margin: isMobile
+                      ? const EdgeInsets.fromLTRB(0, 5, 0, 5)
+                      : key > 0 && !isMobile
+                          ? const EdgeInsets.fromLTRB(15, 0, 0, 0)
+                          : const EdgeInsets.fromLTRB(0, 0, 0, 0),
                   child: value,
                 ),
               ));
@@ -29,20 +31,19 @@ class SideBySideInputs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final maxWidth = MediaQuery.of(context).size.width;
-    if (maxWidth < 600) {
-      // Mobile version
-      return Container(
-        margin: const EdgeInsets.fromLTRB(0, 15, 0, 15),
-        child: Column(
-          children: buildInput(context),
-        ),
-      );
-    } else {
-      return Container(
-        margin: const EdgeInsets.fromLTRB(0, 15, 0, 15),
-        child: Row(children: buildInput(context)),
-      );
-    }
+    final bool isMobile = MediaQuery.of(context).size.width < Constants.breakPoint;
+
+    return Container(
+      margin: isMobile ? const EdgeInsets.symmetric(vertical: 5) : const EdgeInsets.symmetric(vertical: 15),
+      child: isMobile
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              children: buildInput(context),
+            )
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: buildInput(context),
+            ),
+    );
   }
 }

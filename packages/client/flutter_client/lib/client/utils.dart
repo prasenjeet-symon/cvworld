@@ -2,6 +2,7 @@
 import 'dart:html';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -13,6 +14,7 @@ class Constants {
   static const int debounceTime = 1000;
   static const googleClientId = '599994784077-8b5i8jsi9s75ddqv8p8v1031gk2mise7.apps.googleusercontent.com';
   static const String razorpayKeyID = 'rzp_test_nkLYI55QVnJlaQ';
+  static const int breakPoint = 600;
 }
 
 double pageWidth(BuildContext context) {
@@ -46,6 +48,27 @@ class RouteGuard extends AutoRouteGuard {
     } else {
       resolver.next(true);
     }
+  }
+}
+
+// Path correct guard
+class PathGuard extends AutoRouteGuard {
+  @override
+  void onNavigation(NavigationResolver resolver, StackRouter router) async {
+    var isTutorialCompleted = await DatabaseService().isTutorialCompleted();
+
+    if (!isTutorialCompleted && !kIsWeb) {
+      router.navigateNamed('/intro-slider');
+      return;
+    }
+
+    // if the path is / then go to dashboard
+    if (router.current.path == '/' && !kIsWeb) {
+      router.navigateNamed('/dashboard');
+      return;
+    }
+
+    resolver.next(true);
   }
 }
 
@@ -161,4 +184,16 @@ class RequiredFieldException implements Exception {
 
   @override
   String toString() => 'RequiredFieldException: $message';
+}
+
+enum PlatformType { mobile, desktop, web }
+
+PlatformType detectPlatformType() {
+  if (kIsWeb) {
+    return PlatformType.web;
+  } else if (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS) {
+    return PlatformType.mobile;
+  } else {
+    return PlatformType.desktop;
+  }
 }

@@ -126,7 +126,6 @@ class PersonalDetailSectionState extends State<PersonalDetailSection> {
 
   @override
   void initState() {
-    print('personal details section init');
     super.initState();
 
     defaultField = CustomInputType('Default', 'default', true, _getController(), TextInputType.text);
@@ -159,8 +158,7 @@ class PersonalDetailSectionState extends State<PersonalDetailSection> {
 
     // Fetch the old data if the resume id is provided
     // if resume id is not provided then fetch the user details from the server and patch it
-    print(widget.resume.isNull);
-    print(widget.resume);
+
     if (widget.resume.isNull) {
       _fetchPersonalDetails();
       // listen for changes and update
@@ -319,6 +317,7 @@ class PersonalDetailSectionState extends State<PersonalDetailSection> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobile = MediaQuery.of(context).size.width < Constants.breakPoint;
     return Container(
       margin: const EdgeInsets.fromLTRB(0, 45, 0, 45),
       child: Column(

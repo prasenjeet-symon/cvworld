@@ -1642,6 +1642,22 @@ class DatabaseService {
     }
   }
 
+  Future<bool> isTutorialCompleted() async {
+    const storage = FlutterSecureStorage();
+    var token = await storage.read(key: 'IS_TUTORIAL_COMPLETED');
+    if (token == null) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  // set is tutorial completed
+  Future<void> setTutorialCompleted() async {
+    const storage = FlutterSecureStorage();
+    await storage.write(key: 'IS_TUTORIAL_COMPLETED', value: 'true');
+  }
+
   /// Sign in the user using the email and password
   Future<SignUpSignInWithEmailAndPassword?> signInUserWithEmailAndPassword(String email, String password) async {
     // Prepare the request body

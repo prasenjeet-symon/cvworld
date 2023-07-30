@@ -50,6 +50,8 @@ dependencies:
   money_formatter: ^0.0.4
   razorpay_web: ^1.4.2
   flutter_inappwebview: ^5.7.2+3
+  package_info_plus: ^4.0.2
+  intro_slider: ^4.2.0
 
 dev_dependencies:
   flutter_test:
