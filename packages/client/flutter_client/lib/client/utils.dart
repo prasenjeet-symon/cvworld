@@ -1,11 +1,11 @@
 // a function to determine the page width given the context
-import 'dart:html';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // SOME APPLICATION CONSTANTS
 class Constants {
@@ -18,11 +18,11 @@ class Constants {
 }
 
 double pageWidth(BuildContext context) {
-  return MediaQuery.of(context).size.width >= 600 ? MediaQuery.of(context).size.width * 0.7 : MediaQuery.of(context).size.width;
+  return MediaQuery.of(context).size.width >= Constants.breakPoint ? MediaQuery.of(context).size.width * 0.7 : MediaQuery.of(context).size.width;
 }
 
 int flexNumber(BuildContext context) {
-  return MediaQuery.of(context).size.width >= 600 ? 1 : 0;
+  return MediaQuery.of(context).size.width >= Constants.breakPoint ? 1 : 0;
 }
 
 class AuthGuard extends AutoRouteGuard {
@@ -51,7 +51,6 @@ class RouteGuard extends AutoRouteGuard {
   }
 }
 
-// Path correct guard
 class PathGuard extends AutoRouteGuard {
   @override
   void onNavigation(NavigationResolver resolver, StackRouter router) async {
@@ -62,8 +61,7 @@ class PathGuard extends AutoRouteGuard {
       return;
     }
 
-    // if the path is / then go to dashboard
-    if (router.current.path == '/' && !kIsWeb) {
+    if (!kIsWeb) {
       router.navigateNamed('/dashboard');
       return;
     }
@@ -72,20 +70,26 @@ class PathGuard extends AutoRouteGuard {
   }
 }
 
-void downloadFile(String url, String fileName) {
-  final anchor = AnchorElement(href: url);
-  anchor.download = fileName;
-  anchor.target = '_blank';
-
-  anchor.click();
+Future<void> downloadFile(String url, String fileName) async {
+  if (!await launchUrl(
+    Uri.parse(url),
+    mode: LaunchMode.externalApplication,
+  )) {
+  } else {
+    throw 'Could not launch $url';
+  }
 }
 
-///
-/// Open link in browser
 void openLinkInBrowser(String url) async {
-  final anchor = AnchorElement(href: DatabaseService().publicResource(url));
-  anchor.target = '_blank';
-  anchor.click();
+  if (!await launchUrl(Uri.parse(url),
+      mode: LaunchMode.inAppWebView,
+      webViewConfiguration: const WebViewConfiguration(
+        enableJavaScript: true,
+        enableDomStorage: true,
+      ))) {
+  } else {
+    throw 'Could not launch $url';
+  }
 }
 
 Future<void> logOutUser(BuildContext context) async {
@@ -127,16 +131,11 @@ class BackButtonApp extends StatelessWidget {
 }
 
 String toUtcJsonDateTimeFromDateTime(DateTime dateTime) {
-  // Convert DateTime to UTC
   DateTime utcDateTime = dateTime.toUtc();
-
-  // Convert DateTime to JSON datetime string with 'Z' for UTC
   String jsonDateTime = utcDateTime.toIso8601String();
-
   return jsonDateTime;
 }
 
-// For the user already exit
 class UserAlreadyExistsException implements Exception {
   final String message;
 

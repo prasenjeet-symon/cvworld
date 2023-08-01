@@ -44,14 +44,12 @@ dependencies:
   flutter_secure_storage: ^8.0.0
   localstorage: ^4.0.1+2
   fluttertoast: ^8.2.2
-  url_launcher: ^6.1.11
+  url_launcher: ^6.1.12
   rxdart: ^0.27.7
   google_sign_in: ^6.1.4
-  money_formatter: ^0.0.4
-  razorpay_web: ^1.4.2
-  flutter_inappwebview: ^5.7.2+3
-  package_info_plus: ^4.0.2
   intro_slider: ^4.2.0
+  intl: ^0.18.1
+  flutter_file_downloader: ^1.1.2
 
 dev_dependencies:
   flutter_test:

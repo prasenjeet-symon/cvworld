@@ -1,5 +1,3 @@
-import 'dart:js_interop';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
@@ -159,7 +157,7 @@ class PersonalDetailSectionState extends State<PersonalDetailSection> {
     // Fetch the old data if the resume id is provided
     // if resume id is not provided then fetch the user details from the server and patch it
 
-    if (widget.resume.isNull) {
+    if (widget.resume == null) {
       _fetchPersonalDetails();
       // listen for changes and update
       listenForChanges();
@@ -194,7 +192,7 @@ class PersonalDetailSectionState extends State<PersonalDetailSection> {
 
   // patch the resume
   Future<void> patchResume() async {
-    if (widget.resume.isNull) return;
+    if (widget.resume == null) return;
 
     inputs.firstWhere((element) => element.jsonKey == 'firstName').controller.text = widget.resume!.name.split(' ')[0];
     inputs.firstWhere((element) => element.jsonKey == 'lastName').controller.text = widget.resume!.name.split(' ')[1];
@@ -239,7 +237,7 @@ class PersonalDetailSectionState extends State<PersonalDetailSection> {
   _fetchPersonalDetails() async {
     // Fetch the personal details from the server
     var userDetail = await DatabaseService().fetchUserDetails();
-    if (userDetail.isNull) {
+    if (userDetail == null) {
       return;
     }
 
@@ -294,7 +292,7 @@ class PersonalDetailSectionState extends State<PersonalDetailSection> {
     var extraData = getExtraData();
 
     UserDetails userDetailFinal = UserDetails(
-      _userDetails.isNull ? 0 : _userDetails!.id,
+      _userDetails == null ? 0 : _userDetails!.id,
       extraData['profession'],
       extraData['name'],
       userDetail.email,

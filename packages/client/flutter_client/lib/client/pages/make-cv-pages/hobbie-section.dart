@@ -1,5 +1,3 @@
-import 'dart:js_interop';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
@@ -32,7 +30,7 @@ class HobbiesSectionState extends State<HobbiesSection> {
 
   // patch the resume
   Future<void> patchResume() async {
-    if (widget.resume.isNull) return;
+    if (widget.resume == null) return;
 
     var hobbyToPatch = widget.resume!.hobbies;
     _controller.text = hobbyToPatch;
@@ -40,10 +38,10 @@ class HobbiesSectionState extends State<HobbiesSection> {
 
   // fetch the hobby
   Future<void> fetchHobby() async {
-    if (!widget.resume.isNull) return;
+    if (!(widget.resume == null)) return;
 
     var fetchedHobby = await DatabaseService().fetchUserHobby();
-    if (fetchedHobby.isNull) return;
+    if (fetchedHobby == null) return;
 
     hobby = fetchedHobby;
 
@@ -53,7 +51,7 @@ class HobbiesSectionState extends State<HobbiesSection> {
 
   // update the hobby
   Future<void> updateHobby() async {
-    var updatedHobby = UserHobby(hobby.isNull ? 1 : hobby!.id, _controller.text, DateTime.now(), DateTime.now());
+    var updatedHobby = UserHobby(hobby == null ? 1 : hobby!.id, _controller.text, DateTime.now(), DateTime.now());
     await DatabaseService().addUpdateUserHobby(updatedHobby);
     Fluttertoast.showToast(msg: "Hobby updated", toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, backgroundColor: Colors.green.withOpacity(0.8), timeInSecForIosWeb: 1, textColor: Colors.white);
   }
@@ -66,7 +64,7 @@ class HobbiesSectionState extends State<HobbiesSection> {
     textEditor = CustomInputField(label: textEditorType.label, isRequired: textEditorType.isRequired, controller: textEditorType.controller, type: textEditorType.type, isTextArea: true);
 
     // listen for the changes and update the database
-    if (widget.resume.isNull) {
+    if (widget.resume == null) {
       textEditor.controller.addListener(() {
         controller.add(textEditor.controller.text);
       });

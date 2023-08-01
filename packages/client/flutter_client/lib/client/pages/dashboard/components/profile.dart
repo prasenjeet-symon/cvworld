@@ -22,9 +22,7 @@ class ProfileOptionsLogic {
 
   // Log out the user
   void logOutUser(BuildContext context) {
-    // Perform the logout action here, e.g., clearing session data, etc.
-    // Then navigate to the login page
-    context.navigateNamedTo('/login');
+    DatabaseService().logout().then((value) => context.navigateNamedTo('/signin'));
   }
 }
 

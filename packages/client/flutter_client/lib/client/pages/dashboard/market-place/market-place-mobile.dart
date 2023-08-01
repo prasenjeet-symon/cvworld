@@ -1,6 +1,5 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/pages/dashboard/dashboard/dashboard-mobile.dart';
 import 'package:flutter_client/client/pages/dashboard/market-place/market-place.dart';
 
 class MarketPlaceMobile extends StatefulWidget {
@@ -47,7 +46,7 @@ class _MarketPlaceMobileState extends State<MarketPlaceMobile> {
             onFilterOptionChanged: logic.setFilterOption,
             templates: logic.allTemplates,
             width: double.infinity,
-            height: 400,
+            height: 420,
             canShowBackButton: false,
           ),
         ),

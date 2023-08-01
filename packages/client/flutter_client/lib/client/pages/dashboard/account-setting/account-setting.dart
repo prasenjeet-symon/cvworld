@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:js_interop';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
@@ -52,8 +51,8 @@ class PricingPlanCardLogic {
 
   PricingPlanCardLogic({required this.setStateCallback});
 
-  Future<void> fetchUser() async {
-    isLoading = true;
+  Future<void> fetchUser({bool enableLoading = true}) async {
+    isLoading = enableLoading;
     setStateCallback();
     user = await DatabaseService().fetchUser();
     isLoading = false;
@@ -80,19 +79,17 @@ class PricingPlanCardLogic {
   }
 
   Future<void> startTick() async {
-    Timer.periodic(const Duration(seconds: 1), (Timer timer) async {
+    Timer.periodic(const Duration(seconds: 15), (Timer timer) async {
       this.timer = timer;
-      await fetchUser();
+      await fetchUser(enableLoading: false);
       setStateCallback();
     });
   }
 
   Future<void> subscribeNow() async {
     startTick();
-    if (kIsWeb) {
-      var link = await subscribeToPremium(subscriptionPlan!);
-      openLinkInBrowser(link ?? '');
-    }
+    var link = await subscribeToPremium(subscriptionPlan!);
+    openLinkInBrowser(link ?? '');
   }
 
   void dispose() {
@@ -214,7 +211,7 @@ class _PricingPlanCardState extends State<PricingPlanCard> {
               style: TextStyle(fontSize: 15, color: Colors.black.withOpacity(0.6), fontWeight: FontWeight.w500),
             ),
           ),
-          logic.user.isDefinedAndNotNull && logic.user!.subscription.isDefinedAndNotNull && logic.user!.subscription!.isActive
+          logic.user != null && logic.user!.subscription != null && logic.user!.subscription!.isActive
               ? PlanCardWidget(
                   planName: logic.user!.subscription!.planName,
                   description: 'You are on premium plan. You can use any resume template',

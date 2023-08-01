@@ -14,7 +14,7 @@ signUpAdmin()
   .finally(() => {
     app.listen(PORT, async () => { 
       console.log(`Server is running on port ${PORT}`);
-      const tunnelURL = await createLocaltunnel(PORT);
-      console.log(`Tunnel URL: ${tunnelURL}`);
+      // const tunnelURL = await createLocaltunnel(PORT);
+      // console.log(`Tunnel URL: ${tunnelURL}`);
     });
   });

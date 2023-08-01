@@ -59,6 +59,7 @@ class CvMakerMobile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text('CV Maker'),
         leading: IconButton(
           onPressed: () {
             // Add your action here

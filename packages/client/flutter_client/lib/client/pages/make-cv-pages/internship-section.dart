@@ -1,5 +1,3 @@
-import 'dart:js_interop';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
@@ -345,7 +343,7 @@ class CustomInternshipSection {
 
   // patch the resume
   Future<void> patchResume() async {
-    if (resume.isNull) return;
+    if (resume == null) return;
     var internshipToPatch = resume!.internship;
 
     for (var internship in internshipToPatch) {
@@ -383,11 +381,11 @@ class CustomInternshipSection {
 
   // fetch the internship from the server and path it
   Future<void> fetchInternships() async {
-    if (!resume.isNull) return;
+    if (!(resume == null)) return;
 
     var fetchedInternship = await DatabaseService().fetchUserInternships();
-    if (fetchedInternship.isNull) return;
-    _userInternships = fetchedInternship!;
+    if (fetchedInternship == null) return;
+    _userInternships = fetchedInternship;
 
     // loop internships
     for (var internship in _userInternships) {
@@ -463,7 +461,7 @@ class CustomInternshipSection {
     item.removeAt(index);
     itemToDelete.dispose();
 
-    if (resume.isNull) {
+    if (resume == null) {
       var itemToDeleteDatabaseIndex = _userInternships.indexWhere((element) => element.id == itemToDelete.id);
       if (itemToDeleteDatabaseIndex != -1) {
         _userInternships.removeAt(itemToDeleteDatabaseIndex);
@@ -488,7 +486,7 @@ class CustomInternshipSection {
       description: CustomInputType('Description', 'description', true, _addController(), TextInputType.text),
     );
 
-    if (resume.isNull) {
+    if (resume == null) {
       itemToAdd.listenForChanges().listen((event) {
         updateInternship(event);
       });

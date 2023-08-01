@@ -1,5 +1,4 @@
 // ignore: file_names
-import 'dart:js_interop';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
@@ -306,7 +305,7 @@ class CustomEmploymentHistory {
 
   // patch the resume
   Future<void> patchResume() async {
-    if (resume.isNull) return;
+    if (resume == null) return;
     var employmentHistoryToPatch = resume!.employmentHistory;
 
     for (var element in employmentHistoryToPatch) {
@@ -344,9 +343,9 @@ class CustomEmploymentHistory {
 
   // fetch employment history
   Future<void> fetchEmploymentHistory() async {
-    if (!resume.isNull) return;
+    if (!(resume == null)) return;
     var fetchedEmploymentHistory = await DatabaseService().fetchUserEmploymentHistories();
-    if (fetchedEmploymentHistory.isNull) return;
+    if (fetchedEmploymentHistory == null) return;
     employment = fetchedEmploymentHistory!;
 
     for (var element in employment) {
@@ -424,7 +423,7 @@ class CustomEmploymentHistory {
       description: CustomInputType('Description', 'description', true, _addController(), TextInputType.text),
     );
 
-    if (resume.isNull) {
+    if (resume == null) {
       itemToAdd.listenForChanges().listen((event) {
         updateEmploymentHistory(event);
       });
@@ -459,7 +458,7 @@ class CustomEmploymentHistory {
     itemToRemove.dispose();
     item.removeAt(index);
 
-    if (resume.isNull) {
+    if (resume == null) {
       var databaseItemIndex = employment.indexWhere((element) => element.id == itemToRemove.id);
       if (databaseItemIndex != -1) {
         employment.removeAt(databaseItemIndex);

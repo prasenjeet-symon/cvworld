@@ -1,5 +1,3 @@
-import 'dart:js_interop';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
@@ -47,7 +45,7 @@ class ProfessionalSummaryState extends State<ProfessionalSummary> {
     patchResume().then((value) => {setState(() {})});
 
     // listen for the changes and update professional summary
-    if (widget.resume.isNull) {
+    if (widget.resume == null) {
       textEditor?.controller.addListener(() {
         controller.add(textEditor?.controller.text ?? '');
       });
@@ -60,15 +58,15 @@ class ProfessionalSummaryState extends State<ProfessionalSummary> {
 
   // patch the resume
   Future<void> patchResume() async {
-    if (widget.resume.isNull) return;
+    if (widget.resume == null) return;
     _controller.text = widget.resume!.profile;
   }
 
   // fetch professional summary
   Future<void> fetchProfessionalSummary() async {
-    if (widget.resume.isNull) {
+    if (widget.resume == null) {
       var fetchedProfessionalSummary = await DatabaseService().fetchUserProfessionalSummary();
-      if (fetchedProfessionalSummary.isNull) return;
+      if (fetchedProfessionalSummary == null) return;
 
       professionalSummary = fetchedProfessionalSummary;
       // patch the data
@@ -80,8 +78,8 @@ class ProfessionalSummaryState extends State<ProfessionalSummary> {
   Future<void> updateProfessionalSummary() async {
     var inputValue = _controller.text;
 
-    if (widget.resume.isNull && inputValue != '' && inputValue.isNotEmpty) {
-      var updatedProfessionalSummary = UserProfessionalSummary(professionalSummary.isNull ? 1 : professionalSummary!.id, _controller.text, DateTime.now(), DateTime.now());
+    if (widget.resume == null && inputValue != '' && inputValue.isNotEmpty) {
+      var updatedProfessionalSummary = UserProfessionalSummary(professionalSummary == null ? 1 : professionalSummary!.id, _controller.text, DateTime.now(), DateTime.now());
       await DatabaseService().addUpdateUserProfessionalSummary(updatedProfessionalSummary);
       professionalSummary = updatedProfessionalSummary;
 

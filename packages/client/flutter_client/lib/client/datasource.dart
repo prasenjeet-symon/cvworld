@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:js_interop';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_client/client/utils.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart' show FlutterSecureStorage;
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 
 class EmploymentHistory {
@@ -1432,7 +1434,7 @@ class JwtClient extends http.BaseClient {
     const storage = FlutterSecureStorage();
     String? token = await storage.read(key: 'JWT');
 
-    if (token.isNull) {
+    if (token == null) {
       if (kDebugMode) {
         print('No JWT found!');
       }
@@ -1467,8 +1469,7 @@ class JwtClient extends http.BaseClient {
 ///
 ///
 class DatabaseService {
-  // String origin = 'http://localhost:3001';
-  String origin = 'http://localhost:8080';
+  late String origin;
   late Uri authRoute;
   late Uri apiRoute;
   late Uri signInRoute;
@@ -1569,6 +1570,14 @@ class DatabaseService {
   late Uri getTemplateRoute;
 
   DatabaseService() {
+    const apiBaseUrl = 'https://native-humorous-mule.ngrok-free.app';
+    const localBaseUrl = 'http://localhost:8080';
+    if (kIsWeb) {
+      origin = localBaseUrl;
+    } else {
+      origin = apiBaseUrl;
+    }
+
     authRoute = Uri.parse('$origin/server/auth');
     apiRoute = Uri.parse('$origin/server/api');
     signInRoute = Uri.parse('$origin/server/auth/sign_in_with_email_and_password');
@@ -1632,6 +1641,12 @@ class DatabaseService {
     return '$origin/$path';
   }
 
+  Future<bool> logout() async {
+    const storage = FlutterSecureStorage();
+    await storage.delete(key: 'JWT');
+    return true;
+  }
+
   Future<bool> isAuthenticated() async {
     const storage = FlutterSecureStorage();
     var token = await storage.read(key: 'JWT');
@@ -1649,6 +1664,28 @@ class DatabaseService {
       return false;
     } else {
       return true;
+    }
+  }
+
+  void downloadAndSavePdf(String pdfUrl) async {
+    try {
+      // Add the downloaded file to the device's media gallery (Android only)
+      if (Platform.isAndroid) {
+        await FileDownloader.downloadFile(
+          url: pdfUrl,
+          onDownloadCompleted: (String path) {
+            Fluttertoast.showToast(msg: 'PDF file saved to gallery', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white);
+          },
+          onDownloadError: (errorMessage) {
+            Fluttertoast.showToast(msg: errorMessage, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white);
+          },
+        );
+      }
+    } catch (e) {
+      // Show an error message if there was an exception
+      if (kDebugMode) {
+        print('Error: $e');
+      }
     }
   }
 
@@ -1747,7 +1784,7 @@ class DatabaseService {
   Future<String?> getToken() async {
     const storage = FlutterSecureStorage();
     String? token = await storage.read(key: 'JWT');
-    if (token.isUndefinedOrNull) {
+    if (token == null) {
       if (kDebugMode) {
         print('No JWT found!');
       }
@@ -2698,7 +2735,7 @@ class DatabaseService {
     var url = Uri.parse('$origin/server/api/template/$templateName');
 
     // Create a new Map to hold the query parameters and include the 'token'
-    var queryParams = {'token': token};
+    var queryParams = {'token': token, 'hostName': '$origin/'};
     url = url.replace(queryParameters: queryParams);
 
     return url;

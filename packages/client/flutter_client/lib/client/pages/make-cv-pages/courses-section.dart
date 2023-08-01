@@ -1,5 +1,4 @@
 // ignore: file_names
-import 'dart:js_interop';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
@@ -328,7 +327,7 @@ class CustomCourseSection {
 
   // patch the resume if applicable
   Future<void> patchResume() async {
-    if (resume.isNull) return;
+    if (resume == null) return;
     var coursesToPatch = resume!.courses;
 
     for (var element in coursesToPatch) {
@@ -358,11 +357,11 @@ class CustomCourseSection {
 
   // Fetch already created courses by the user
   Future<void> fetchCourses() async {
-    if (!resume.isNull) return;
+    if (!(resume == null)) return;
 
     var createdCourses = await DatabaseService().fetchUserCourses();
-    if (createdCourses.isNull) return;
-    courses = createdCourses!;
+    if (createdCourses == null) return;
+    courses = createdCourses;
 
     for (var element in courses) {
       var courseController = _addController();
@@ -423,7 +422,7 @@ class CustomCourseSection {
       startDate: CustomInputType('Start Date', 'startDate', true, _addController(), TextInputType.datetime),
     );
 
-    if (resume.isNull) {
+    if (resume == null) {
       // listen for the changes and update the item
       courseItem.listenForChanges().listen((event) {
         // save the updated value here
@@ -460,7 +459,7 @@ class CustomCourseSection {
     courseToDelete.dispose();
     item.removeAt(index);
 
-    if (resume.isNull) {
+    if (resume == null) {
       var courseToDeleteDatabaseIndex = courses.indexWhere((element) => element.id == courseToDelete.id);
       if (courseToDeleteDatabaseIndex != -1) {
         courses.removeAt(courseToDeleteDatabaseIndex);

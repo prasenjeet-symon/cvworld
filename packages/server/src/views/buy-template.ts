@@ -1,6 +1,6 @@
 import { getBaseUrl, getResourcePath } from "../utils"
 
-export function buyTemplate(imageUrl: string, price : number, orderId: string, fullName: string, mobileNumber: string, email: string) {
+export function buyTemplate(imageUrl: string, price : number, orderId: string, fullName: string, mobileNumber: string, email: string, hostName: string) {
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -68,7 +68,7 @@ export function buyTemplate(imageUrl: string, price : number, orderId: string, f
       <body>
         <section class="cvWorldBuyTemplate">
           <img
-            src="${getResourcePath(imageUrl)}"
+            src="${hostName + imageUrl}"
           />
           <div>
             <div></div>
@@ -85,14 +85,14 @@ export function buyTemplate(imageUrl: string, price : number, orderId: string, f
             "currency": "INR",
             "name": "CV WORLD",
             "description": "Buy Template",
-            "image": "https://yourcompany.com/logo.png", // Replace this with your company logo URL
+            "image": "${hostName}logo.png", // Replace this with your company logo URL
             "order_id": "${orderId}", // Replace this with your actual order ID
             "handler": function (response) {
                 // This function will be called after successful payment
                 console.log("Payment successful!", response);
                 // redirect to success page
                 const {razorpay_payment_id, razorpay_order_id, razorpay_signature } = response;
-                const URL = "${getBaseUrl()}" + "/" + "server/api_public/payment_success?razorpay_payment_id=" + razorpay_payment_id + "&razorpay_order_id=" + razorpay_order_id + "&razorpay_signature=" + razorpay_signature + "&price=" + ${price};
+                const URL = "${hostName}" + "server/api_public/payment_success?razorpay_payment_id=" + razorpay_payment_id + "&razorpay_order_id=" + razorpay_order_id + "&razorpay_signature=" + razorpay_signature + "&price=" + ${price};
                 window.location.href = URL;
             },
             "prefill": {

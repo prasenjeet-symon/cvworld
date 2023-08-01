@@ -6,8 +6,7 @@ class FooterSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
+    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       if (constraints.maxWidth < 600) {
         return const FooterSectionMobile();
       } else {
@@ -92,21 +91,11 @@ class FooterSectionDesktop extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Container(
-                    margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    child: const Text('Contact Us')),
-                Container(
-                    margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    child: const Text('Our Services')),
-                Container(
-                    margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    child: const Text('Privacy Policy')),
-                Container(
-                    margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    child: const Text('Terms & Condition')),
-                Container(
-                    margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    child: const Text('Career')),
+                Container(margin: const EdgeInsets.fromLTRB(10, 0, 10, 0), child: const Text('Contact Us')),
+                Container(margin: const EdgeInsets.fromLTRB(10, 0, 10, 0), child: const Text('Our Services')),
+                Container(margin: const EdgeInsets.fromLTRB(10, 0, 10, 0), child: const Text('Privacy Policy')),
+                Container(margin: const EdgeInsets.fromLTRB(10, 0, 10, 0), child: const Text('Terms & Condition')),
+                Container(margin: const EdgeInsets.fromLTRB(10, 0, 10, 0), child: const Text('Career')),
               ],
             ),
           ),

@@ -1,6 +1,3 @@
-// ignore: file_names
-import 'dart:js_interop';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
@@ -336,7 +333,7 @@ class CustomEducationSection {
 
   // patch the educations
   Future<void> patchResume() async {
-    if (resume.isNull) return;
+    if (resume == null) return;
     var educationToPatch = resume!.education;
 
     for (var element in educationToPatch) {
@@ -374,10 +371,10 @@ class CustomEducationSection {
 
   // fetch education
   fetchEducation() async {
-    if (!resume.isNull) return;
+    if (!(resume == null)) return;
 
     var educationFetched = await DatabaseService().fetchUserEducations();
-    if (educationFetched.isNull) return;
+    if (educationFetched == null) return;
     education = educationFetched!;
 
     for (var element in education) {
@@ -449,7 +446,7 @@ class CustomEducationSection {
       description: CustomInputType('Description', 'description', true, _addController(), TextInputType.text),
     );
 
-    if (resume.isNull) {
+    if (resume == null) {
       // listen for the changes and update the item
       customEducationItem.listenForChanges().listen((event) {
         updateItem(event);
@@ -485,7 +482,7 @@ class CustomEducationSection {
     itemToRemove.dispose();
     item.removeAt(index);
 
-    if (resume.isNull) {
+    if (resume == null) {
       var savedItemIndex = education.indexWhere((element) => element.id == itemToRemove.id);
       if (savedItemIndex != -1) {
         education.removeAt(savedItemIndex);

@@ -9,7 +9,8 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:auto_route/auto_route.dart' as _i11;
-import 'package:flutter/material.dart' as _i12;
+import 'package:flutter/foundation.dart' as _i12;
+import 'package:flutter/material.dart' as _i13;
 import 'package:flutter_client/client/pages/contact-us-page/contact-us-page.dart'
     as _i1;
 import 'package:flutter_client/client/pages/dashboard/account-setting/account-setting.dart'
@@ -242,7 +243,7 @@ class IntroSliderPage extends _i11.PageRouteInfo<void> {
 /// [_i8.CvMakerScreen]
 class CvMakerRoute extends _i11.PageRouteInfo<CvMakerRouteArgs> {
   CvMakerRoute({
-    _i12.Key? key,
+    _i13.Key? key,
     required int? resumeID,
     required String? templateName,
     List<_i11.PageRouteInfo>? children,
@@ -273,7 +274,7 @@ class CvMakerRouteArgs {
     required this.templateName,
   });
 
-  final _i12.Key? key;
+  final _i13.Key? key;
 
   final int? resumeID;
 

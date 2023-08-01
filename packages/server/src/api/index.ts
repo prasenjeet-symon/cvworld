@@ -1761,6 +1761,7 @@ router.post("/cancel_subscription", async (req, res) => {
 // For the buy template get req with auth token and template name
 router.get("/template/:name", async (req, res) => {
   const templateName = req.params.name;
+  const hostName = req.query.hostName as string;
   const email = res.locals.email;
 
   const Razorpay = require("razorpay");
@@ -1830,7 +1831,7 @@ router.get("/template/:name", async (req, res) => {
 
   // return the web page
   res.set("Content-Type", "text/html"); 
-  res.send(buyTemplate(marketPlaceTemplate.previewImgUrl, order.amount, order.id, user.fullName, "", user.email));
+  res.send(buyTemplate(marketPlaceTemplate.previewImgUrl, order.amount, order.id, user.fullName, "", user.email, hostName));
 });
 
 /** Get single the premium plan */

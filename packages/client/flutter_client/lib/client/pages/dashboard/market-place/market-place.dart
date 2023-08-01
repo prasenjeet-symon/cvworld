@@ -5,7 +5,12 @@ import 'package:flutter_client/client/pages/dashboard/market-place/market-place-
 import 'package:flutter_client/client/pages/dashboard/market-place/market-place-mobile.dart';
 import 'package:flutter_client/client/utils.dart';
 import 'package:flutter_client/routes/router.gr.dart';
-import 'package:money_formatter/money_formatter.dart';
+import 'package:intl/intl.dart';
+
+String formatAsIndianRupee(double amount) {
+  final format = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
+  return format.format(amount);
+}
 
 @RoutePage()
 class MarketPlacePage extends StatelessWidget {
@@ -215,7 +220,7 @@ class MarketPlaceTemplates extends StatelessWidget {
           (template) => MarketPlaceTemplateItem(
             templateName: template.name,
             imageUrl: template.previewImgUrl,
-            label: template.price.toString(),
+            price: template.price,
             isBought: template.isBought,
             isPremium: !template.isFree,
             width: width,
@@ -246,16 +251,16 @@ enum FilterOption {
 ///
 ///
 class IndianRupeeWidget extends StatelessWidget {
-  final int amountInPaisa;
+  final double amountInPaisa;
 
   const IndianRupeeWidget({Key? key, required this.amountInPaisa}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    MoneyFormatterOutput fmf = MoneyFormatter(amount: amountInPaisa.toDouble() / 100).output;
+    final fmf = formatAsIndianRupee(amountInPaisa / 100);
 
     return Text(
-      fmf.symbolOnLeft,
+      fmf,
       style: const TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 16,
@@ -287,8 +292,8 @@ class MarketPlaceLogic {
     setStateCallback();
 
     allTemplates = (await DatabaseService().getMarketplaceTemplates()) ?? [];
-    freeTemplates = allTemplates!.where((element) => element.isFree == true).toList();
-    premiumTemplates = allTemplates!.where((element) => element.isFree == false).toList();
+    freeTemplates = allTemplates.where((element) => element.isFree == true).toList();
+    premiumTemplates = allTemplates.where((element) => element.isFree == false).toList();
 
     isLoading = false;
     setStateCallback();
@@ -321,7 +326,7 @@ class MarketPlaceLogic {
 ///
 class MarketPlaceTemplateItem extends StatelessWidget {
   final String imageUrl;
-  final String label;
+  final double price;
   final bool isPremium;
   final bool isBought;
   final String templateName;
@@ -331,7 +336,7 @@ class MarketPlaceTemplateItem extends StatelessWidget {
   const MarketPlaceTemplateItem({
     Key? key,
     required this.imageUrl,
-    required this.label,
+    required this.price,
     this.isPremium = false,
     this.isBought = false,
     required this.templateName,
@@ -358,7 +363,7 @@ class MarketPlaceTemplateItem extends StatelessWidget {
             children: [
               TemplateImage(imageUrl: imageUrl, width: width, height: height),
               PriceAndIcons(
-                label: label,
+                price: price,
                 isPremium: isPremium,
                 isBought: isBought,
               ),
@@ -386,11 +391,11 @@ class TemplateImage extends StatelessWidget {
 }
 
 class PriceAndIcons extends StatelessWidget {
-  final String label;
+  final double price;
   final bool isPremium;
   final bool isBought;
 
-  const PriceAndIcons({Key? key, required this.label, this.isPremium = false, this.isBought = false}) : super(key: key);
+  const PriceAndIcons({Key? key, required this.price, this.isPremium = false, this.isBought = false}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -399,7 +404,7 @@ class PriceAndIcons extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: IndianRupeeWidget(amountInPaisa: int.parse(label)),
+            child: IndianRupeeWidget(amountInPaisa: price),
           ),
           if (isBought) const Icon(Icons.check, color: Colors.green),
           if (isPremium) const Icon(Icons.star, color: Colors.orange),

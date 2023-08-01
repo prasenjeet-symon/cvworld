@@ -59,46 +59,50 @@ class _ContactUsPageDesktopBodyState extends State<ContactUsPageDesktopBody> {
 
   @override
   Widget build(BuildContext context) {
+    bool isMobile = MediaQuery.of(context).size.width < Constants.breakPoint;
+
     return SizedBox(
       width: double.infinity,
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Expanded(
-          flex: 1,
-          child: Container(
-            width: double.infinity,
-            height: 700,
-            color: Colors.blue,
-            child: Image.asset(
-              'assets/contact_us.png',
-              fit: BoxFit.cover,
-              height: double.infinity,
+        if (!isMobile)
+          Expanded(
+            flex: 1,
+            child: Container(
               width: double.infinity,
+              height: 700,
+              color: Colors.blue,
+              child: Image.asset(
+                'assets/contact_us.png',
+                fit: BoxFit.cover,
+                height: double.infinity,
+                width: double.infinity,
+              ),
             ),
           ),
-        ),
         Expanded(
           flex: 2,
           child: isMessageSent
               ? const ContactUsMessageSent()
               : Container(
                   width: double.infinity,
-                  margin: const EdgeInsets.fromLTRB(50, 0, 50, 0),
+                  margin: isMobile ? const EdgeInsets.fromLTRB(30, 0, 30, 0) : const EdgeInsets.fromLTRB(50, 0, 50, 0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       // Back button holder
-                      Container(
-                        margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                        padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                        width: double.infinity,
-                        child: Row(children: [
-                          BackButtonApp(onPressed: () {
-                            context.navigateBack();
-                          }),
-                          const Expanded(child: SizedBox()),
-                        ]),
-                      ),
+                      if (!isMobile)
+                        Container(
+                          margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                          padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                          width: double.infinity,
+                          child: Row(children: [
+                            BackButtonApp(onPressed: () {
+                              context.navigateBack();
+                            }),
+                            const Expanded(child: SizedBox()),
+                          ]),
+                        ),
                       // Contact us title ( GET IN TOUCH ) where touch is bold only
                       Container(
                         margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
@@ -436,7 +440,17 @@ class ContactUsPageMobile extends StatefulWidget {
 class _ContactUsPageMobileState extends State<ContactUsPageMobile> {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
+    return Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+            title: const Text('Contact Us'),
+            leading: IconButton(
+              onPressed: () {
+                // ignore: deprecated_member_use
+                context.navigateBack();
+              },
+              icon: const Icon(Icons.arrow_back),
+            )),
+        body: const SingleChildScrollView(child: Column(children: [ContactUsPageDesktopBody()])));
   }
 }

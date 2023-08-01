@@ -1,6 +1,3 @@
-// ignore: file_names
-import 'dart:js_interop';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
@@ -252,7 +249,7 @@ class CustomWebsiteLinkSection {
 
   // patch the resume
   Future<void> patchResume() async {
-    if (resume.isNull) return;
+    if (resume == null) return;
     var websiteLinksToPatch = resume!.links;
 
     for (var websiteLink in websiteLinksToPatch) {
@@ -274,9 +271,9 @@ class CustomWebsiteLinkSection {
 
   // fetch website links
   Future<void> fetchWebsiteLinks() async {
-    if (resume.isNull) {
+    if (resume == null) {
       var fetchedLinks = await DatabaseService().fetchUserLinks();
-      if (fetchedLinks.isNull) return;
+      if (fetchedLinks == null) return;
       _userLinks = fetchedLinks!;
 
       for (var element in _userLinks) {
@@ -322,7 +319,7 @@ class CustomWebsiteLinkSection {
       link: CustomInputType('Link', 'link', true, _addController(), TextInputType.text),
     );
 
-    if (resume.isNull) {
+    if (resume == null) {
       // add to the database
       itemToAdd.listenForChanges().listen((event) {
         updateItem(event);
@@ -375,7 +372,7 @@ class CustomWebsiteLinkSection {
     itemToRemove.dispose();
     item.removeAt(index);
 
-    if (resume.isNull) {
+    if (resume == null) {
       var itemToRemoveDatabaseIndex = _userLinks.indexWhere((element) => element.id == itemToRemove.id);
       if (itemToRemoveDatabaseIndex != -1) {
         _userLinks.removeAt(itemToRemoveDatabaseIndex);

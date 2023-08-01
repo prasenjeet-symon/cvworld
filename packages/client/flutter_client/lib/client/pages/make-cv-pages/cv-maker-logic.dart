@@ -1,5 +1,3 @@
-import 'dart:js_interop';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +12,7 @@ import 'package:flutter_client/client/pages/make-cv-pages/personal-details-secti
 import 'package:flutter_client/client/pages/make-cv-pages/professional-summry-section.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/skills-section.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/website-links-section.dart';
-
-import '../../../routes/router.gr.dart';
+import 'package:flutter_client/routes/router.gr.dart';
 
 class CVMakerLogic {
   final String educationSectionTitle = 'Education';
@@ -139,7 +136,7 @@ class CVMakerLogic {
       if (resumeID != null) {
         var oldResumeFetched = await DatabaseService().fetchSingleResume(resumeID!);
 
-        if (oldResumeFetched.isDefinedAndNotNull) {
+        if (oldResumeFetched != null) {
           oldResume = oldResumeFetched;
         }
       }
@@ -230,7 +227,7 @@ class CVMakerLogic {
     try {
       var payload = getData();
 
-      if (oldResume.isNull || oldResume.isUndefined) {
+      if (oldResume == null) {
         var generatedResume = await DatabaseService().generateResume(
           payload,
           templateName ?? '',
@@ -257,7 +254,7 @@ class CVMakerLogic {
   // init
   init() async {
     await fetchResume();
-    if (oldResume.isDefinedAndNotNull) {
+    if (oldResume!= null) {
       addCourse();
       addInternship();
       addHobbies();

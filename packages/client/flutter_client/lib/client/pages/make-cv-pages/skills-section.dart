@@ -1,5 +1,3 @@
-import 'dart:js_interop';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
@@ -257,7 +255,7 @@ class CustomSkillSection {
 
   // patch the resume
   Future<void> patchResume() async {
-    if (resume.isNull) return;
+    if (resume == null) return;
     var skillsToPatch = resume!.skills;
 
     for (var element in skillsToPatch) {
@@ -279,10 +277,10 @@ class CustomSkillSection {
 
   // fetch user skills
   Future<void> fetchUserSkills() async {
-    if (!resume.isNull) return;
+    if (!(resume == null)) return;
 
     var fetchedUserSkills = await DatabaseService().fetchUserSkills();
-    if (fetchedUserSkills.isNull) return;
+    if (fetchedUserSkills == null) return;
     _userSkills = fetchedUserSkills!;
 
     for (var element in _userSkills) {
@@ -342,7 +340,7 @@ class CustomSkillSection {
       level: CustomInputType('Level', 'level', true, _addController(), TextInputType.text),
     );
 
-    if (resume.isNull) {
+    if (resume == null) {
       // add to database
       itemToAdd.listenForChanges().listen((event) {
         updateUserSkill(event);
@@ -372,7 +370,7 @@ class CustomSkillSection {
     item.removeAt(index);
     itemToRemove.dispose();
 
-    if (resume.isNull) {
+    if (resume == null) {
       // also remove from database
       var itemToRemoveDatabaseIndex = _userSkills.indexWhere((element) => element.id == itemToRemove.id);
       if (itemToRemoveDatabaseIndex != -1) {

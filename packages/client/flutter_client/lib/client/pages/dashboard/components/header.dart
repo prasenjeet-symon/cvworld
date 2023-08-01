@@ -1,5 +1,3 @@
-import 'dart:js_interop';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
@@ -79,7 +77,7 @@ class _DashboardHeaderState extends State<DashboardHeader> {
           const Expanded(child: SizedBox()),
           Row(
             children: [
-              if (!user.subscription.isDefinedAndNotNull || !user.subscription!.isActive) _buildUpgradeButton(context),
+              if (!(user.subscription != null) || !user.subscription!.isActive) _buildUpgradeButton(context),
               const ProfileOptions(),
             ],
           ),
@@ -119,6 +117,8 @@ class _DashboardHeaderState extends State<DashboardHeader> {
 }
 
 class DashboardHeaderSecondary extends StatelessWidget {
+  const DashboardHeaderSecondary({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(

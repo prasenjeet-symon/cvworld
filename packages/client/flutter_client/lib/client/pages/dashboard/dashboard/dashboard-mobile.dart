@@ -44,11 +44,13 @@ class _DashboardMobileState extends State<DashboardMobile> {
       ),
       drawer: DashboardDrawer(logic: logic),
       body: const SingleChildScrollView(
-        child: Column(
-          children: [
-            DashboardBodyContent(resumeWidth: 200),
-          ],
-        ),
+        child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Column(
+              children: [
+                DashboardBodyContent(resumeWidth: 200),
+              ],
+            )),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -79,6 +81,13 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    bool isSubscriber = false;
+    if (widget.logic.user != null && widget.logic.user!.subscription != null && widget.logic.user!.subscription!.isActive) {
+      isSubscriber = true;
+    } else {
+      isSubscriber = false;
+    }
+
     return Drawer(
       child: widget.logic.isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -87,20 +96,20 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
               children: <Widget>[
                 DrawerHeader(
                   decoration: const BoxDecoration(color: Colors.blue),
-                  child: ProfileWidget(fullName: widget.logic.user!.fullName, imageUrl: widget.logic.user!.profilePicture, isPremium: widget.logic.user!.subscription!.isActive),
+                  child: ProfileWidget(fullName: widget.logic.user!.fullName, imageUrl: widget.logic.user!.profilePicture, isPremium: isSubscriber),
                 ),
                 DrawerMenuItem(
                   icon: Icons.home,
                   title: 'Dashboard',
                   onTap: () {
-                    Navigator.pop(context); // Close the drawer
+                    context.pushRoute(const Dashboard());
                   },
                 ),
                 DrawerMenuItem(
                   icon: Icons.settings,
                   title: 'Account Setting',
                   onTap: () {
-                    Navigator.pop(context); // Close the drawer
+                    context.pushRoute(const AccountSettingPage());
                   },
                 ),
                 const Divider(), // Add a divider between menu items and app info
@@ -109,24 +118,19 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
                   title: 'Contact Us',
                   onTap: () {
                     // Handle menu item tap here
-                    Navigator.pop(context); // Close the drawer
-                  },
-                ),
-                DrawerMenuItem(
-                  icon: Icons.info,
-                  title: 'About Us',
-                  onTap: () {
-                    Navigator.pop(context); // Close the drawer
+                    context.pushRoute(const ContactUsPage());
                   },
                 ),
                 DrawerMenuItem(
                   icon: Icons.logout,
                   title: 'Logout',
                   onTap: () {
-                    Navigator.pop(context); // Close the drawer
+                    DatabaseService().logout().then((value) => context.pushRoute(const SignInRoute()));
                   },
                 ),
-                const SizedBox(height: 200),
+                const SizedBox(height: 20),
+                const Divider(),
+
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text('App Version: ${widget.logic.appVersion}', textAlign: TextAlign.center, style: const TextStyle(color: Colors.grey)),
@@ -198,7 +202,9 @@ class ProfileWidget extends StatelessWidget {
                 ),
               )
             : GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  context.pushRoute(const AccountSettingPage());
+                },
                 child: Container(
                   margin: const EdgeInsets.only(top: 10),
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),

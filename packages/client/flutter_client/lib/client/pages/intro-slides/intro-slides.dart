@@ -45,7 +45,7 @@ class IntroSlideLogic {
         description: "Create a professional resume in minutes!",
         styleDescription: TextStyle(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 17),
         styleTitle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 35),
-        pathImage: "slide_1.png", // Replace with your image asset
+        pathImage: "assets/slide_1.png", // Replace with your image asset
         backgroundColor: Colors.white,
       ),
       const ContentConfig(
@@ -53,7 +53,7 @@ class IntroSlideLogic {
         description: "Select from a variety of beautifully designed templates.",
         styleDescription: TextStyle(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 17),
         styleTitle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 35),
-        pathImage: "slide_2.png", // Replace with your image asset
+        pathImage: "assets/slide_2.png", // Replace with your image asset
         backgroundColor: Colors.white,
       ),
       const ContentConfig(
@@ -61,7 +61,7 @@ class IntroSlideLogic {
         description: "Edit the content, colors, and styles to fit your needs.",
         styleDescription: TextStyle(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 17),
         styleTitle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 35),
-        pathImage: "slide_3.png", // Replace with your image asset
+        pathImage: "assets/slide_3.png", // Replace with your image asset
         backgroundColor: Colors.white,
       ),
       const ContentConfig(
@@ -69,7 +69,7 @@ class IntroSlideLogic {
         description: "Export your resume as a PDF and share it with potential employers.",
         styleDescription: TextStyle(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 17),
         styleTitle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 35),
-        pathImage: "slide_4.png", // Replace with your image asset
+        pathImage: "assets/slide_4.png", // Replace with your image asset
         backgroundColor: Colors.white,
       ),
     ];

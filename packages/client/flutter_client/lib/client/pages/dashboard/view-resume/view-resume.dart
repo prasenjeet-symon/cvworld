@@ -1,16 +1,15 @@
 // ignore: file_names
 import 'dart:async';
-import 'dart:js_interop';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
+import 'package:flutter_client/client/pages/dashboard/view-resume/view-resume-desktop.dart';
 import 'package:flutter_client/client/pages/dashboard/view-resume/view-resume-mobile.dart';
 import 'package:flutter_client/client/utils.dart';
 import 'package:flutter_client/routes/router.gr.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
-import 'view-resume-desktop.dart';
 
 @RoutePage()
 class ViewResume extends StatefulWidget {
@@ -99,7 +98,7 @@ class ResumeViewerLogic {
   ResumeViewerLogic({required this.setStateCallback});
 
   dispose() {
-    if (timer.isDefinedAndNotNull) {
+    if (timer != null) {
       timer.cancel();
     }
   }
@@ -143,7 +142,7 @@ class ResumeViewerLogic {
   // Check if the template is bought for the given resume
   Future<bool> checkIsBought(GeneratedResume resume) async {
     var isBought = await DatabaseService().isTemplateBought(resume.templateName);
-    if (isBought.isDefinedAndNotNull) {
+    if (isBought != null) {
       return isBought!.isBought;
     } else {
       return false;
@@ -153,8 +152,8 @@ class ResumeViewerLogic {
   // Check if the user is a subscriber
   Future<bool> checkSubscriber() async {
     var user = await DatabaseService().fetchUser();
-    if (user.isDefinedAndNotNull) {
-      if (user!.subscription.isDefinedAndNotNull && user.subscription!.isActive) {
+    if (user != null) {
+      if (user!.subscription != null && user.subscription!.isActive) {
         return true;
       } else {
         return false;
@@ -167,14 +166,12 @@ class ResumeViewerLogic {
   // Buy the template for the given resume
   Future<void> buyTemplate(String templateName) async {
     var url = await DatabaseService().buyTemplate(templateName);
-    if (url.isDefinedAndNotNull) {
-      Timer.periodic(const Duration(seconds: 5), (timer) {
-        timer = timer;
-        init(resume!.id);
-      });
+    Timer.periodic(const Duration(seconds: 15), (timer) {
+      timer = timer;
+      init(resume!.id);
+    });
 
-      openLinkInBrowser(url.toString());
-    }
+    openLinkInBrowser(url.toString());
   }
 }
 
@@ -272,7 +269,11 @@ class _ResumeViewerState extends State<ResumeViewer> {
                       child: canDownload
                           ? ViewResumeButton(
                               onPressed: () {
-                                downloadFile(_logic.resume!.resumeLink.pdfUrl, _logic.resume!.resumeLink.pdfUrl);
+                                if (kIsWeb) {
+                                  downloadFile(_logic.resume!.resumeLink.pdfUrl, _logic.resume!.resumeLink.pdfUrl);
+                                } else {
+                                  DatabaseService().downloadAndSavePdf(_logic.resume!.resumeLink.pdfUrl);
+                                }
                               },
                               buttonText: 'Download',
                               backgroundColor: Colors.blue,

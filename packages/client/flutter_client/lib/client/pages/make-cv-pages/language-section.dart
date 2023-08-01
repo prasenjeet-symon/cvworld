@@ -1,5 +1,3 @@
-import 'dart:js_interop';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
@@ -251,7 +249,7 @@ class CustomLanguageSection {
 
   // patch the resume
   Future<void> patchResume() async {
-    if (resume.isNull) return;
+    if (resume == null) return;
     var resumeToPatch = resume!.languages;
 
     for (var language in resumeToPatch) {
@@ -291,10 +289,10 @@ class CustomLanguageSection {
 
   // Fetch all the items from the database
   Future<void> fetchUserLanguages() async {
-    if (!resume.isNull) return;
+    if (!(resume == null)) return;
 
     var fetchedLanguages = await DatabaseService().fetchUserLanguages();
-    if (fetchedLanguages.isNull) return;
+    if (fetchedLanguages == null) return;
     _userLanguages = fetchedLanguages!;
 
     for (var language in _userLanguages) {
@@ -329,7 +327,7 @@ class CustomLanguageSection {
     itemToRemove.dispose();
 
     // remove from database
-    if (resume.isNull) {
+    if (resume == null) {
       var itemToRemoveDatabaseIndex = _userLanguages.indexWhere((element) => element.id == itemToRemove.id);
       if (itemToRemoveDatabaseIndex != -1) {
         _userLanguages.removeAt(itemToRemoveDatabaseIndex);
@@ -371,7 +369,7 @@ class CustomLanguageSection {
       level: CustomInputType('Level', 'level', true, _addController(), TextInputType.text),
     );
 
-    if (resume.isNull) {
+    if (resume == null) {
       itemToAdd.listenForChanges().listen((event) {
         // update the item
         updateItem(event);

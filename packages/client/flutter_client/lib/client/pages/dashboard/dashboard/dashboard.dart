@@ -189,8 +189,11 @@ class ResumeActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+      margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
       child: TextButton.icon(
+        style: TextButton.styleFrom(
+          padding: const EdgeInsets.all(3),
+        ),
         onPressed: onPressed,
         icon: Icon(icon),
         label: Text(label),
@@ -275,7 +278,8 @@ class ShiningImageDescription extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(0, 15, 0, 0),
+      margin: const EdgeInsets.fromLTRB(0, 15, 0, 30),
+      padding: const EdgeInsets.fromLTRB(25, 0, 25, 0),
       child: Text(
         'Custom-built, amazing resumes. Empower your job search in just a few clicks!',
         style: TextStyle(fontSize: descriptionFontSize, fontWeight: FontWeight.w400),
@@ -293,7 +297,7 @@ class ShiningImageCreateButton extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
       child: ElevatedButton(
-        style: ElevatedButton.styleFrom(padding: const EdgeInsets.fromLTRB(20, 15, 20, 15)),
+        style: ElevatedButton.styleFrom(padding: const EdgeInsets.fromLTRB(35, 12, 35, 12)),
         onPressed: () => context.pushRoute(const MarketPlacePage()),
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -302,7 +306,10 @@ class ShiningImageCreateButton extends StatelessWidget {
           children: [
             Icon(Icons.add),
             SizedBox(width: 8),
-            Text('Create'),
+            Text(
+              'Create',
+              style: TextStyle(fontSize: 16),
+            ),
           ],
         ),
       ),
