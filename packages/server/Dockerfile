@@ -29,7 +29,7 @@ RUN npx prisma generate
 COPY . .
 
 # Expose the port that the Express server listens on
-EXPOSE 8080:8080
+EXPOSE 8081:8081
 
 # Build the application
 RUN npm run build

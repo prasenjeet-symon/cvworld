@@ -1571,7 +1571,7 @@ class DatabaseService {
 
   DatabaseService() {
     const apiBaseUrl = 'https://native-humorous-mule.ngrok-free.app';
-    const localBaseUrl = 'http://localhost:8080';
+    const localBaseUrl = 'http://localhost:8081';
     if (kIsWeb) {
       origin = localBaseUrl;
     } else {
