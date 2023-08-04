@@ -30,7 +30,11 @@ services:
       - ADMIN_PASSWORD=user
       - ADMIN_NAME=user
       - JWT_SECRET=secret
-    command: sh -c "npx prisma migrate deploy --preview-feature && npm run start"
+      - RAZORPAY_KEY_ID=rzp_test_nkLYI55QVnJlaQ
+      - RAZORPAY_KEY_SECRET=DpYQwN7KKYopH6L1ipTnQu0J
+      - RAZORPAY_WEBHOOK_SECRET=cvworld
+      
+    command: sh -c "npx prisma migrate deploy && npm run start"
     volumes:
       - ./public:/app/public
     networks:

@@ -92,6 +92,12 @@ class PricingPlanCardLogic {
     openLinkInBrowser(link ?? '');
   }
 
+  // cancel the subscription
+  Future<void> cancelSubscription() async {
+    startTick();
+    await DatabaseService().cancelSubscription();
+  }
+
   void dispose() {
     timer?.cancel();
   }
@@ -216,13 +222,15 @@ class _PricingPlanCardState extends State<PricingPlanCard> {
                   planName: logic.user!.subscription!.planName,
                   description: 'You are on premium plan. You can use any resume template',
                   isPremium: true,
-                  onPressed: () {},
+                  onPressed: () {
+                    logic.cancelSubscription();
+                  },
                 )
               : PlanCardWidget(
                   planName: 'Free Plan',
                   description: 'You are on the free plan. You can use free resume template only. Upgrade for PDF downloads & premium templates.',
                   isPremium: false,
-                  onPressed: logic.subscribeNow,
+                  onPressed: () => logic.subscribeNow(),
                 ),
         ],
       ),

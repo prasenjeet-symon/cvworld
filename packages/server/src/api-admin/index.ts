@@ -1,5 +1,5 @@
 import express from "express";
-import { PrismaClientSingleton, Resume, generateDummyResume, generateImage } from "../utils";
+import { PrismaClientSingleton, Resume, addTemplate, generateDummyResume, generateImage } from "../utils";
 
 const router = express.Router();
 
@@ -22,27 +22,7 @@ router.post("/add_template", async (req, res) => {
   const name = req.body.name;
   const price = +req.body.price; // in paisa
 
-  const loadTemplate = async () => {
-    const template = await import(`../templates/${name}`);
-    return template as unknown as { default: (resume: Resume) => string };
-  };
-
-  const template = await loadTemplate();
-  console.log(template);
-
-  // generate the dummy template for the preview
-  const dummyResume = generateDummyResume();
-  const imageUrl = await generateImage(dummyResume, template.default)
-
-  // add to the database template marketplace
-  const prisma = PrismaClientSingleton.prisma;
-  await prisma.resumeTemplateMarketplace.create({
-    data: {
-      name: name,
-      price: price,
-      previewImgUrl: imageUrl,
-    },
-  });
+  const imageUrl = await addTemplate(name, price);
 
   res.json({ imageUrl: imageUrl, price: price });
 });

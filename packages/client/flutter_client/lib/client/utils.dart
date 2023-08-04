@@ -13,6 +13,7 @@ class Constants {
   static const String appVersion = '1.0';
   static const int debounceTime = 1000;
   static const googleClientId = '599994784077-8b5i8jsi9s75ddqv8p8v1031gk2mise7.apps.googleusercontent.com';
+  static const googleClientIdAndroid = '599994784077-kq6slt22l90qfk6kjl81jti233o1e050.apps.googleusercontent.com';
   static const String razorpayKeyID = 'rzp_test_nkLYI55QVnJlaQ';
   static const int breakPoint = 600;
 }
@@ -81,12 +82,10 @@ Future<void> downloadFile(String url, String fileName) async {
 }
 
 void openLinkInBrowser(String url) async {
-  if (!await launchUrl(Uri.parse(url),
-      mode: LaunchMode.inAppWebView,
-      webViewConfiguration: const WebViewConfiguration(
-        enableJavaScript: true,
-        enableDomStorage: true,
-      ))) {
+  if (!await launchUrl(
+    Uri.parse(url),
+    mode: LaunchMode.externalApplication,
+  )) {
   } else {
     throw 'Could not launch $url';
   }

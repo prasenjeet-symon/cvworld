@@ -1822,8 +1822,14 @@ export class BrowserPuppeteer {
   public static async browser() {
     if (!BrowserPuppeteer.#instance) {
       BrowserPuppeteer.#instance = new BrowserPuppeteer();
-      const puppeteer = require("puppeteer");
-      BrowserPuppeteer.#instance.browserInstance = await puppeteer.launch({ headless: true, args: ["--no-sandbox"] });
+      const puppeteer = require("puppeteer-core");
+      const chromium = require("@sparticuz/chromium");
+      BrowserPuppeteer.#instance.browserInstance = await puppeteer.launch({
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
+      });
     }
 
     return BrowserPuppeteer.#instance;
@@ -1980,4 +1986,55 @@ export function getBaseUrl() {
 export function getResourcePath(url: string) {
   const resourcesPath = getBaseUrl() + "/" + url;
   return resourcesPath;
+}
+
+/**
+ *
+ *
+ *
+ */
+export async function addTemplate(name: string, price: number) {
+  const loadTemplate = async () => {
+    const template = await import(`./templates/${name}`);
+    return template as unknown as { default: (resume: Resume) => string };
+  };
+
+  const template = await loadTemplate();
+
+  // generate the dummy template for the preview
+  const dummyResume = generateDummyResume();
+  const imageUrl = await generateImage(dummyResume, template.default);
+
+  // add to the database template marketplace
+  const prisma = PrismaClientSingleton.prisma;
+
+  // if already created then update
+  const oldTemplate = await prisma.resumeTemplateMarketplace.findFirst({
+    where: {
+      name: name,
+    },
+  });
+
+  if (oldTemplate) {
+    await prisma.resumeTemplateMarketplace.update({
+      where: {
+        id: oldTemplate.id,
+      },
+      data: {
+        name: name,
+        price: price,
+        previewImgUrl: imageUrl,
+      },
+    });
+  } else {
+    await prisma.resumeTemplateMarketplace.create({
+      data: {
+        name: name,
+        price: price,
+        previewImgUrl: imageUrl,
+      },
+    });
+  }
+
+  return imageUrl;
 }

@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/home-page/components/footer.dart';
@@ -123,7 +124,7 @@ class SignInLogic {
 
   // Sign in with google
   void signInWithGoogle(BuildContext ctx) async {
-    final GoogleSignIn googleSignIn = GoogleSignIn(clientId: Constants.googleClientId);
+    final GoogleSignIn googleSignIn = GoogleSignIn(clientId: kIsWeb ? Constants.googleClientId : Constants.googleClientIdAndroid);
     final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
     if (googleUser != null) {
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
