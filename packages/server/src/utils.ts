@@ -1923,8 +1923,8 @@ export async function createPremiumTemplatePlan() {
 
   // Is already created on razorpay
   const allCreatedPlans = (await instance.plans.all()) as templatePlans;
-  if (allCreatedPlans.count === 0 || !!!allCreatedPlans.items.find((p) => p.item.name === nameOfPlan)) {
-    console.log("will create");
+  const marsPlan = allCreatedPlans.items.find((p) => p.item.name === nameOfPlan);
+  if (allCreatedPlans.count === 0 || !!!marsPlan) {
     const createdPlan = (await instance.plans.create({
       period: "monthly",
       interval: 1,
@@ -1955,7 +1955,26 @@ export async function createPremiumTemplatePlan() {
       },
     });
   } else {
-    return true;
+    const planID = marsPlan.id;
+
+    await prisma.admin.update({
+      where: {
+        email: adminEmail,
+      },
+      data: {
+        premiumTemplatePlans: {
+          create: {
+            currency: "INR",
+            description: "Access all the premium templates",
+            interval: 1,
+            name: nameOfPlan,
+            period: "MONTHLY",
+            planID: planID,
+            price: price,
+          },
+        },
+      },
+    });
   }
 }
 

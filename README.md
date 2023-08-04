@@ -264,16 +264,23 @@ CV World utilizes Razorpay as the payment gateway for processing transactions.
 > **_NOTE:_** The payment and subscription integration is complete. Website is working properly and user can use this to generate new template by choosing the free templates or can buy the premium templates on the go . User cal also subscribe to the monthly subscription plan to get all the templates.
 
 ### Mobile Application
-- [ ] Make the tutorial page
+- [x] Make the tutorial page
     - Using this page user can learn how to use the application and it's benefits. usually 3 to 5 slides will be shown.
 - [x] Make the sign up page with google and email based authentication.
     - Using this route user can create a new account using either their email and password or their Google account.
 - [x] Make the login page with google and email based authentication.
     - Using this route user can log in to their existing accounts using either their email and password or their Google account.
-- [ ] Make the dashboard page.
+- [x] Make the dashboard page.
     - Using this page user can view all the created resumes. User can delete any created resume. User can view the resume and can download or buy that if template used is premium with monthly subscription.
-- [ ] Make the resume view page.
+- [x] Make the resume view page.
     - Using this page user can view all the created resumes in the full screen mode and can also navigate to edit page. User can either download or buy that if template used is premium with no monthly subscription.
+- [x] Make the account setting page
+    - Using this page user can subscribe to premium plan and can also cancel the plan anytime. User can edit there personal information that can be reused at the time of resume building.
+
+- [x] Make the resume builder page
+    - Using this user can easily create and edit the resume quickly.
+
+> Please note that during the testing Mobile Application may work slowly because it is connected to the local server using the Ngrok that is slow most of the time due to high traffic. But on the Production server everything will work lightning fast.
 # Technologies stack
 - Node.js         
 - Express.js       
@@ -436,13 +443,67 @@ cd cvworld
 ```
 Stop any running container
 ```BASH
-docker-compose down
+docker-compose down --rmi all --volumes
 ```
 Once the latest source code is fetched and containers are sopped run the following commands : 
 ```BASH
-docker-compose build
+docker-compose build --no-cache
 ```
 
 After the command finish executing it is time to run container. To run containers run this command :
 ```BASH
 docker-compose up -d
+```
+
+## Install Local Tunnel For Application & Webhook Testing
+
+1. Open a terminal.
+
+2. Download the Ngrok binary for Linux:
+
+```bash
+wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+```
+
+3. Extract the downloaded archive:
+
+```bash
+unzip ngrok-stable-linux-amd64.zip
+```
+
+4. Move the Ngrok binary to a suitable location in your system's PATH:
+
+```bash
+sudo mv ngrok /usr/local/bin/
+```
+
+5. Make the Ngrok binary executable:
+
+```bash
+sudo chmod +x /usr/local/bin/ngrok
+```
+
+6. Test the installation:
+
+```bash
+ngrok --version
+```
+
+You should see the Ngrok version information printed in the terminal.
+
+Ngrok is now installed on your Linux system and ready to be used from the command line.
+
+### Sign in and start the tunnel ( currently using my Account - Prasenjeet Symon )
+
+1. Signin to Ngrok
+```BASH
+ngrok config add-authtoken 2THw2qEDXP71v5A3rbUtKpJvKVd_pociQgFLVEVdMY4it45x
+```
+2. Start the tunnel
+```BASH
+ngrok http --domain=native-humorous-mule.ngrok-free.app 8081
+```
+
+### Mobile Application Download Link
+
+[Download CVWORLD Android Application](https://drive.google.com/file/d/1nV2Cw4C35BiIOYUdq5FlZujbNTwTbB9C/view?usp=drive_link)
