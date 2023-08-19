@@ -1570,13 +1570,9 @@ class DatabaseService {
   late Uri getTemplateRoute;
 
   DatabaseService() {
-    const apiBaseUrl = 'https://native-humorous-mule.ngrok-free.app';
-    const localBaseUrl = 'http://localhost:8081';
-    if (kIsWeb) {
-      origin = localBaseUrl;
-    } else {
-      origin = apiBaseUrl;
-    }
+    // const apiBaseUrl = 'https://native-humorous-mule.ngrok-free.app';
+    // const localBaseUrl = 'http://localhost:8081';
+    origin = 'https://cvworld.ioss.dev';
 
     authRoute = Uri.parse('$origin/server/auth');
     apiRoute = Uri.parse('$origin/server/api');
