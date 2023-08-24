@@ -889,6 +889,17 @@ export const authenticateUser = (req: Request, res: Response, next: NextFunction
   }
 };
 
+/** Authenticate admin  */
+export const authenticateAdmin = (req: Request, res: Response, next: NextFunction) => {
+  // if res.locals.isAdmin is false, return
+  if (!res.locals.isAdmin) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  } 
+
+  next();
+}
+
 /** Do user already exit */
 export async function doUserAlreadyExit(email: string) {
   const prisma = PrismaClientSingleton.prisma;
@@ -1103,12 +1114,12 @@ export function createServer() {
   app.use(cors());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
-  app.use(express.static(path.join(process.cwd(), "public")));
+  app.use('/server/media', express.static(path.join(process.cwd(), 'public')));
   app.use("/server/auth", routerAuth);
   app.use("/server/api_public", routerPublic);
   app.use("/server/api", authenticateUser, router);
   app.use("/server/api/media", authenticateUser, routerMedia);
-  app.use("/server/api_admin", routerAdmin);
+  app.use("/server/api_admin", authenticateUser, authenticateAdmin, routerAdmin);
 
   app.get("/server/", (req, res) => {
     res.send({ message: "Hello World" });
@@ -1121,7 +1132,7 @@ export function createServer() {
 import crypto from "crypto";
 import path from "path";
 
-const hashPassword = (password: string): string => {
+export const hashPassword = (password: string): string => {
   const hash = crypto.createHash("sha256");
   hash.update(password);
   return hash.digest("hex");
@@ -1853,7 +1864,7 @@ export function sanitizePrismaData(data: any): any {
   return data;
 }
 
-function isWeakPassword(password: string): boolean {
+export function isWeakPassword(password: string): boolean {
   // Criteria for a weak password
   const minLength = 8; // Minimum password length
   const maxRepeatedCharacters = 2; // Maximum number of repeated characters allowed
