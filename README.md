@@ -509,3 +509,5 @@ ngrok http --domain=native-humorous-mule.ngrok-free.app 8081
 [Download CVWORLD Android Application](https://drive.google.com/file/d/1nV2Cw4C35BiIOYUdq5FlZujbNTwTbB9C/view?usp=drive_link)
 
 [Download Version 1.0.1](https://www.dropbox.com/scl/fi/5clx5y7fvt1ymr5k9ib4d/app-release.apk?rlkey=g3z0crupne6zft622bgazqiu3&dl=0 )
+
+[Download Version 1.0.2](https://www.dropbox.com/scl/fi/5clx5y7fvt1ymr5k9ib4d/app-release.apk?rlkey=g3z0crupne6zft622bgazqiu3&dl=0)
