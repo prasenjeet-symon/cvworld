@@ -1572,8 +1572,8 @@ class DatabaseService {
   DatabaseService() {
     // const apiBaseUrl = 'https://native-humorous-mule.ngrok-free.app';
     // const localBaseUrl = 'http://localhost:8081';
-    origin = 'https://cvworld.ioss.dev';
-    // origin = 'http://localhost';
+    //origin = 'https://cvworld.ioss.dev';
+    origin = 'http://localhost:8080';
 
     authRoute = Uri.parse('$origin/server/auth');
     apiRoute = Uri.parse('$origin/server/api');

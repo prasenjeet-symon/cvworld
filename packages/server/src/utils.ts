@@ -895,10 +895,10 @@ export const authenticateAdmin = (req: Request, res: Response, next: NextFunctio
   if (!res.locals.isAdmin) {
     res.status(401).json({ error: "Unauthorized" });
     return;
-  } 
+  }
 
   next();
-}
+};
 
 /** Do user already exit */
 export async function doUserAlreadyExit(email: string) {
@@ -1106,7 +1106,7 @@ export class PrismaClientSingleton {
  * Create the server
  */
 export function createServer() {
-  require("dotenv").config();
+  
 
   const cors = require("cors");
   const app = express();
@@ -1114,7 +1114,7 @@ export function createServer() {
   app.use(cors());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
-  app.use('/server/media', express.static(path.join(process.cwd(), 'public')));
+  app.use("/server/media", express.static(path.join(process.cwd(), "public")));
   app.use("/server/auth", routerAuth);
   app.use("/server/api_public", routerPublic);
   app.use("/server/api", authenticateUser, router);
@@ -1833,14 +1833,23 @@ export class BrowserPuppeteer {
   public static async browser() {
     if (!BrowserPuppeteer.#instance) {
       BrowserPuppeteer.#instance = new BrowserPuppeteer();
-      const puppeteer = require("puppeteer-core");
-      const chromium = require("@sparticuz/chromium");
-      BrowserPuppeteer.#instance.browserInstance = await puppeteer.launch({
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(),
-        headless: chromium.headless,
-      });
+      console.log("IS_SERVERLESS", process.env.IS_SERVERLESS);
+      if (process.env.IS_SERVERLESS === "true") {
+        const puppeteer = require("puppeteer-core");
+        const chromium = require("@sparticuz/chromium");
+        BrowserPuppeteer.#instance.browserInstance = await puppeteer.launch({
+          args: chromium.args,
+          defaultViewport: chromium.defaultViewport,
+          executablePath: await chromium.executablePath(),
+          headless: chromium.headless,
+        });
+      } else {
+        const puppeteer = require("puppeteer");
+        BrowserPuppeteer.#instance.browserInstance = await puppeteer.launch({
+          args: ["--no-sandbox", "--disable-setuid-sandbox"],
+          headless: true,
+        });
+      }
     }
 
     return BrowserPuppeteer.#instance;

@@ -10,6 +10,7 @@ node_modules/
 
 # Ignore logs
 logs/
+.cache/
 
 # Ignore build output
 dist/

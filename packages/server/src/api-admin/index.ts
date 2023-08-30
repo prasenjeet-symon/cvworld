@@ -1,5 +1,5 @@
 import express from "express";
-import { PrismaClientSingleton, addTemplate, hashPassword, isWeakPassword } from "../utils";
+import { PremiumTemplatePlan, PrismaClientSingleton, addTemplate, hashPassword, isWeakPassword } from "../utils";
 
 const router = express.Router();
 
@@ -76,6 +76,8 @@ router.post("/reset_password", async (req, res) => {
       password: hashPassword(password),
     },
   });
+
+  res.json({ message: "Password updated successfully" });
 });
 
 /**
@@ -116,6 +118,224 @@ router.post("/contact_us_resolved", async (req, res) => {
   });
 
   res.json(message);
+});
+
+/**
+ *
+ * Update the subscription of the plan
+ *
+ */
+router.post("/update_template_plan", async (req, res) => {
+  if (!("planID" in req.body && "name" in req.body && "description" in req.body && "price" in req.body)) {
+    res.status(400).json({ message: "All fields are required" });
+    return;
+  }
+
+  const Razorpay = require("razorpay");
+  const razorpayKeyID = process.env.RAZORPAY_KEY_ID;
+  const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET;
+  const instance = new Razorpay({ key_id: razorpayKeyID, key_secret: razorpayKeySecret });
+
+  const email = res.locals.email; // admin email
+  const planID = req.body.planID;
+  const name = req.body.name;
+  const description = req.body.description;
+  const price = +req.body.price; // in paisa
+
+  // we need to create new razorpay plan
+  const createdPlan = (await instance.plans.create({
+    period: "monthly",
+    interval: 1,
+    item: {
+      name: name,
+      amount: price,
+      currency: "INR",
+      description: description,
+    },
+  })) as PremiumTemplatePlan;
+
+  // update the plan
+  await PrismaClientSingleton.prisma.premiumTemplatePlans.update({
+    where: {
+      planID,
+    },
+    data: {
+      price: price,
+      description: description,
+      name: name,
+      planID: createdPlan.id,
+      updatedAt: new Date(),
+    },
+  });
+
+  // fetch all the user having the subscriptions and update the subscription
+  const usersWithSubscription = await PrismaClientSingleton.prisma.user.findMany({
+    where: {
+      subscription: {
+        isActive: true,
+      },
+    },
+    select: {
+      subscription: true,
+      email: true,
+      reference: true,
+    },
+  });
+
+  // update every user razorpay plan
+  await Promise.all(
+    usersWithSubscription.map(async (user) => {
+      await instance.subscriptions.update(user.subscription?.subscriptionID, {
+        plan_id: createdPlan.id,
+        customer_notify: 1,
+      });
+    })
+  );
+
+  await Promise.all(
+    usersWithSubscription.map(async (user) => {
+      await PrismaClientSingleton.prisma.user.update({
+        where: {
+          reference: user.reference,
+        },
+        data: {
+          subscription: {
+            update: {
+              basePrice: price,
+              planName: name,
+              updatedAt: new Date(),
+            },
+          },
+        },
+      });
+    })
+  );
+
+  res.json({ message: "Plan updated successfully" });
+});
+
+/**
+ *
+ * Get all the premium template plans
+ *
+ */
+router.get("/premium_template_plans", async (req, res) => {
+  const plans = await PrismaClientSingleton.prisma.premiumTemplatePlans.findMany();
+  res.json(plans);
+});
+
+/**
+ * Get all the bought premium template of the user
+ *
+ */
+router.post("/bought_templates", async (req, res) => {
+  // should have user reference
+  if (!("reference" in req.body)) {
+    res.status(400).json({ message: "reference field is missing" });
+    return;
+  }
+
+  const reference = req.body.reference;
+
+  const user = await PrismaClientSingleton.prisma.user.findUnique({
+    where: {
+      reference: reference,
+    },
+    select: {
+      boughtTemplate: true,
+    },
+  });
+
+  // only get the bought template
+  res.json(user?.boughtTemplate ? user?.boughtTemplate : []);
+});
+
+/**
+ *
+ * Generated resumes by user
+ *
+ */
+router.get("/generated_resumes", async (req, res) => {
+  // user reference
+  if (!("reference" in req.body)) {
+    res.status(400).json({ message: "reference field is missing" });
+    return;
+  }
+
+  const reference = req.body.reference;
+
+  const user = await PrismaClientSingleton.prisma.user.findUnique({
+    where: {
+      reference: reference,
+    },
+    select: {
+      resumes: true,
+    },
+  });
+
+  // only get the resumes
+  res.json(user?.resumes ? user?.resumes : []);
+});
+
+/**
+ *
+ * Bought templates transactions
+ *
+ */
+router.post("/bought_templates_transactions", async (req, res) => {
+  // should have user reference
+  if (!("reference" in req.body)) {
+    res.status(400).json({ message: "reference field is missing" });
+    return;
+  }
+
+  const reference = req.body.reference;
+  const boughtTemplatesTransactions = await PrismaClientSingleton.prisma.user.findUnique({
+    where: {
+      reference: reference,
+    },
+    select: {
+      boughtTemplate: {
+        select: {
+          transaction: true,
+        },
+      },
+    },
+  });
+
+  const onlyTransactions = boughtTemplatesTransactions ? boughtTemplatesTransactions.boughtTemplate.map((item) => item.transaction).filter((item) => item) : [];
+  res.json(onlyTransactions);
+});
+
+/**
+ *
+ * Subscription transactions of the user
+ *
+ */
+router.post("/subscription_transactions", async (req, res) => {
+  // should have user reference
+  if (!("reference" in req.body)) {
+    res.status(400).json({ message: "reference field is missing" });
+    return;
+  }
+
+  const reference = req.body.reference;
+
+  const user = await PrismaClientSingleton.prisma.user.findUnique({
+    where: {
+      reference: reference,
+    },
+    select: {
+      subscription: {
+        select: {
+          transaction: true,
+        },
+      },
+    },
+  });
+
+  const onlyTransactions = user ? user.subscription?.transaction.map((item) => item) : [];
+  res.json(onlyTransactions);
 });
 
 export default router;
