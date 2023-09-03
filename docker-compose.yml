@@ -26,14 +26,14 @@ services:
       - mysql
     environment:
       - DATABASE_URL=mysql://root:root@mysql:3306/cvworld
-      - ADMIN_EMAIL=admin@gmail.com
-      - ADMIN_PASSWORD=user
-      - ADMIN_NAME=user
+      - ADMIN_EMAIL=iampawanbhatia@gmail.com
+      - ADMIN_PASSWORD=iampawanbhatia
+      - ADMIN_NAME=Pawan
       - JWT_SECRET=secret
       - RAZORPAY_KEY_ID=rzp_test_nkLYI55QVnJlaQ
       - RAZORPAY_KEY_SECRET=DpYQwN7KKYopH6L1ipTnQu0J
       - RAZORPAY_WEBHOOK_SECRET=cvworld
-      
+
     command: sh -c "npx prisma migrate deploy && npm run start"
     volumes:
       - ./public:/app/public
@@ -49,20 +49,34 @@ services:
       - 8080:80
     networks:
       - mynetwork
-    
+
   nginx:
     image: nginx
     ports:
       - 80:80
       - 443:443
+    restart: always
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./ssl:/etc/nginx/certs
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot/:ro
+      - ./certbot/var:/var/lib/letsencrypt
     depends_on:
       - server
       - client
     networks:
       - mynetwork
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot:rw
+      - ./certbot/var:/var/lib/letsencrypt
+    networks:
+      - mynetwork
+    command: certonly --webroot --webroot-path=/var/www/certbot --force-renewal --email pawan.apexinfosys@gmail.com --agree-tos --no-eff-email -d cvworld.me -d www.cvworld.me
+
 
 networks:
   mynetwork:
