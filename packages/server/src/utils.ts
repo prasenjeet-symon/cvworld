@@ -1915,7 +1915,7 @@ export function razorpayPrice(price: number) {
  * Create new premium resume template
  */
 export async function createPremiumTemplatePlan() {
-  const nameOfPlan = "Mars";
+  const nameOfPlan = "Jupiter";
   const price = razorpayPrice(820.84); // 10 Dollar
   const Razorpay = require("razorpay");
   const razorpayKeyID = process.env.RAZORPAY_KEY_ID;
@@ -1944,6 +1944,9 @@ export async function createPremiumTemplatePlan() {
   // Is already created on razorpay
   const allCreatedPlans = (await instance.plans.all()) as templatePlans;
   const marsPlan = allCreatedPlans.items.find((p) => p.item.name === nameOfPlan);
+
+  let createdPlanID = marsPlan ? marsPlan.id : "";
+
   if (allCreatedPlans.count === 0 || !!!marsPlan) {
     const createdPlan = (await instance.plans.create({
       period: "monthly",
@@ -1956,46 +1959,41 @@ export async function createPremiumTemplatePlan() {
       },
     })) as PremiumTemplatePlan;
 
-    await prisma.admin.update({
-      where: {
-        email: adminEmail,
-      },
-      data: {
-        premiumTemplatePlans: {
-          create: {
-            currency: "INR",
-            description: "Access all the premium templates",
-            interval: 1,
-            name: nameOfPlan,
-            period: "MONTHLY",
-            planID: createdPlan.id,
-            price: price,
-          },
-        },
-      },
-    });
-  } else {
-    const planID = marsPlan.id;
-
-    await prisma.admin.update({
-      where: {
-        email: adminEmail,
-      },
-      data: {
-        premiumTemplatePlans: {
-          create: {
-            currency: "INR",
-            description: "Access all the premium templates",
-            interval: 1,
-            name: nameOfPlan,
-            period: "MONTHLY",
-            planID: planID,
-            price: price,
-          },
-        },
-      },
-    });
+    createdPlanID = createdPlan.id; 
   }
+
+  await prisma.admin.update({
+    where: {
+      email: adminEmail,
+    },
+    data: {
+      premiumTemplatePlans: {
+        upsert: {
+          where: {
+            name: nameOfPlan,
+          },
+          create: {
+            currency: "INR",
+            description: "Access all the premium templates",
+            interval: 1,
+            name: nameOfPlan,
+            period: "MONTHLY",
+            planID: createdPlanID,
+            price: price,
+          },
+          update: {
+            currency: "INR",
+            description: "Access all the premium templates",
+            interval: 1,
+            name: nameOfPlan,
+            period: "MONTHLY",
+            planID: createdPlanID,
+            price: price,
+          }
+        },
+      },
+    },
+  });
 }
 
 /**

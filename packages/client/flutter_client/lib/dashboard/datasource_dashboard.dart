@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
@@ -239,6 +240,300 @@ class ContactUsMessageUpdate {
   }
 }
 
+class TemplateTransaction {
+  final int id;
+  final int templateId;
+  final String orderId;
+  final int amount;
+  final int amountPaid;
+  final int amountDue;
+  final String currency;
+  final String status;
+  final bool isInternational;
+  final String method;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  TemplateTransaction({
+    required this.id,
+    required this.templateId,
+    required this.orderId,
+    required this.amount,
+    required this.amountPaid,
+    required this.amountDue,
+    required this.currency,
+    required this.status,
+    required this.isInternational,
+    required this.method,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory TemplateTransaction.fromJson(Map<String, dynamic> json) {
+    return TemplateTransaction(
+      id: json['id'] as int,
+      templateId: json['templateId'] as int,
+      orderId: json['orderId'] as String,
+      amount: json['amount'] as int,
+      amountPaid: json['amountPaid'] as int, // in paisa
+      amountDue: json['amountDue'] as int, // in paisa
+      currency: json['currency'] as String, // INR
+      status: json['status'] as String,
+      isInternational: json['isInternational'] as bool,
+      method: json['method'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'templateId': templateId,
+      'orderId': orderId,
+      'amount': amount,
+      'amountPaid': amountPaid,
+      'amountDue': amountDue,
+      'currency': currency,
+      'status': status,
+      'isInternational': isInternational,
+      'method': method,
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
+    };
+  }
+}
+
+enum PaymentMethod {
+  CASH,
+  CARD,
+  UPI,
+  WALLET,
+  NET_BANKING,
+}
+
+class CardPaymentSubscription {
+  final int id;
+  final String last4;
+  final String name;
+  final String network;
+  final CardType type;
+  final bool isInternational;
+  final int transactionId;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  CardPaymentSubscription({
+    required this.id,
+    required this.last4,
+    required this.name,
+    required this.network,
+    required this.type,
+    required this.isInternational,
+    required this.transactionId,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory CardPaymentSubscription.fromJson(Map<String, dynamic> json) {
+    return CardPaymentSubscription(
+      id: json['id'] as int,
+      last4: json['last4'] as String,
+      name: json['name'] as String,
+      network: json['network'] as String,
+      type: cardTypeFromString(json['type'] as String),
+      isInternational: json['isInternational'] as bool,
+      transactionId: json['transactionId'] as int,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'last4': last4,
+      'name': name,
+      'network': network,
+      'type': cardTypeToString(type),
+      'isInternational': isInternational,
+      'transactionId': transactionId,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+    };
+  }
+}
+
+enum CardType {
+  VISA,
+  MASTERCARD,
+  AMERICAN_EXPRESS,
+  DISCOVER,
+  OTHER,
+}
+
+CardType cardTypeFromString(String value) {
+  switch (value) {
+    case 'VISA':
+      return CardType.VISA;
+    case 'MASTERCARD':
+      return CardType.MASTERCARD;
+    case 'AMERICAN_EXPRESS':
+      return CardType.AMERICAN_EXPRESS;
+    case 'DISCOVER':
+      return CardType.DISCOVER;
+    default:
+      return CardType.OTHER;
+  }
+}
+
+String cardTypeToString(CardType type) {
+  switch (type) {
+    case CardType.VISA:
+      return 'VISA';
+    case CardType.MASTERCARD:
+      return 'MASTERCARD';
+    case CardType.AMERICAN_EXPRESS:
+      return 'AMERICAN_EXPRESS';
+    case CardType.DISCOVER:
+      return 'DISCOVER';
+    default:
+      return 'OTHER';
+  }
+}
+
+class UPIPaymentSubscription {
+  final int id;
+  final int transactionId;
+  final String vpa;
+  final String email;
+  final String mobile;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  UPIPaymentSubscription({
+    required this.id,
+    required this.transactionId,
+    required this.vpa,
+    required this.email,
+    required this.mobile,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory UPIPaymentSubscription.fromJson(Map<String, dynamic> json) {
+    return UPIPaymentSubscription(
+      id: json['id'] as int,
+      transactionId: json['transactionId'] as int,
+      vpa: json['vpa'] as String,
+      email: json['email'] as String,
+      mobile: json['mobile'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'transactionId': transactionId,
+      'vpa': vpa,
+      'email': email,
+      'mobile': mobile,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+    };
+  }
+}
+
+class SubscriptionTransaction {
+  final int id;
+  final double amount;
+  final PaymentMethod method;
+  final String eventID;
+  final CardPaymentSubscription? card;
+  final UPIPaymentSubscription? upi;
+  final int subscriptionId;
+
+  SubscriptionTransaction({
+    required this.id,
+    required this.amount,
+    required this.method,
+    required this.eventID,
+    this.card,
+    this.upi,
+    required this.subscriptionId,
+  });
+
+  factory SubscriptionTransaction.fromJson(Map<String, dynamic> json) {
+    return SubscriptionTransaction(
+      id: json['id'] as int,
+      amount: json['amount'] as double,
+      method: paymentMethodFromString(json['method'] as String),
+      eventID: json['eventID'] as String,
+      card: json['card'] != null ? CardPaymentSubscription.fromJson(json['card'] as Map<String, dynamic>) : null,
+      upi: json['upi'] != null ? UPIPaymentSubscription.fromJson(json['upi'] as Map<String, dynamic>) : null,
+      subscriptionId: json['subscriptionId'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'amount': amount,
+      'method': paymentMethodToString(method),
+      'eventID': eventID,
+      'card': card?.toJson(),
+      'upi': upi?.toJson(),
+      'subscriptionId': subscriptionId,
+    };
+  }
+}
+
+PaymentMethod paymentMethodFromString(String value) {
+  switch (value) {
+    case 'CASH':
+      return PaymentMethod.CASH;
+    case 'CARD':
+      return PaymentMethod.CARD;
+    case 'UPI':
+      return PaymentMethod.UPI;
+    case 'WALLET':
+      return PaymentMethod.WALLET;
+    case 'NET_BANKING':
+      return PaymentMethod.NET_BANKING;
+    default:
+      throw ArgumentError('Invalid PaymentMethod value: $value');
+  }
+}
+
+String paymentMethodToString(PaymentMethod method) {
+  switch (method) {
+    case PaymentMethod.CASH:
+      return 'CASH';
+    case PaymentMethod.CARD:
+      return 'CARD';
+    case PaymentMethod.UPI:
+      return 'UPI';
+    case PaymentMethod.WALLET:
+      return 'WALLET';
+    case PaymentMethod.NET_BANKING:
+      return 'NET_BANKING';
+    default:
+      throw ArgumentError('Invalid PaymentMethod value: $method');
+  }
+}
+
+///
+///
+///
+///
+///
+///
+///
+///
+///
+
 class SubscriptionPlan {
   final int id;
   final String planID;
@@ -338,10 +633,20 @@ class DashboardDataService {
   late Uri getPremiumPlanRoute;
   // {{host}}server/api_admin/update_template_plan
   late Uri updateTemplatePlanRoute;
+  // {{host}}server/api_admin/bought_templates
+  late Uri getTemplateRoute;
+  // {{host}}server/api_admin/generated_resumes
+  late Uri generateOrderRoute;
+  // {{host}}server/api_admin/bought_templates_transactions
+  late Uri getTransactionRoute;
+  // {{host}}server/api_admin/subscription_transactions
+  late Uri subscriptionTransactionRoute;
+  // {{host}}server/api_admin/single_user
+  late Uri singleUserRoute;
 
   DashboardDataService() {
-    //origin = 'https://cvworld.ioss.dev';
-    origin = 'http://localhost:8080';
+    origin = 'https://cvworld.me';
+    // origin = 'http://localhost:8080';
     signInRoute = Uri.parse('$origin/server/auth/sign_in_as_admin');
     resetPasswordRoute = Uri.parse('$origin/server/api_admin/reset_password');
     addTemplateRoute = Uri.parse('$origin/server/api_admin/add_template');
@@ -350,6 +655,11 @@ class DashboardDataService {
     contactUsResolvedRoute = Uri.parse('$origin/server/api_admin/contact_us_resolved');
     getPremiumPlanRoute = Uri.parse('$origin/server/api_admin/premium_template_plans');
     updateTemplatePlanRoute = Uri.parse('$origin/server/api_admin/update_template_plan');
+    getTemplateRoute = Uri.parse('$origin/server/api_admin/bought_templates');
+    generateOrderRoute = Uri.parse('$origin/server/api_admin/generated_resumes');
+    getTransactionRoute = Uri.parse('$origin/server/api_admin/bought_templates_transactions');
+    subscriptionTransactionRoute = Uri.parse('$origin/server/api_admin/subscription_transactions');
+    singleUserRoute = Uri.parse('$origin/server/api_admin/single_user');
   }
 
   // Sign in as admin
@@ -485,6 +795,96 @@ class DashboardDataService {
 
     if (response.statusCode == 200) {
       var responseData = UpdatePasswordResponse.fromJson(json.decode(response.body));
+      return responseData;
+    } else {
+      if (kDebugMode) {
+        print('POST request failed with status code: ${response.statusCode}');
+      }
+
+      return null;
+    }
+  }
+
+  // Get bought templates
+  Future<List<BoughtTemplate>?> getBoughtTemplates(String reference) async {
+    var client = JwtAdminClient();
+    var body = {'reference': reference};
+
+    final response = await client.post(getTemplateRoute, body: json.encode(body));
+    if (response.statusCode == 200) {
+      var responseData = (json.decode(response.body) as List).map((item) => BoughtTemplate.fromJson(item)).toList();
+      return responseData;
+    } else {
+      if (kDebugMode) {
+        print('POST request failed with status code: ${response.statusCode}');
+      }
+
+      return null;
+    }
+  }
+
+  // fetch all the generated resume
+  Future<List<GeneratedResume>?> getGeneratedResumes(String reference) async {
+    var client = JwtAdminClient();
+    var body = {'reference': reference};
+
+    final response = await client.post(generateOrderRoute, body: json.encode(body));
+    if (response.statusCode == 200) {
+      var responseData = (json.decode(response.body) as List).map((item) => GeneratedResume.fromJson(item)).toList();
+      return responseData;
+    } else {
+      if (kDebugMode) {
+        print('POST request failed with status code: ${response.statusCode}');
+      }
+
+      return null;
+    }
+  }
+
+  // Get transaction of bought templates
+  Future<List<TemplateTransaction>?> getTransactionOfBoughtTemplates(String reference) async {
+    var client = JwtAdminClient();
+    var body = {'reference': reference};
+
+    final response = await client.post(getTransactionRoute, body: json.encode(body));
+    if (response.statusCode == 200) {
+      var responseData = (json.decode(response.body) as List).map((item) => TemplateTransaction.fromJson(item)).toList();
+      return responseData;
+    } else {
+      if (kDebugMode) {
+        print('POST request failed with status code: ${response.statusCode}');
+      }
+
+      return null;
+    }
+  }
+
+  // Get subscription transactions
+  Future<List<SubscriptionTransaction>?> getSubscriptionTransactions(String reference) async {
+    var client = JwtAdminClient();
+    var body = {'reference': reference};
+
+    final response = await client.post(subscriptionTransactionRoute, body: json.encode(body));
+    if (response.statusCode == 200) {
+      var responseData = (json.decode(response.body) as List).map((item) => SubscriptionTransaction.fromJson(item)).toList();
+      return responseData;
+    } else {
+      if (kDebugMode) {
+        print('POST request failed with status code: ${response.statusCode}');
+      }
+
+      return null;
+    }
+  }
+
+  // Get single user
+  Future<User?> getSingleUser(String reference) async {
+    var client = JwtAdminClient();
+    var body = {'reference': reference};
+
+    final response = await client.post(singleUserRoute, body: json.encode(body));
+    if (response.statusCode == 200) {
+      var responseData = User.fromJson(json.decode(response.body));
       return responseData;
     } else {
       if (kDebugMode) {

@@ -30,5 +30,7 @@ class AppRouter extends $AppRouter {
         AutoRoute(path: '/admin/subscriptionSetting', page: AdminSubscriptionSettingPage.page, maintainState: false, guards: [AuthAdminGuard()]),
         // all users
         AutoRoute(path: '/admin/allUsers', page: AdminAllUsersPage.page, maintainState: false, guards: [AuthAdminGuard()]),
+        // user profile ( userId )
+        AutoRoute(path: '/admin/userProfile/:userId', page: UserProfilePage.page, maintainState: false, guards: [AuthAdminGuard()]),
       ];
 }

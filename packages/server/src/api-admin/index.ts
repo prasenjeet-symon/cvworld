@@ -255,7 +255,7 @@ router.post("/bought_templates", async (req, res) => {
  * Generated resumes by user
  *
  */
-router.get("/generated_resumes", async (req, res) => {
+router.post("/generated_resumes", async (req, res) => {
   // user reference
   if (!("reference" in req.body)) {
     res.status(400).json({ message: "reference field is missing" });
@@ -336,6 +336,34 @@ router.post("/subscription_transactions", async (req, res) => {
 
   const onlyTransactions = user ? user.subscription?.transaction.map((item) => item) : [];
   res.json(onlyTransactions);
+});
+
+/**
+ *
+ * Get the single user given the reference
+ *
+ */
+router.post("/single_user", async (req, res) => {
+  // reference is required
+  if (!("reference" in req.body)) {
+    res.status(400).json({ message: "reference field is missing" });
+    return;
+  }
+
+  const reference = req.body.reference;
+
+  const user = await PrismaClientSingleton.prisma.user.findUnique({
+    where: {
+      reference: reference,
+    },
+    include: {
+      subscription: true,
+      boughtTemplate: true,
+    },
+  });
+
+  // return the sigle user 
+  res.json(user);
 });
 
 export default router;
