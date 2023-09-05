@@ -1,24 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
+import '../../../routes/router.gr.dart';
+
 @RoutePage()
 class AdminHomePage extends StatelessWidget {
   const AdminHomePage({super.key});
-
-  void onAllUsersTap() {
-    // TODO: Implement navigation to All Users screen
-    print('All Users tapped');
-  }
-
-  void onAllTemplatesTap() {
-    // TODO: Implement navigation to All Templates screen
-    print('All Templates tapped');
-  }
-
-  void onSubscriptionSettingsTap() {
-    // TODO: Implement navigation to Subscription Settings screen
-    print('Subscription Settings tapped');
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,42 +16,27 @@ class AdminHomePage extends StatelessWidget {
           width: 800,
           child: Column(
             children: [
-              // Big Text Wriiten , "Welcome Admin"
               const Text(
                 'Welcome Admin',
                 style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 50),
-              // List some actions card rectangular, with white background , one logo image center and below a text action
+              const SizedBox(height: 50),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  ActionCard(
-                    title: 'All Users',
-                    icon: Icons.people,
-                    onTap: onAllUsersTap,
-                  ),
-                  ActionCard(
-                    title: 'All Templates',
-                    icon: Icons.format_list_bulleted,
-                    onTap: onAllTemplatesTap,
-                  ),
-                  ActionCard(
-                    title: 'Subscription Settings',
-                    icon: Icons.settings,
-                    onTap: onSubscriptionSettingsTap,
-                  ),
+                  ActionCard(title: 'All Users', icon: Icons.people, onTap: () => context.pushRoute(const AdminAllUsersPage())),
+                  ActionCard(title: 'All Templates', icon: Icons.format_list_bulleted, onTap: () => {context.pushRoute(const AllTemplatesPage())}),
+                  ActionCard(title: 'Subscription Settings', icon: Icons.settings, onTap: () => context.pushRoute(const AdminSubscriptionSettingPage())),
                 ],
               ),
-              SizedBox(height: 50),
+              const SizedBox(height: 50),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  ActionCard(
-                    title: 'Update Password',
-                    icon: Icons.password,
-                    onTap: onSubscriptionSettingsTap,
-                  ),
+                  ActionCard(title: 'Update Password', icon: Icons.password, onTap: () => context.pushRoute(const AdminChangePasswordPage())),
+                  // Contact Us Messages
+                  ActionCard(title: 'Contact Us Messages', icon: Icons.message, onTap: () => context.pushRoute(const AdminContactUsPage())),
+                  ActionCard(title: 'Sign Out', icon: Icons.logout, onTap: () => context.pushRoute(const SignInDashboardPage())),
                 ],
               )
             ],
@@ -101,17 +73,9 @@ class ActionCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Icon(
-                  icon,
-                  size: 48,
-                  color: Colors.blue,
-                ),
+                Icon(icon, size: 48, color: Colors.blue),
                 const SizedBox(height: 8),
-                Text(
-                  title,
-                  style: const TextStyle(fontSize: 16),
-                  textAlign: TextAlign.center,
-                ),
+                Text(title, style: const TextStyle(fontSize: 16), textAlign: TextAlign.center),
               ],
             ),
           ),

@@ -366,4 +366,127 @@ router.post("/single_user", async (req, res) => {
   res.json(user);
 });
 
+/** 
+ * 
+ * Get all the marketplace templates
+ * 
+ */
+router.get("/marketplace_templates", async (req, res) => {
+  const templates = await PrismaClientSingleton.prisma.resumeTemplateMarketplace.findMany();
+  res.json(templates);
+})
+
+/** 
+ * 
+ * Update the marketplace template
+ * 
+ */
+router.post("/update_marketplace_template", async (req, res) => {
+  // should have template id
+  if (!("id" in req.body)) {
+    res.status(400).json({ message: "id field is missing" });
+    return;
+  }
+  
+  // price 
+  if(!("price" in req.body)) {
+    res.status(400).json({ message: "price field is missing" });
+    return;
+  }
+
+  // name
+  if(!("name" in req.body)) {
+    res.status(400).json({ message: "name field is missing" });
+    return;
+  }
+
+  const id = +req.body.id;
+  const price = +req.body.price; // in paisa
+  const name = req.body.name;
+
+  await PrismaClientSingleton.prisma.resumeTemplateMarketplace.update({
+    where: {
+      id: id,
+    },
+    data: {
+      price: price,
+      name: name,
+      updatedAt: new Date(),
+    }
+  });
+
+  res.json({ message: "Template updated successfully" });
+})
+
+/** 
+ * 
+ * Delete the marketplace template
+ * 
+ */
+router.post("/delete_marketplace_template", async (req, res) => {
+  // should have template id
+  if (!("id" in req.body)) {
+    res.status(400).json({ message: "id field is missing" });
+    return;
+  }
+
+  const id = +req.body.id;
+
+  await PrismaClientSingleton.prisma.resumeTemplateMarketplace.delete({
+    where: {
+      id: id,
+    },
+
+  });
+
+  res.json({ message: "Template deleted successfully" });
+})
+
+/** 
+ * 
+ * Get single marketplace template
+ * 
+ */
+router.post("/single_marketplace_template", async (req, res) => {
+  // should have template id
+  if (!("id" in req.body)) {
+    res.status(400).json({ message: "id field is missing" });
+    return;
+  }
+
+  const id = +req.body.id;
+
+  const template = await PrismaClientSingleton.prisma.resumeTemplateMarketplace.findUnique({
+    where: {
+      id: id,
+    },
+
+  });
+
+  res.json(template);
+});
+
+/** 
+ * 
+ * Get single contact us message
+ * 
+ */
+router.post("/single_contact_us_message", async (req, res) => {
+  // should have template id
+  if (!("id" in req.body)) {
+    res.status(400).json({ message: "id field is missing" });
+    return;
+  }
+
+  const id = +req.body.id;
+
+  const message = await PrismaClientSingleton.prisma.contactUs.findUnique({
+    where: {
+      id: id,
+    },
+  });
+
+  res.json(message);
+})
+
 export default router;

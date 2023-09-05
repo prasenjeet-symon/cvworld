@@ -1,7 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/utils.dart';
+import 'package:flutter_client/dashboard/dashboard/users/user_profile_page.dart';
 import 'package:flutter_client/dashboard/datasource_dashboard.dart';
+import 'package:flutter_client/routes/router.gr.dart' as router;
 
 @RoutePage()
 class AdminAllUsersPage extends StatefulWidget {
@@ -46,18 +48,19 @@ class _AdminAllUsersPageState extends State<AdminAllUsersPage> {
               // list all the users
               Expanded(
                 // Wrap ListView.builder with Expanded
-                child: ListView.builder(
-                  itemCount: adminAllUsersLogic.users.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(adminAllUsersLogic.users[index].profilePicture),
+                child: adminAllUsersLogic.users.isEmpty
+                    ? const NoResultFound(icon: Icons.warning_amber_rounded, heading: 'No Users', description: 'No users registered yet! Please add some users')
+                    : ListView.builder(
+                        itemCount: adminAllUsersLogic.users.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            onTap: () => {context.pushRoute(router.UserProfilePage(userId: adminAllUsersLogic.users[index].reference))},
+                            leading: CircleAvatar(backgroundImage: NetworkImage(adminAllUsersLogic.users[index].profilePicture)),
+                            title: Text(adminAllUsersLogic.users[index].fullName),
+                            subtitle: Text(adminAllUsersLogic.users[index].subscription != null ? 'Subscriber' : 'Not a Subscriber'),
+                          );
+                        },
                       ),
-                      title: Text(adminAllUsersLogic.users[index].fullName),
-                      subtitle: Text(adminAllUsersLogic.users[index].subscription != null ? 'Subscriber' : 'Not a Subscriber'),
-                    );
-                  },
-                ),
               ),
             ],
           ),

@@ -32,5 +32,13 @@ class AppRouter extends $AppRouter {
         AutoRoute(path: '/admin/allUsers', page: AdminAllUsersPage.page, maintainState: false, guards: [AuthAdminGuard()]),
         // user profile ( userId )
         AutoRoute(path: '/admin/userProfile/:userId', page: UserProfilePage.page, maintainState: false, guards: [AuthAdminGuard()]),
+        // all templates
+        AutoRoute(path: '/admin/allTemplates', page: AllTemplatesPage.page, maintainState: false, guards: [AuthAdminGuard()]),
+        // update template
+        AutoRoute(path: '/admin/updateTemplate/:templateId', page: AdminUpdateTemplatePage.page, maintainState: false, guards: [AuthAdminGuard()]),
+        // contact us
+        AutoRoute(path: '/admin/contactUs', page: AdminContactUsPage.page, maintainState: false, guards: [AuthAdminGuard()]),
+        // single contact us
+        AutoRoute(path: '/admin/contactUs/:messageId', page: AdminContactUsFullPage.page, maintainState: false, guards: [AuthAdminGuard()]),
       ];
 }

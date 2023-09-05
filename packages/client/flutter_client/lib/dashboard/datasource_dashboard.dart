@@ -524,6 +524,46 @@ String paymentMethodToString(PaymentMethod method) {
   }
 }
 
+class MarketplaceTemplate {
+  final int id;
+  final String name;
+  final int price; // in paisa
+  final String previewImageUrl;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  MarketplaceTemplate({
+    required this.id,
+    required this.name,
+    required this.price,
+    required this.previewImageUrl,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory MarketplaceTemplate.fromJson(Map<String, dynamic> json) {
+    return MarketplaceTemplate(
+      id: json['id'],
+      name: json['name'],
+      price: int.parse(json['price'].toString()),
+      previewImageUrl: DatabaseService().publicResource(json['previewImgUrl']),
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'price': price,
+      'previewImgUrl': previewImageUrl,
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
+    };
+  }
+}
+
 ///
 ///
 ///
@@ -643,10 +683,18 @@ class DashboardDataService {
   late Uri subscriptionTransactionRoute;
   // {{host}}server/api_admin/single_user
   late Uri singleUserRoute;
+  // {{host}}server/api_admin/marketplace_templates
+  late Uri marketplaceTemplateRoute;
+  // {{host}}server/api_admin/update_marketplace_template
+  late Uri updateMarketplaceTemplateRoute;
+  // {{host}}server/api_admin/single_marketplace_template
+  late Uri singleMarketplaceTemplateRoute;
+  // {{host}}server/api_admin/single_contact_us_message
+  late Uri singleContactUsMessageRoute;
 
   DashboardDataService() {
-    origin = 'https://cvworld.me';
-    // origin = 'http://localhost:8080';
+    // origin = 'https://cvworld.me';
+    origin = 'http://localhost:8080';
     signInRoute = Uri.parse('$origin/server/auth/sign_in_as_admin');
     resetPasswordRoute = Uri.parse('$origin/server/api_admin/reset_password');
     addTemplateRoute = Uri.parse('$origin/server/api_admin/add_template');
@@ -660,6 +708,10 @@ class DashboardDataService {
     getTransactionRoute = Uri.parse('$origin/server/api_admin/bought_templates_transactions');
     subscriptionTransactionRoute = Uri.parse('$origin/server/api_admin/subscription_transactions');
     singleUserRoute = Uri.parse('$origin/server/api_admin/single_user');
+    marketplaceTemplateRoute = Uri.parse('$origin/server/api_admin/marketplace_templates');
+    updateMarketplaceTemplateRoute = Uri.parse('$origin/server/api_admin/update_marketplace_template');
+    singleMarketplaceTemplateRoute = Uri.parse('$origin/server/api_admin/single_marketplace_template');
+    singleContactUsMessageRoute = Uri.parse('$origin/server/api_admin/single_contact_us_message');
   }
 
   // Sign in as admin
@@ -885,6 +937,77 @@ class DashboardDataService {
     final response = await client.post(singleUserRoute, body: json.encode(body));
     if (response.statusCode == 200) {
       var responseData = User.fromJson(json.decode(response.body));
+      return responseData;
+    } else {
+      if (kDebugMode) {
+        print('POST request failed with status code: ${response.statusCode}');
+      }
+
+      return null;
+    }
+  }
+
+  // Get marketplace templates
+  Future<List<MarketplaceTemplate>?> getMarketplaceTemplates() async {
+    var client = JwtAdminClient();
+    final response = await client.get(marketplaceTemplateRoute);
+
+    if (response.statusCode == 200) {
+      var responseData = (json.decode(response.body) as List).map((item) => MarketplaceTemplate.fromJson(item)).toList();
+      return responseData;
+    } else {
+      if (kDebugMode) {
+        print('GET request failed with status code: ${response.statusCode}');
+      }
+
+      return null;
+    }
+  }
+
+  // Update marketplace template
+  Future<UpdatePasswordResponse?> updateMarketplaceTemplate(int id, String name, int price) async {
+    var client = JwtAdminClient();
+    var requestBody = {'id': id, 'name': name, 'price': price};
+
+    final response = await client.post(updateMarketplaceTemplateRoute, body: json.encode(requestBody));
+    if (response.statusCode == 200) {
+      var responseData = UpdatePasswordResponse.fromJson(json.decode(response.body));
+      return responseData;
+    } else {
+      if (kDebugMode) {
+        print('POST request failed with status code: ${response.statusCode}');
+      }
+
+      return null;
+    }
+  }
+
+  // Get single marketplace template
+  Future<MarketplaceTemplate?> getSingleMarketplaceTemplate(int id) async {
+    var client = JwtAdminClient();
+    var body = {'id': id};
+
+    final response = await client.post(singleMarketplaceTemplateRoute, body: json.encode(body));
+    if (response.statusCode == 200) {
+      var responseData = MarketplaceTemplate.fromJson(json.decode(response.body));
+      return responseData;
+    } else {
+      if (kDebugMode) {
+        print('POST request failed with status code: ${response.statusCode}');
+      }
+
+      return null;
+    }
+  }
+
+  // Get single marketplace template
+  Future<ContactUsMessage?> getSingleContactUsMessage(int id) async {
+    var client = JwtAdminClient();
+    var body = {'id': id};
+
+    final response = await client.post(singleContactUsMessageRoute, body: json.encode(body));
+    if (response.statusCode == 200) {
+      var responseData = ContactUsMessage.fromJson(json.decode(response.body));
       return responseData;
     } else {
       if (kDebugMode) {
