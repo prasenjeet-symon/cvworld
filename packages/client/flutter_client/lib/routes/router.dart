@@ -8,6 +8,11 @@ import 'router.gr.dart';
 class AppRouter extends $AppRouter {
   @override
   List<AutoRoute> get routes => [
+        ///
+        ///
+        ///
+        ///
+        ///Client Routes
         AutoRoute(path: '/', page: HomeRoute.page, initial: true, guards: [PathGuard()]),
         AutoRoute(path: '/intro-slider', page: IntroSliderPage.page),
         AutoRoute(path: '/contact-us', page: ContactUsPage.page),
@@ -19,26 +24,20 @@ class AppRouter extends $AppRouter {
         AutoRoute(path: '/cv-maker/:resumeID/:templateName', page: CvMakerRoute.page, maintainState: false, guards: [AuthGuard()]),
         AutoRoute(path: '/choose-template', page: MarketPlacePage.page, maintainState: false, guards: [AuthGuard()]),
 
-        // For the dashboard , prepend /dashboard/
-        // sign
+        ///
+        ///
+        ///
+        ///
+        /// Admin Routes
         AutoRoute(path: '/admin/signin', page: SignInDashboardPage.page, maintainState: false),
-        // Dashboard
         AutoRoute(path: '/admin/dashboard', page: AdminHomePage.page, maintainState: false, guards: [AuthAdminGuard()]),
-        // change password
         AutoRoute(path: '/admin/changePassword', page: AdminChangePasswordPage.page, maintainState: false, guards: [AuthAdminGuard()]),
-        // subscription Setting
         AutoRoute(path: '/admin/subscriptionSetting', page: AdminSubscriptionSettingPage.page, maintainState: false, guards: [AuthAdminGuard()]),
-        // all users
         AutoRoute(path: '/admin/allUsers', page: AdminAllUsersPage.page, maintainState: false, guards: [AuthAdminGuard()]),
-        // user profile ( userId )
         AutoRoute(path: '/admin/userProfile/:userId', page: UserProfilePage.page, maintainState: false, guards: [AuthAdminGuard()]),
-        // all templates
         AutoRoute(path: '/admin/allTemplates', page: AllTemplatesPage.page, maintainState: false, guards: [AuthAdminGuard()]),
-        // update template
         AutoRoute(path: '/admin/updateTemplate/:templateId', page: AdminUpdateTemplatePage.page, maintainState: false, guards: [AuthAdminGuard()]),
-        // contact us
         AutoRoute(path: '/admin/contactUs', page: AdminContactUsPage.page, maintainState: false, guards: [AuthAdminGuard()]),
-        // single contact us
         AutoRoute(path: '/admin/contactUs/:messageId', page: AdminContactUsFullPage.page, maintainState: false, guards: [AuthAdminGuard()]),
       ];
 }

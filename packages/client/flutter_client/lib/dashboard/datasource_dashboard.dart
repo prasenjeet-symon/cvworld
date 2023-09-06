@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 
 class TokenModel {
@@ -564,6 +566,54 @@ class MarketplaceTemplate {
   }
 }
 
+class Admin {
+  final int id;
+  final String email;
+  final String fullName;
+  final String? profilePicture;
+  final String password;
+  final String reference;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  Admin({
+    required this.id,
+    required this.email,
+    required this.fullName,
+    required this.profilePicture,
+    required this.password,
+    required this.reference,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory Admin.fromJson(Map<String, dynamic> json) {
+    return Admin(
+      id: json['id'] as int,
+      email: json['email'] as String,
+      fullName: json['fullName'] as String,
+      profilePicture: json['profilePicture'] as String?,
+      password: json['password'] as String,
+      reference: json['reference'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'email': email,
+      'fullName': fullName,
+      'profilePicture': profilePicture,
+      'password': password,
+      'reference': reference,
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
+    };
+  }
+}
+
 ///
 ///
 ///
@@ -655,6 +705,12 @@ class JwtAdminClient extends http.BaseClient {
   }
 }
 
+// Logout
+Future<void> logoutAdmin() async {
+  const storage = FlutterSecureStorage();
+  await storage.delete(key: 'JWT_ADMIN');
+}
+
 class DashboardDataService {
   late String origin;
   // {{host}}server/auth/sign_in_as_admin
@@ -691,10 +747,12 @@ class DashboardDataService {
   late Uri singleMarketplaceTemplateRoute;
   // {{host}}server/api_admin/single_contact_us_message
   late Uri singleContactUsMessageRoute;
+  // {{host}}server/api_admin/admin_details
+  late Uri adminDetailsRoute;
 
   DashboardDataService() {
-    // origin = 'https://cvworld.me';
-    origin = 'http://localhost:8080';
+    origin = 'https://cvworld.me';
+    // origin = 'http://localhost:8080';
     signInRoute = Uri.parse('$origin/server/auth/sign_in_as_admin');
     resetPasswordRoute = Uri.parse('$origin/server/api_admin/reset_password');
     addTemplateRoute = Uri.parse('$origin/server/api_admin/add_template');
@@ -712,12 +770,17 @@ class DashboardDataService {
     updateMarketplaceTemplateRoute = Uri.parse('$origin/server/api_admin/update_marketplace_template');
     singleMarketplaceTemplateRoute = Uri.parse('$origin/server/api_admin/single_marketplace_template');
     singleContactUsMessageRoute = Uri.parse('$origin/server/api_admin/single_contact_us_message');
+    adminDetailsRoute = Uri.parse('$origin/server/api_admin/admin_details');
   }
 
   // Sign in as admin
   Future<void> signInAsAdmin(String email, String password) async {
     var requestBody = {'email': email, 'password': password};
     final response = await http.post(signInRoute, body: requestBody);
+
+    if (response.statusCode == 401) {
+      Fluttertoast.showToast(msg: 'Incorrect password', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white);
+    }
 
     if (response.statusCode == 200) {
       var responseData = TokenModel.fromJson(json.decode(response.body));
@@ -1008,6 +1071,23 @@ class DashboardDataService {
     final response = await client.post(singleContactUsMessageRoute, body: json.encode(body));
     if (response.statusCode == 200) {
       var responseData = ContactUsMessage.fromJson(json.decode(response.body));
+      return responseData;
+    } else {
+      if (kDebugMode) {
+        print('POST request failed with status code: ${response.statusCode}');
+      }
+
+      return null;
+    }
+  }
+
+  // Get the Admin Details
+  Future<Admin?> getAdminDetails() async {
+    var client = JwtAdminClient();
+    final response = await client.post(adminDetailsRoute);
+
+    if (response.statusCode == 200) {
+      var responseData = Admin.fromJson(json.decode(response.body));
       return responseData;
     } else {
       if (kDebugMode) {

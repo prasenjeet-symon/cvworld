@@ -55,6 +55,7 @@ class _AdminUpdateTemplatePageState extends State<AdminUpdateTemplatePage> {
                       decoration: const InputDecoration(
                         labelText: 'Name',
                         border: OutlineInputBorder(),
+                        hintText: 'Enter your template name',
                       ),
                       keyboardType: TextInputType.text,
                     ),
@@ -62,10 +63,7 @@ class _AdminUpdateTemplatePageState extends State<AdminUpdateTemplatePage> {
                     // template price input
                     TextFormField(
                       controller: updateTemplatePageLogic.priceController,
-                      decoration: const InputDecoration(
-                        labelText: 'Price',
-                        border: OutlineInputBorder(),
-                      ),
+                      decoration: const InputDecoration(labelText: 'Price', border: OutlineInputBorder(), hintText: 'Enter price in paisa'),
                       keyboardType: TextInputType.number,
                     ),
                     const SizedBox(height: 25),

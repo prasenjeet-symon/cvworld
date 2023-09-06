@@ -27,27 +27,18 @@ class _AdminAllUsersPageState extends State<AdminAllUsersPage> {
     return Scaffold(
       body: Center(
         child: Container(
-          margin: const EdgeInsets.only(top: 70),
-          width: 500,
+          margin: const EdgeInsets.only(top: 50),
+          width: 800,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              // back button
-              BackButtonApp(onPressed: () {
-                context.popRoute(const AdminAllUsersPage());
-              }),
-              const SizedBox(height: 60),
-              // Big Text "Registered Users"
-              const Text(
-                'Registered Users',
-                style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
-              ),
+              BackButtonApp(onPressed: () => {context.popRoute(const router.AdminAllUsersPage())}),
+              const SizedBox(height: 50),
+              const Text('Registered Users', style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold)),
               const SizedBox(height: 35),
-              // list all the users
               Expanded(
-                // Wrap ListView.builder with Expanded
                 child: adminAllUsersLogic.users.isEmpty
                     ? const NoResultFound(icon: Icons.warning_amber_rounded, heading: 'No Users', description: 'No users registered yet! Please add some users')
                     : ListView.builder(

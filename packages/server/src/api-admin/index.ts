@@ -487,6 +487,21 @@ router.post("/single_contact_us_message", async (req, res) => {
   });
 
   res.json(message);
-})
+});
+
+/** 
+ * 
+ * Get the admin details
+ * 
+ */
+router.post("/admin_details", async (req, res) => {
+  const adminDetails = await PrismaClientSingleton.prisma.admin.findUnique({
+    where: {
+      email: res.locals.email,
+    },
+  });
+
+  res.json(adminDetails);
+});
 
 export default router;

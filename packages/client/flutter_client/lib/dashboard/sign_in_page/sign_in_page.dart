@@ -1,6 +1,5 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_client/dashboard/dashboard/home_page/home_page.dart';
 import 'package:flutter_client/dashboard/datasource_dashboard.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -26,7 +25,7 @@ class _SignInDashboardPageState extends State<SignInDashboardPage> {
           child: Center(
             child: Column(children: [
               // Welcome to CV World
-              const Text('Welcome to CV World', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+              const Text('Welcome to CV-World', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
               const SizedBox(height: 50),
               // Input email and password
               TextField(
@@ -56,6 +55,7 @@ class _SignInDashboardPageState extends State<SignInDashboardPage> {
                     signInPageLogic.signInWithEmailAndPassword(context);
                   },
                   style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50),
                     padding: const EdgeInsets.fromLTRB(25, 20, 25, 20),
                     backgroundColor: Colors.blue,
                     shape: const RoundedRectangleBorder(

@@ -253,6 +253,43 @@ CV World utilizes Razorpay as the payment gateway for processing transactions.
         - Using this route we can create subscription link given the plan name to subscribe to. User can use this link to subscribe to the cv world premium plan.
     - [x] Generate Order Premium Template
         - Using this route we can generate order for premium template to be used by the Razorpay.
+- [x] Admin Dashboard
+    - [x] Add new template
+        - Using this route admin can add new template to the marketplace.
+    - [x] Reset Password
+        - Using this route admin can reset the password of the dashboard.
+    - [x] Sign in as Admin
+        - Using this route admin can sign in to the dashboard.
+    - [x] Get All Users
+        - Using this route admin can get all the users from the database.
+    - [x] All Contact Us Messages
+        - Using this route admin can get all the contact us messages from the database.
+    - [x] Contact Us Resolved
+        - Using this route admin can resolve the contact us messages.
+    - [x] Premium Templates Plans
+        - Using this route admin can get all the premium templates plans from the database.
+    - [x] Update Template Plan
+        - Using this route admin can update the premium templates plans.
+    - [x] Bought Templates
+        - Using this route admin can get all the bought templates from the database.
+    - [x] Generated Resumes
+        - Using this route admin can get all the generated resumes from the database.
+    - [x] Bought Templates Transactions
+        - Using this route admin can get all the bought templates transactions from the database.
+    - [x] Subscription Transactions
+        - Using this route admin can get all the subscription transactions from the database.
+    - [x] Get the single user
+        - Using this route admin can get the single user from the database.
+    - [x] Get all marketplace templates
+        - Using this route admin can get all the marketplace templates from the database.
+    - [x] Update the marketplace template
+        - Using this route admin can update the marketplace template.
+    - [x] Single Template Marketplace
+        - Using this route admin can get the single marketplace template from the database.
+    - [x] Single Contact Us Message
+        - Using this route admin can get the single contact us message from the database.
+    - [x] Admin Details
+        - Using this route admin can get the admin details from the database.
 
 ### Flutter ( client )
 - [x] Make market place page
@@ -281,6 +318,40 @@ CV World utilizes Razorpay as the payment gateway for processing transactions.
     - Using this user can easily create and edit the resume quickly.
 
 > Please note that during the testing Mobile Application may work slowly because it is connected to the local server using the Ngrok that is slow most of the time due to high traffic. But on the Production server everything will work lightning fast.
+
+### Admin Dashboard ( Flutter )
+- [x] Make the admin dashboard home page
+    - This page holds all the action cards related to the admin dashboard.
+- [x] Make the admin signin page
+    - This page can be used by the user to signin as admin with email and password as provided in the environment variables.
+- [x] All users page 
+    - This page list all the registered user of the cv-world application.
+- [x] User Page 
+    - This page display full details of the user. This page contains section of `Bought Templates`, `Resumes` , `Transactions`. Bought template section holds all the bought templates of the user. Resumes section holds all the generated resumes of the user. Transactions section holds all the bought template transactions of the user.
+- [x] All templates page
+    - This page list all the templates of the cv-world application. This page contain form to add new template also.
+- [x] Update template page
+    - This page can be used by the admin to update the template like it's price and name. If the price is set to 0 then it is free template. Note that all the price is set in paisa ( Indian ).
+- [x] All contact us messages page
+    - This page list all the contact us messages of the cv-world application.
+- [x] Contact us resolved page
+    - This page can be used by the admin to resolve the contact us messages.
+- [x] Subscription Setting page
+    - This page can be used by the admin to update the subscription plan.
+- [x] Update password page
+    - This page can be used by the admin to update the password of the admin.
+    
+# How to add new template ( free or premium ) to the cv-world application ? 
+Please see the `sample-resume` folder for the HTML example reference. Once you have created the template, then you need to add your HTML content to the `packages/server/src/templates` folder with unique name. Do open the exiting template for how to make new file in the `packages/server/src/templates` folder. Once complete, you can add the new template to the `marketplace` using the following steps.
+
+- Login to your admin dashboard.
+- Go to the `All Templates` section.
+- Enter the name of the template ( same as file name without .ts that you have added recently in the folder `packages/server/src/templates`).
+- Enter the price in paisa ( 0 for free ).
+- Click `Add Template` button to add the template.
+
+That's it. You have successfully added a new template to the marketplace.
+
 # Technologies stack
 - Node.js         
 - Express.js       

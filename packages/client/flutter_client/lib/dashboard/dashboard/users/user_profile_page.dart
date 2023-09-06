@@ -33,27 +33,20 @@ class _UserProfilePageState extends State<UserProfilePage> {
         child: userProfileLogic.isLoading
             ? const CircularProgressIndicator()
             : Container(
-                margin: const EdgeInsets.only(top: 5),
+                margin: const EdgeInsets.only(top: 50),
                 width: 800,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    BackButtonApp(onPressed: () {
-                      context.popRoute(UserProfilePage(userId: widget.userId));
-                    }),
-                    const SizedBox(height: 40),
+                    BackButtonApp(onPressed: () => {context.popRoute(UserProfilePage(userId: widget.userId))}),
+                    const SizedBox(height: 50),
                     Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
-                      // circular image
-                      CircleAvatar(
-                        backgroundImage: NetworkImage(userProfileLogic.user!.profilePicture),
-                        radius: 80,
-                      ),
+                      CircleAvatar(backgroundImage: NetworkImage(userProfileLogic.user!.profilePicture), radius: 80),
                       const SizedBox(height: 10),
                       Text(userProfileLogic.user!.fullName, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 12),
-                      // is subscriber
                       InputChip(
                         label: Text(
                           userProfileLogic.user!.subscription != null ? 'Subscriber' : 'Not a Subscriber',
@@ -67,67 +60,70 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       const Divider(thickness: 2, color: Colors.black),
                       const SizedBox(height: 20),
                       // List all the bought template
-                      Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-                        // Heading "Bought Templates"
-                        const Text(
-                          'Bought Templates',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 15),
-                        // list all the bought template card with image and title and price in rupee
-                        userProfileLogic.boughtTemplate!.isEmpty
-                            ? const NoResultFound(
-                                heading: 'No Bought Templates',
-                                icon: Icons.warning_amber_rounded,
-                                description: 'Once this user will buy a template you will see it here',
-                              )
-                            : ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: userProfileLogic.boughtTemplate?.length,
-                                itemBuilder: (context, index) => BoughtTemplateCard(boughtTemplate: userProfileLogic.boughtTemplate![index], isMobile: MediaQuery.of(context).size.width < Constants.breakPoint, onPressed: () {}),
-                              ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ///
+                          ///
+                          ///
+                          ///
+                          const Text('Bought Templates', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 15),
+                          // list all the bought template card with image and title and price in rupee
+                          userProfileLogic.boughtTemplate!.isEmpty
+                              ? const NoResultFound(
+                                  heading: 'No Bought Templates',
+                                  icon: Icons.warning_amber_rounded,
+                                  description: 'Once this user will buy a template you will see it here',
+                                )
+                              : ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: userProfileLogic.boughtTemplate?.length,
+                                  itemBuilder: (context, index) => BoughtTemplateCard(boughtTemplate: userProfileLogic.boughtTemplate![index], isMobile: MediaQuery.of(context).size.width < Constants.breakPoint, onPressed: () {}),
+                                ),
 
-                        // List all the resume
-                        const SizedBox(height: 45),
-                        // Heading "Resumes"
-                        const Text(
-                          'Resumes',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 15),
-                        // list all the resume card
-                        userProfileLogic.resumes!.isEmpty
-                            ? const NoResultFound(heading: 'No Resumes', icon: Icons.warning_amber_rounded, description: 'Once this user will create a resume you will see it here')
-                            : ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: userProfileLogic.resumes?.length,
-                                itemBuilder: (context, index) => ResumeCard(
-                                  resume: userProfileLogic.resumes![index],
+                          ///
+                          ///
+                          ///
+                          ///
+                          const SizedBox(height: 45),
+                          const Text('Resumes', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 15),
+                          userProfileLogic.resumes!.isEmpty
+                              ? const NoResultFound(heading: 'No Resumes', icon: Icons.warning_amber_rounded, description: 'Once this user will create a resume you will see it here')
+                              : ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: userProfileLogic.resumes?.length,
+                                  itemBuilder: (context, index) => ResumeCard(
+                                    resume: userProfileLogic.resumes![index],
+                                  ),
                                 ),
-                              ),
-                        // List all the bought templates transactions
-                        const SizedBox(height: 45),
-                        // Heading "Transactions"
-                        const Text(
-                          'Transactions',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 15),
-                        // list all the transactions
-                        userProfileLogic.transactions!.isEmpty
-                            ? const NoResultFound(heading: 'No Transactions', icon: Icons.warning_amber_rounded, description: 'Once this user will buy a template you will see all related transactions here')
-                            : ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: userProfileLogic.transactions?.length,
-                                itemBuilder: (context, index) => TransactionCard(
-                                  transaction: userProfileLogic.transactions![index],
+
+                          ///
+                          ///
+                          ///
+                          ///
+                          const SizedBox(height: 45),
+                          const Text('Transactions', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 15),
+                          // list all the transactions
+                          userProfileLogic.transactions!.isEmpty
+                              ? const NoResultFound(heading: 'No Transactions', icon: Icons.warning_amber_rounded, description: 'Once this user will buy a template you will see all related transactions here')
+                              : ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: userProfileLogic.transactions?.length,
+                                  itemBuilder: (context, index) => TransactionCard(
+                                    transaction: userProfileLogic.transactions![index],
+                                  ),
                                 ),
-                              ),
-                        const SizedBox(height: 50),
-                      ])
+                          const SizedBox(height: 50),
+                        ],
+                      )
                     ])
                   ],
                 ),

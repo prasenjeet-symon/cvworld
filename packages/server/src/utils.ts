@@ -1050,7 +1050,7 @@ export async function signInAdmin(req: Request, res: Response) {
     return;
   } else {
     // incorrect password
-    res.status(400).json({ message: "Incorrect password" });
+    res.status(401).json({ message: "Incorrect password" });
   }
 }
 /**

@@ -111,7 +111,7 @@ class _NewTemplateFormState extends State<NewTemplateForm> {
             },
           ),
           TextFormField(
-            decoration: const InputDecoration(labelText: 'Price'),
+            decoration: const InputDecoration(labelText: 'Price', hintText: 'Enter price in paisa'),
             keyboardType: TextInputType.number,
             validator: (value) {
               if (value == null || value.isEmpty) {

@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/utils.dart';
 import 'package:flutter_client/dashboard/datasource_dashboard.dart';
+import 'package:flutter_client/routes/router.gr.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 @RoutePage()
@@ -67,6 +68,7 @@ class _AdminChangePasswordPageState extends State<AdminChangePasswordPage> {
                 ElevatedButton(
                   onPressed: () {
                     adminChangePasswordLogic.changePassword();
+                    context.pushRoute(const SignInDashboardPage());
                   },
                   style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.fromLTRB(25, 20, 25, 20),
@@ -110,6 +112,7 @@ class AdminChangePasswordLogic {
 
     // update password
     await DashboardDataService().resetPassword(confirmPassword);
+    Fluttertoast.showToast(msg: 'Password updated', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white);
     return;
   }
 }
