@@ -17,35 +17,35 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final ScrollController scrollController = ScrollController();
-  final GlobalKey<PriceSectionState> pricingSectionKey = GlobalKey();
+  // final ScrollController scrollController = ScrollController();
+  // final GlobalKey<PriceSectionState> pricingSectionKey = GlobalKey();
 
   void scrollToPricingSection() {
-    final RenderBox? renderBox = pricingSectionKey.currentContext?.findRenderObject() as RenderBox?;
-    if (renderBox != null) {
-      final offsetY = renderBox.localToGlobal(Offset.zero).dy;
-      scrollController.animateTo(
-        offsetY,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.ease,
-      );
-    }
+    // final RenderBox? renderBox = pricingSectionKey.currentContext?.findRenderObject() as RenderBox?;
+    // if (renderBox != null) {
+    //   final offsetY = renderBox.localToGlobal(Offset.zero).dy;
+    //   scrollController.animateTo(
+    //     offsetY,
+    //     duration: const Duration(milliseconds: 500),
+    //     curve: Curves.ease,
+    //   );
+    // }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        controller: scrollController,
+        //controller: scrollController,
         child: Column(
           children: [
             HeaderSection(pricingSectionCallback: () => scrollToPricingSection()),
             const HeroSection(),
             const SectionOne(),
             const SectionTwo(),
-            PriceSection(
-              key: pricingSectionKey,
-            ),
+            // PriceSection(
+            //   key: pricingSectionKey,
+            // ),
             const FooterSection()
           ],
         ),

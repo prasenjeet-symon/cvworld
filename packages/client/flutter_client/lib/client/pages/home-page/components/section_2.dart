@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_client/client/utils.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class SectionTwo extends StatelessWidget {
@@ -8,7 +9,7 @@ class SectionTwo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
-      if (constraints.maxWidth < 600) {
+      if (constraints.maxWidth < Constants.breakPoint) {
         return const SectionTwoMobile();
       } else {
         return const SectionTwoDesktop();
@@ -30,87 +31,7 @@ class SectionTwoDesktop extends StatelessWidget {
             flex: 7,
             child: Row(
               children: [
-                Expanded(
-                    child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                      child: const Text('Quick Resume Builder', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400)),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.fromLTRB(0, 0, 150, 15),
-                      child: const Text('Effortlessly Create a Stunning Professional Resume', style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600)),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.fromLTRB(0, 0, 0, 15),
-                      child: const Text(
-                          'Our online resume builder simplifies the process of crafting a standout resume. With user-friendly templates and intuitive tools, you can create a polished and professional resume in just a few minutes. Impress potential employers with a visually appealing and well-structured resume that highlights your skills and experience. Start building your resume today and take the next step towards landing your dream job.',
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400, height: 1.5)),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.fromLTRB(0, 15, 0, 15),
-                      child: Column(
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.document_scanner_sharp, color: Colors.blue, size: 15),
-                                Expanded(
-                                  child: Container(
-                                    margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                                    child: const Text('Job-specific resumes', style: TextStyle(fontWeight: FontWeight.w500)),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.sensor_occupied_outlined, color: Colors.blue, size: 15),
-                                Expanded(
-                                  child: Container(
-                                    margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                                    child: const Text('Optimized templates and text', style: TextStyle(fontWeight: FontWeight.w500)),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.verified, color: Colors.blue, size: 15),
-                                Expanded(
-                                  child: Container(
-                                    margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                                    child: const Text('Industry best practices', style: TextStyle(fontWeight: FontWeight.w500)),
-                                  ),
-                                )
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () => context.navigateNamedTo('/dashboard'),
-                      style: ElevatedButton.styleFrom(foregroundColor: Colors.white, backgroundColor: Colors.blue, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)), padding: const EdgeInsets.fromLTRB(20, 15, 20, 15)),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Build Resume', style: TextStyle(fontSize: 11)),
-                          Icon(Icons.arrow_right, color: Colors.white, size: 18),
-                        ],
-                      ),
-                    )
-                  ],
-                )),
+                const Expanded(child: SectionTwoLeft()),
                 Expanded(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -127,17 +48,136 @@ class SectionTwoDesktop extends StatelessWidget {
   }
 }
 
-///
-///
-///
-///
-///
-///
+class SectionTwoLeft extends StatelessWidget {
+  const SectionTwoLeft({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var isMobile = MediaQuery.of(context).size.width < Constants.breakPoint;
+    return Column(
+      crossAxisAlignment: isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+          child: Text(
+            'Quick Resume Builder',
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
+            textAlign: isMobile ? TextAlign.center : TextAlign.left,
+          ),
+        ),
+        Container(
+          margin: isMobile ? const EdgeInsets.fromLTRB(0, 0, 0, 10) : const EdgeInsets.fromLTRB(0, 0, 150, 15),
+          child: Text(
+            'Effortlessly Create a Stunning Professional Resume',
+            style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
+            textAlign: isMobile ? TextAlign.center : TextAlign.left,
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.fromLTRB(0, 0, 0, 15),
+          child: Text(
+            'Our online resume builder simplifies the process of crafting a standout resume. With user-friendly templates and intuitive tools, you can create a polished and professional resume in just a few minutes. Impress potential employers with a visually appealing and well-structured resume that highlights your skills and experience. Start building your resume today and take the next step towards landing your dream job.',
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w400, height: 1.5),
+            textAlign: isMobile ? TextAlign.center : TextAlign.left,
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.fromLTRB(0, 15, 0, 15),
+          child: Column(
+            crossAxisAlignment: isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+            children: [
+              Container(
+                margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                child: Row(
+                  mainAxisAlignment: isMobile ? MainAxisAlignment.center : MainAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.document_scanner_sharp, color: Colors.blue, size: 15),
+                    isMobile
+                        ? Container(
+                            margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                            child: const Text('Job-specific resumes', style: TextStyle(fontWeight: FontWeight.w500)),
+                          )
+                        : Expanded(
+                            child: Container(
+                              margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                              child: const Text('Job-specific resumes', style: TextStyle(fontWeight: FontWeight.w500)),
+                            ),
+                          )
+                  ],
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                child: Row(
+                  mainAxisAlignment: isMobile ? MainAxisAlignment.center : MainAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.sensor_occupied_outlined, color: Colors.blue, size: 15),
+                    isMobile
+                        ? Container(
+                            margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                            child: const Text('Optimized templates and text', style: TextStyle(fontWeight: FontWeight.w500)),
+                          )
+                        : Expanded(
+                            child: Container(
+                              margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                              child: const Text('Optimized templates and text', style: TextStyle(fontWeight: FontWeight.w500)),
+                            ),
+                          )
+                  ],
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                child: Row(
+                  mainAxisAlignment: isMobile ? MainAxisAlignment.center : MainAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.verified, color: Colors.blue, size: 15),
+                    isMobile
+                        ? Container(
+                            margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                            child: const Text('Industry best practices', style: TextStyle(fontWeight: FontWeight.w500)),
+                          )
+                        : Expanded(
+                            child: Container(
+                              margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                              child: const Text('Industry best practices', style: TextStyle(fontWeight: FontWeight.w500)),
+                            ),
+                          )
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () => context.navigateNamedTo('/dashboard'),
+          style: ElevatedButton.styleFrom(foregroundColor: Colors.white, backgroundColor: Colors.blue, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)), padding: const EdgeInsets.fromLTRB(20, 15, 20, 15)),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Build Resume', style: TextStyle(fontSize: 11)),
+              Icon(Icons.arrow_right, color: Colors.white, size: 18),
+            ],
+          ),
+        )
+      ],
+    );
+  }
+}
+
 class SectionTwoMobile extends StatelessWidget {
   const SectionTwoMobile({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Text('Mobile Version');
+    return Container(
+      color: const Color(0xFFF6EEE8),
+      margin: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+      padding: const EdgeInsets.all(30),
+      child: const Column(
+        children: [SectionTwoLeft()],
+      ),
+    );
   }
 }
