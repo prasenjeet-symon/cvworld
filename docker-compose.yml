@@ -34,7 +34,6 @@ services:
       - RAZORPAY_KEY_SECRET=DpYQwN7KKYopH6L1ipTnQu0J
       - RAZORPAY_WEBHOOK_SECRET=cvworld
       - IS_SERVERLESS=true
-      
     command: sh -c "npx prisma migrate deploy && npm run start"
     volumes:
       - ./public:/app/public
