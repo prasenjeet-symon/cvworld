@@ -69,13 +69,13 @@ class HeroSectionLeft extends StatelessWidget {
         Column(
           crossAxisAlignment: isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
           children: [
-            Container(margin: const EdgeInsets.fromLTRB(0, 0, 0, 20), child: const Text('Elevate your potential')),
+            Container(margin: const EdgeInsets.fromLTRB(0, 0, 0, 20), child: const Text('ELEVATE YOUR POTENTIAL')),
             Container(
               margin: isMobile ? const EdgeInsets.fromLTRB(0, 0, 0, 20) : const EdgeInsets.fromLTRB(0, 0, 200, 20),
               child: RichText(
                 textAlign: isMobile ? TextAlign.center : TextAlign.left,
                 text: const TextSpan(
-                  text: 'Put Your ',
+                  text: 'Put your ',
                   style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
                   children: [
                     TextSpan(
@@ -89,7 +89,7 @@ class HeroSectionLeft extends StatelessWidget {
             ),
             Container(
               margin: isMobile ? const EdgeInsets.fromLTRB(0, 0, 0, 20) : const EdgeInsets.fromLTRB(0, 0, 200, 20),
-              child: Text('Stand out among job seekers with our best in class online resume builder. Ready to aspire higher ?', style: const TextStyle(height: 1.5), textAlign: isMobile ? TextAlign.center : TextAlign.left),
+              child: Text('Stand out among job seekers with our best in class online resume builder. Ready to aspire higher?', style: const TextStyle(height: 1.5), textAlign: isMobile ? TextAlign.center : TextAlign.left),
             ),
             Container(
               margin: const EdgeInsets.fromLTRB(0, 0, 0, 20),

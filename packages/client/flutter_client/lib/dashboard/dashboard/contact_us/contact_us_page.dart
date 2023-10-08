@@ -27,7 +27,12 @@ class _AdminContactUsPageState extends State<AdminContactUsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: contactUsLogic.isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: Padding(
+                padding: EdgeInsets.all(50),
+                child: CircularProgressIndicator(),
+              ),
+            )
           : Center(
               child: Container(
                 margin: const EdgeInsets.only(top: 20),
@@ -43,19 +48,17 @@ class _AdminContactUsPageState extends State<AdminContactUsPage> {
                     }),
                     const SizedBox(height: 50),
                     // Heading "Customer Inquiry"
-                    const Text(
-                      'Customer Inquiry',
-                      style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
-                    ),
+                    const Text('Customer Inquiries', style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 35),
                     // List all the users's inquiry
                     contactUsLogic.messages!.isEmpty
-                        ? const NoResultFound(icon: Icons.question_answer, heading: 'No Messages', description: 'No messages yet! Once your user will send a message you will see it here')
-                        : ListView.builder(
-                            itemCount: contactUsLogic.messages!.length,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemBuilder: (context, index) => CustomerIssueCard(issue: contactUsLogic.messages![index], canCutText: true),
+                        ? const NoResultFound(icon: Icons.question_answer, heading: 'No Messages', description: 'No messages yet! Once your user sends a message, you will see it here.')
+                        : Expanded(
+                            child: ListView.builder(
+                              itemCount: contactUsLogic.messages!.length,
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) => CustomerIssueCard(issue: contactUsLogic.messages![index], canCutText: true),
+                            ),
                           )
                   ],
                 ),
@@ -157,8 +160,11 @@ class ContactUsLogic {
   }
 
   // mark as resolved
-  Future<void> markAsResolved(int id, void Function(void Function()) setState) async {
+  Future<void> markAsResolved(BuildContext context, int id, void Function(void Function()) setState) async {
     await DashboardDataService().contactUsMessagesResolved(id);
     await fetchMessages(setState);
+    // redirect back
+    // ignore: use_build_context_synchronously
+    context.popRoute(const ContactUsPage());
   }
 }

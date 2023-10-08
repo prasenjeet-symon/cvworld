@@ -774,12 +774,27 @@ class DashboardDataService {
   }
 
   // Sign in as admin
-  Future<void> signInAsAdmin(String email, String password) async {
+  Future<void> signInAsAdmin(String email, String password, BuildContext ctx) async {
     var requestBody = {'email': email, 'password': password};
     final response = await http.post(signInRoute, body: requestBody);
 
     if (response.statusCode == 401) {
-      Fluttertoast.showToast(msg: 'Incorrect password', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white);
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(ctx).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.red,
+          content: Center(
+            child: Text(
+              'Wrong password. Please try again.',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          duration: Duration(seconds: 5), // Set a longer duration (e.g., 5 seconds)
+        ),
+      );
     }
 
     if (response.statusCode == 200) {

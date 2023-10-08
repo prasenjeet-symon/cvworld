@@ -28,7 +28,12 @@ class _AdminContactUsPageFullState extends State<AdminContactUsFullPage> {
       body: SingleChildScrollView(
         child: Center(
           child: contactUsLogic.isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(50),
+                    child: CircularProgressIndicator(),
+                  ),
+                )
               : Container(
                   width: 800,
                   margin: const EdgeInsets.only(top: 20),
@@ -62,7 +67,7 @@ class _AdminContactUsPageFullState extends State<AdminContactUsFullPage> {
                       if (!contactUsLogic.singleMessage!.isResolved)
                         ElevatedButton(
                           onPressed: () {
-                            contactUsLogic.markAsResolved(int.parse(widget.messageId), setState);
+                            contactUsLogic.markAsResolved(context, int.parse(widget.messageId), setState);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green,

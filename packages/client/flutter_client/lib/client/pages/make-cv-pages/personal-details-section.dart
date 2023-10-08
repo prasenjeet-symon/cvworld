@@ -1,9 +1,9 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/utils.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'types.dart';
@@ -106,11 +106,11 @@ class PersonalDetailSectionState extends State<PersonalDetailSection> {
     inputs.add(nationality);
 
     // for the place of birth
-    CustomInputType placeOfBirth = CustomInputType('Place Of Birth', 'placeOfBirth', true, _getController(), TextInputType.text);
+    CustomInputType placeOfBirth = CustomInputType('Place of Birth', 'placeOfBirth', true, _getController(), TextInputType.text);
     inputs.add(placeOfBirth);
 
     // for date of birth
-    CustomInputType dateOfBirth = CustomInputType('Date Of Birth', 'dateOfBirth', true, _getController(), TextInputType.datetime);
+    CustomInputType dateOfBirth = CustomInputType('Date of Birth', 'dateOfBirth', true, _getController(), TextInputType.datetime);
     inputs.add(dateOfBirth);
   }
 
@@ -228,7 +228,7 @@ class PersonalDetailSectionState extends State<PersonalDetailSection> {
     inputs.firstWhere((element) => element.jsonKey == 'placeOfBirth').controller.text = widget.resume!.details.placeOfBirth;
 
     // for the date of birth
-    inputs.firstWhere((element) => element.jsonKey == 'dateOfBirth').controller.text = widget.resume!.details.dateOfBirth.toIso8601String();
+    inputs.firstWhere((element) => element.jsonKey == 'dateOfBirth').controller.text = formatDateTime(widget.resume!.details.dateOfBirth);
 
     setState(() {});
   }
@@ -281,7 +281,7 @@ class PersonalDetailSectionState extends State<PersonalDetailSection> {
     inputs.firstWhere((element) => element.jsonKey == 'placeOfBirth').controller.text = userDetail.placeOfBirth;
 
     // for the date of birth
-    inputs.firstWhere((element) => element.jsonKey == 'dateOfBirth').controller.text = userDetail.dateOfBirth.toIso8601String();
+    inputs.firstWhere((element) => element.jsonKey == 'dateOfBirth').controller.text = formatDateTime(userDetail.dateOfBirth);
 
     setState(() {});
   }
@@ -310,7 +310,6 @@ class PersonalDetailSectionState extends State<PersonalDetailSection> {
     );
 
     await DatabaseService().addUpdateUserDetails(userDetailFinal);
-    Fluttertoast.showToast(msg: 'Personal details updated successfully', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
   }
 
   @override

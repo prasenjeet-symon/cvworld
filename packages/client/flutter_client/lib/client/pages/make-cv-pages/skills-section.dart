@@ -1,3 +1,4 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
@@ -5,7 +6,6 @@ import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
 import 'package:flutter_client/client/utils.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rxdart/rxdart.dart';
 
 class SkillSection extends StatefulWidget {
@@ -140,12 +140,41 @@ class _SkillItemState extends State<SkillItem> {
     widget.customSkillsItem.generateCustomInputFields();
   }
 
+  void deleteSkill(BuildContext context, int skillId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Deletion'),
+          content: const Text('Are you sure you want to delete this skill item?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // Close the dialog and delete the skill item
+                Navigator.of(context).pop();
+                widget.onDelete(skillId);
+              },
+              child: const Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Close the dialog and cancel deletion
+                Navigator.of(context).pop();
+              },
+              child: const Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ExpandableCard(
       index: widget.index,
       title: 'Skill Item',
-      onDelete: widget.onDelete,
+      onDelete: (int id) => deleteSkill(context, id),
       children: Container(
         padding: const EdgeInsets.all(10),
         child: Column(
@@ -327,8 +356,6 @@ class CustomSkillSection {
     if (localUserSkillIndex != -1) {
       _userSkills[localUserSkillIndex] = userSkillForDatabase;
     }
-
-    Fluttertoast.showToast(msg: 'Skill updated', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
   }
 
   Future<void> addNewItem() async {
@@ -361,8 +388,6 @@ class CustomSkillSection {
     } else {
       item.add(itemToAdd);
     }
-
-    Fluttertoast.showToast(msg: 'Added a new skill', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.grey, textColor: Colors.white, fontSize: 16.0);
   }
 
   Future<void> removeItem(int index) async {
@@ -378,7 +403,5 @@ class CustomSkillSection {
         await DatabaseService().deleteUserSkill(DeleteDocuments(itemToRemove.id));
       }
     }
-
-    Fluttertoast.showToast(msg: 'Removed a skill', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white, fontSize: 16.0);
   }
 }

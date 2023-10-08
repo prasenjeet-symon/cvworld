@@ -26,8 +26,8 @@ class _SignUpFormMobileState extends State<SignUpFormMobile> {
                 children: [
                   SizedBox(height: 120),
                   Heading(
-                    title: 'Create an account',
-                    subtitle: 'Take your first step toward your dream job with cvworld',
+                    title: 'Create an Account',
+                    subtitle: 'Take the first step toward your dream job with CV World.',
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 50),
@@ -74,37 +74,15 @@ class _SignUpFormState extends State<SignUpForm> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Name field
-        TextField(
-          controller: nameController,
-          decoration: const InputDecoration(labelText: 'Name', border: OutlineInputBorder()),
-        ),
-        const SizedBox(height: 10),
-        // Email field
-        TextField(
-          controller: emailController,
-          decoration: const InputDecoration(labelText: 'Email', border: OutlineInputBorder()),
-        ),
-        const SizedBox(height: 10),
-        // Password field
-        TextField(
-          controller: passwordController,
-          decoration: const InputDecoration(labelText: 'Password', border: OutlineInputBorder()),
-          obscureText: true, // Hide the password input
-        ),
-        const SizedBox(height: 40),
-        CreateAccountButton(
-          onPressed: () => signUpWithEmailAndPassword(context),
-          buttonText: 'Create an account',
-        ),
+        EmailPasswordForm(emailController: emailController, nameController: nameController, passwordController: passwordController, onSubmit: signUpWithEmailAndPassword),
         const SizedBox(height: 10),
         SingUpWithGoogle(
           onPressed: () => signUpWithGoogle(context),
-          buttonText: 'Sign up with Google',
+          buttonText: 'Sign Up with Google',
           icon: FontAwesomeIcons.google,
         ),
         const SizedBox(height: 50),
-        AlreadyHaveAccount(mainText: 'Already have an account', linkedText: ' Sign in?', onTap: () => context.pushRoute(const SignInRoute()))
+        AlreadyHaveAccount(mainText: 'Already have an account?', linkedText: ' Sign In', onTap: () => context.pushRoute(const SignInRoute()))
       ],
     );
   }
@@ -193,6 +171,104 @@ class AlreadyHaveAccount extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+///
+///
+///
+///
+///
+
+class NameInput extends StatefulWidget {
+  final TextEditingController nameController;
+
+  NameInput({required this.nameController});
+
+  @override
+  _NameInputState createState() => _NameInputState();
+}
+
+class _NameInputState extends State<NameInput> {
+  String? _validateName(String value) {
+    if (value.isEmpty) {
+      return 'Please enter your name';
+    }
+
+    // Check if the name contains only letters and spaces.
+    if (!RegExp(r'^[A-Za-z\s]+$').hasMatch(value)) {
+      return 'Name can only contain letters and spaces';
+    }
+
+    // Check if the name is at least 2 characters long.
+    if (value.length < 2) {
+      return 'Name must be at least 2 characters long';
+    }
+
+    // Check if the name doesn't consist of only spaces.
+    if (value.trim().isEmpty) {
+      return 'Name cannot consist of only spaces';
+    }
+
+    return null; // Name is valid
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: widget.nameController,
+      decoration: const InputDecoration(
+        hintText: 'Enter Your Full Name',
+        labelText: 'Full Name',
+        border: OutlineInputBorder(),
+      ),
+      validator: (value) => _validateName(value!),
+    );
+  }
+}
+
+class EmailPasswordForm extends StatefulWidget {
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+  final TextEditingController nameController;
+  final void Function(BuildContext) onSubmit;
+
+  EmailPasswordForm({
+    required this.emailController,
+    required this.passwordController,
+    required this.nameController,
+    required this.onSubmit,
+  });
+
+  @override
+  _EmailPasswordFormState createState() => _EmailPasswordFormState();
+}
+
+class _EmailPasswordFormState extends State<EmailPasswordForm> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          NameInput(nameController: widget.nameController), // Include NameInput
+          const SizedBox(height: 10),
+          EmailInput(emailController: widget.emailController),
+          const SizedBox(height: 10),
+          PasswordInputWithToggle(passwordController: widget.passwordController),
+          const SizedBox(height: 40),
+          CreateAccountButton(
+              buttonText: 'CREATE ACCOUNT',
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  widget.onSubmit(context);
+                }
+              }),
+        ],
       ),
     );
   }

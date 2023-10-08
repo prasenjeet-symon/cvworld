@@ -1,3 +1,4 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
@@ -5,7 +6,6 @@ import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
 import 'package:flutter_client/client/utils.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rxdart/rxdart.dart';
 
 class EducationSection extends StatefulWidget {
@@ -176,12 +176,41 @@ class _EducationItemState extends State<EducationItem> {
     }
   }
 
+  void deleteEducation(BuildContext context, int educationId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Deletion'),
+          content: const Text('Are you sure you want to delete this education?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // Close the dialog and delete the education item
+                widget.onDelete(educationId);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Close the dialog and cancel deletion
+                Navigator.of(context).pop();
+              },
+              child: const Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ExpandableCard(
       index: widget.index,
       title: 'Education Item',
-      onDelete: widget.onDelete,
+      onDelete: (int index) => deleteEducation(context, index),
       children: Container(
         padding: const EdgeInsets.all(10),
         child: Column(
@@ -344,10 +373,10 @@ class CustomEducationSection {
       degreeController.text = element.degree;
 
       var startDateController = _addController();
-      startDateController.text = element.startDate.toIso8601String();
+      startDateController.text = formatDateTime(element.startDate);
 
       var endDateController = _addController();
-      endDateController.text = element.endDate.toIso8601String();
+      endDateController.text = formatDateTime(element.endDate);
 
       var cityController = _addController();
       cityController.text = element.city;
@@ -385,10 +414,10 @@ class CustomEducationSection {
       degreeController.text = element.degree;
 
       var startDateController = _addController();
-      startDateController.text = element.startDate.toIso8601String();
+      startDateController.text = formatDateTime(element.startDate);
 
       var endDateController = _addController();
-      endDateController.text = element.endDate.toIso8601String();
+      endDateController.text = formatDateTime(element.endDate);
 
       var cityController = _addController();
       cityController.text = element.city;
@@ -472,8 +501,6 @@ class CustomEducationSection {
     } else {
       item.add(customEducationItem);
     }
-
-    Fluttertoast.showToast(msg: 'Added education', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
   }
 
   Future<void> removeItem(int index) async {
@@ -489,8 +516,6 @@ class CustomEducationSection {
         await DatabaseService().deleteUserEducation(DeleteDocuments(itemToRemove.id));
       }
     }
-
-    Fluttertoast.showToast(msg: 'Removed education', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white, fontSize: 16.0);
   }
 
   // update the item
@@ -517,7 +542,5 @@ class CustomEducationSection {
     if (savedItemIndexChanged != -1) {
       education[savedItemIndexChanged] = itemForUpdate;
     }
-
-    Fluttertoast.showToast(msg: 'Updated education', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
   }
 }

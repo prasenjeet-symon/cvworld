@@ -2,7 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/utils.dart';
 import 'package:flutter_client/dashboard/datasource_dashboard.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 @RoutePage()
 class AdminSubscriptionSettingPage extends StatefulWidget {
@@ -15,96 +14,68 @@ class AdminSubscriptionSettingPage extends StatefulWidget {
 class _AdminSubscriptionSettingPageState extends State<AdminSubscriptionSettingPage> {
   final AdminSubscriptionSettingsLogic adminSubscriptionSettingLogic = AdminSubscriptionSettingsLogic();
   late String planID;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    adminSubscriptionSettingLogic.fetchAllTemplatePlans(setState).then(
+
+    setState(() {
+      isLoading = true;
+    });
+
+    adminSubscriptionSettingLogic
+        .fetchAllTemplatePlans(setState)
+        .then(
           (value) => {
             if (value != null) {planID = value}
           },
-        );
+        )
+        .then((value) {
+      setState(() {
+        isLoading = false;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: SizedBox(
-          width: 500,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              BackButtonApp(onPressed: () {
-                context.popRoute(const AdminSubscriptionSettingPage());
-              }),
-              const SizedBox(height: 60),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Big text "Subscription Settings"
-                  const Text(
-                    'Subscription Setting',
-                    style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 35),
-                  // Subscription Settings name field
-                  TextField(
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Subscription Name',
-                      hintText: 'Enter your subscription name',
-                    ),
-                    keyboardType: TextInputType.text,
-                    controller: adminSubscriptionSettingLogic.subscriptionNameController,
-                  ),
-                  const SizedBox(height: 10),
-                  // Subscription Settings price field
-                  TextField(
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Subscription Price',
-                      hintText: 'Enter your subscription price in paisa',
-                    ),
-                    keyboardType: TextInputType.number,
-                    controller: adminSubscriptionSettingLogic.subscriptionPriceController,
-                  ),
-                  const SizedBox(height: 10),
-                  // Subscription Settings description field
-                  TextField(
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Subscription Description',
-                      hintText: 'Enter your subscription description',
-                    ),
-                    keyboardType: TextInputType.text,
-                    maxLines: null,
-                    controller: adminSubscriptionSettingLogic.subscriptionDescriptionController,
-                  ),
-                  const SizedBox(height: 50),
-                  ElevatedButton(
-                    onPressed: () {
-                      adminSubscriptionSettingLogic.saveSubscription(planID);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.fromLTRB(25, 20, 25, 20),
-                      backgroundColor: Colors.blue,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(50)),
-                      ),
-                    ),
-                    child: const Text('Save Settings'),
-                  )
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
+      body: isLoading
+          ? const Center(child: Padding(padding: EdgeInsets.all(50), child: CircularProgressIndicator()))
+          : Center(
+              child: SizedBox(
+                width: 500,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    BackButtonApp(onPressed: () {
+                      context.popRoute(const AdminSubscriptionSettingPage());
+                    }),
+                    const SizedBox(height: 60),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Big text "Subscription Settings"
+                        const Text('Subscription Settings', style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 35),
+
+                        SubscriptionSettingsForm(
+                          nameController: adminSubscriptionSettingLogic.subscriptionNameController,
+                          priceController: adminSubscriptionSettingLogic.subscriptionPriceController,
+                          descriptionController: adminSubscriptionSettingLogic.subscriptionDescriptionController,
+                          onSave: () => adminSubscriptionSettingLogic.saveSubscription(context, planID),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
     );
   }
 }
@@ -118,19 +89,28 @@ class AdminSubscriptionSettingsLogic {
   final TextEditingController subscriptionDescriptionController = TextEditingController();
 
   // save subscription
-  Future<void> saveSubscription(String planID) async {
+  Future<void> saveSubscription(BuildContext context, String planID) async {
     var subscriptionName = subscriptionNameController.text;
     var subscriptionPrice = int.parse(subscriptionPriceController.text);
     var subscriptionDescription = subscriptionDescriptionController.text;
 
-    // check for the subscription
-    if (subscriptionName.isEmpty || subscriptionPriceController.text.isEmpty) {
-      return;
-    }
-
-    // save
     await DashboardDataService().updateTemplatePlan(planID, subscriptionPrice, subscriptionName, subscriptionDescription);
-    Fluttertoast.showToast(msg: 'Subscription Updated', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white);
+
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        backgroundColor: Colors.green,
+        content: Center(
+          child: Text(
+            'Subscription updated successfully!',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   // Fetch all the template plans receive the set state
@@ -149,5 +129,204 @@ class AdminSubscriptionSettingsLogic {
     } else {
       return null;
     }
+  }
+}
+
+///
+///
+///
+///
+///
+///
+
+class SubscriptionNameInput extends StatelessWidget {
+  final TextEditingController controller;
+
+  const SubscriptionNameInput({
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
+
+  String? _validateSubscriptionName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter a subscription name';
+    }
+
+    // Check if the subscription name contains at least 3 characters.
+    if (value.length < 3) {
+      return 'Subscription name must be at least 3 characters long';
+    }
+
+    // Check if the subscription name contains only letters, numbers, and spaces.
+    if (!RegExp(r'^[a-zA-Z0-9\s]+$').hasMatch(value)) {
+      return 'Subscription name can only contain letters, numbers, and spaces';
+    }
+
+    // You can add more specific validation criteria here if needed.
+
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      decoration: const InputDecoration(
+        border: OutlineInputBorder(),
+        labelText: 'Subscription Name',
+        hintText: 'Enter your subscription name',
+      ),
+      keyboardType: TextInputType.text,
+      validator: _validateSubscriptionName,
+    );
+  }
+}
+
+///
+///
+///
+///
+///
+
+class SubscriptionPriceInput extends StatelessWidget {
+  final TextEditingController controller;
+
+  const SubscriptionPriceInput({
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
+
+  String? _validateSubscriptionPrice(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter a subscription price';
+    }
+
+    // Check if the value is a valid price in paisa
+    final RegExp regex = RegExp(r'^\d+$');
+    if (!regex.hasMatch(value)) {
+      return 'Subscription price must be a valid number in paisa';
+    }
+
+    // Convert the value to an integer
+    final int priceInPaisa = int.parse(value);
+
+    // Check if the subscription price is within a valid range (e.g., between 100 and 100000 paisa)
+    if (priceInPaisa < 0) {
+      return 'Subscription price cannot be negative';
+    }
+
+    // You can add more specific validation criteria here if needed.
+
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      decoration: const InputDecoration(
+        border: OutlineInputBorder(),
+        labelText: 'Subscription Price',
+        hintText: 'Enter your subscription price in paisa',
+      ),
+      keyboardType: TextInputType.number,
+      validator: _validateSubscriptionPrice,
+    );
+  }
+}
+
+///
+///
+///
+///
+///
+
+class SubscriptionDescriptionInput extends StatelessWidget {
+  final TextEditingController controller;
+
+  const SubscriptionDescriptionInput({
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
+
+  String? _validateSubscriptionDescription(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter a subscription description';
+    }
+
+    // Additional validation criteria can be added here if needed.
+
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      decoration: const InputDecoration(
+        border: OutlineInputBorder(),
+        labelText: 'Subscription Description',
+        hintText: 'Enter your subscription description',
+      ),
+      keyboardType: TextInputType.text,
+      maxLines: null, // Allows multi-line input
+      validator: _validateSubscriptionDescription,
+    );
+  }
+}
+
+///
+///
+///
+///
+///
+
+class SubscriptionSettingsForm extends StatelessWidget {
+  final TextEditingController nameController;
+  final TextEditingController priceController;
+  final TextEditingController descriptionController;
+  final VoidCallback onSave;
+
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  SubscriptionSettingsForm({
+    required this.nameController,
+    required this.priceController,
+    required this.descriptionController,
+    required this.onSave,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: formKey,
+      child: Column(
+        children: [
+          SubscriptionNameInput(controller: nameController),
+          const SizedBox(height: 10),
+          SubscriptionPriceInput(controller: priceController),
+          const SizedBox(height: 10),
+          SubscriptionDescriptionInput(controller: descriptionController),
+          const SizedBox(height: 50),
+          ElevatedButton(
+            onPressed: () {
+              // Validate individual fields as needed
+              if (formKey.currentState!.validate()) {
+                // Handle form submission
+                onSave();
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.fromLTRB(25, 20, 25, 20),
+              backgroundColor: Colors.blue,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(50)),
+              ),
+            ),
+            child: const Text('Save Settings'),
+          ),
+        ],
+      ),
+    );
   }
 }

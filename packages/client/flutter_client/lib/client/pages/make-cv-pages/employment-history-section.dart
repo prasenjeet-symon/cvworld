@@ -1,5 +1,4 @@
 // ignore: file_names
-
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
@@ -7,7 +6,6 @@ import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
 import 'package:flutter_client/client/utils.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rxdart/rxdart.dart';
 
 class EmploymentHistorySection extends StatefulWidget {
@@ -141,12 +139,41 @@ class _EmploymentHistoryItemState extends State<EmploymentHistoryItem> {
     widget.customEmploymentHistoryItem.generateCustomInputFields();
   }
 
+  void deleteEmploymentHistory(BuildContext context, int employmentHistoryId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Deletion'),
+          content: const Text('Are you sure you want to delete this employment history?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // Close the dialog and delete the employment history item
+                widget.onDelete(employmentHistoryId);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Close the dialog and cancel deletion
+                Navigator.of(context).pop();
+              },
+              child: const Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ExpandableCard(
       index: widget.index,
       title: 'Employment History Item',
-      onDelete: widget.onDelete,
+      onDelete: (int id) => deleteEmploymentHistory(context, id),
       children: Container(
         padding: const EdgeInsets.all(10),
         child: Column(
@@ -316,10 +343,10 @@ class CustomEmploymentHistory {
       employerController.text = element.employer;
 
       var startDateController = _addController();
-      startDateController.text = element.startDate.toIso8601String();
+      startDateController.text = formatDateTime(element.startDate);
 
       var endDateController = _addController();
-      endDateController.text = element.endDate.toIso8601String();
+      endDateController.text = formatDateTime(element.endDate);
 
       var cityController = _addController();
       cityController.text = element.city;
@@ -356,10 +383,10 @@ class CustomEmploymentHistory {
       employerController.text = element.employer;
 
       var startDateController = _addController();
-      startDateController.text = element.startDate.toIso8601String();
+      startDateController.text = formatDateTime(element.startDate);
 
       var endDateController = _addController();
-      endDateController.text = element.endDate.toIso8601String();
+      endDateController.text = formatDateTime(element.endDate);
 
       var cityController = _addController();
       cityController.text = element.city;
@@ -448,8 +475,6 @@ class CustomEmploymentHistory {
     } else {
       item.add(itemToAdd);
     }
-
-    Fluttertoast.showToast(toastLength: Toast.LENGTH_SHORT, msg: 'Employment history added.', gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white);
   }
 
   Future<void> removeItem(int index) async {
@@ -465,8 +490,6 @@ class CustomEmploymentHistory {
         await DatabaseService().deleteUserEmploymentHistory(DeleteDocuments(itemToRemove.id));
       }
     }
-
-    Fluttertoast.showToast(toastLength: Toast.LENGTH_SHORT, msg: 'Employment history removed.', gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white);
   }
 
   // update the employment history
@@ -495,7 +518,5 @@ class CustomEmploymentHistory {
     if (databaseItemIndex != -1) {
       employment[databaseItemIndex] = itemForDatabase;
     }
-
-    Fluttertoast.showToast(toastLength: Toast.LENGTH_SHORT, msg: 'Employment history updated.', gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white);
   }
 }

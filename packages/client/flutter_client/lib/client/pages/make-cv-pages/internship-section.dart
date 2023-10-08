@@ -1,3 +1,4 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
@@ -5,7 +6,6 @@ import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
 import 'package:flutter_client/client/utils.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rxdart/rxdart.dart';
 
 class InternshipSection extends StatefulWidget {
@@ -154,12 +154,41 @@ class _InternshipItemState extends State<InternshipItem> {
     widget.customInternshipItem.generateCustomInputFields();
   }
 
+  void deleteInternship(BuildContext context, int internshipId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Deletion'),
+          content: const Text('Are you sure you want to delete this internship item?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // Close the dialog and delete the internship item
+                widget.onDelete(internshipId);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Close the dialog and cancel deletion
+                Navigator.of(context).pop();
+              },
+              child: const Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ExpandableCard(
       index: widget.index,
       title: 'Internship item',
-      onDelete: widget.onDelete,
+      onDelete: (int id) => deleteInternship(context, id),
       children: Container(
         padding: const EdgeInsets.all(10),
         child: Column(
@@ -354,10 +383,10 @@ class CustomInternshipSection {
       employerController.text = internship.employer;
 
       var startDateController = _addController();
-      startDateController.text = internship.startDate.toIso8601String();
+      startDateController.text = formatDateTime(internship.startDate);
 
       var endDateController = _addController();
-      endDateController.text = internship.endDate.toIso8601String();
+      endDateController.text = formatDateTime(internship.endDate);
 
       var cityController = _addController();
       cityController.text = internship.city;
@@ -396,10 +425,10 @@ class CustomInternshipSection {
       employerController.text = internship.employer;
 
       var startDateController = _addController();
-      startDateController.text = internship.startDate.toIso8601String();
+      startDateController.text = formatDateTime(internship.startDate);
 
       var endDateController = _addController();
-      endDateController.text = internship.endDate.toIso8601String();
+      endDateController.text = formatDateTime(internship.endDate);
 
       var cityController = _addController();
       cityController.text = internship.city;
@@ -451,8 +480,6 @@ class CustomInternshipSection {
     if (savedItemIndex != -1) {
       _userInternships[savedItemIndex] = updatedItemForDatabase;
     }
-
-    Fluttertoast.showToast(msg: 'Updated internship...', toastLength: Toast.LENGTH_LONG, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.green.withOpacity(0.8), textColor: Colors.white, fontSize: 16.0);
   }
 
   // Delete the internship given index
@@ -468,8 +495,6 @@ class CustomInternshipSection {
         await DatabaseService().deleteUserInternship(DeleteDocuments(itemToDelete.id));
       }
     }
-
-    Fluttertoast.showToast(msg: 'Deleted...', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.red.withOpacity(0.8), textColor: Colors.white, fontSize: 16.0);
   }
 
   // Add new item to the list and if possible add it to the database
@@ -511,8 +536,6 @@ class CustomInternshipSection {
     } else {
       item.add(itemToAdd);
     }
-
-    Fluttertoast.showToast(msg: 'Internship added', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
   }
 
   // get the latest id

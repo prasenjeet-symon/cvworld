@@ -2,6 +2,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
+import 'package:flutter_client/client/pages/signin-page/components/signin_form_mobile.dart';
 
 import '../../utils.dart';
 import '../home-page/components/footer.dart';
@@ -123,7 +124,7 @@ class _ContactUsPageDesktopBodyState extends State<ContactUsPageDesktopBody> {
                         padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
                         width: double.infinity,
                         child: Text(
-                          '24/7 we will answer all your questions and help you ',
+                          ' We will answer all your questions and help you 24/7! ',
                           style: TextStyle(
                             color: Colors.black.withOpacity(0.7),
                             fontSize: 16,
@@ -153,15 +154,16 @@ class _ContactUsPageDesktopBodyState extends State<ContactUsPageDesktopBody> {
 ///
 // Contact us form
 class ContactUsForm extends StatefulWidget {
-  Function messageSent = () {};
+  final Function messageSent;
 
-  ContactUsForm({super.key, required this.messageSent});
+  ContactUsForm({required this.messageSent});
 
   @override
-  State<ContactUsForm> createState() => _ContactUsFormState();
+  _ContactUsFormState createState() => _ContactUsFormState();
 }
 
 class _ContactUsFormState extends State<ContactUsForm> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _nameFirstController = TextEditingController();
   final TextEditingController _nameLastController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -170,18 +172,31 @@ class _ContactUsFormState extends State<ContactUsForm> {
 
   // submit
   Future<void> _submit(BuildContext context) async {
-    String nameFirst = _nameFirstController.text;
-    String nameLast = _nameLastController.text;
-    String email = _emailController.text;
-    String message = _messageController.text;
-    String phone = _phoneController.text;
-    String name = nameFirst + ' ' + nameLast;
+    if (_formKey.currentState!.validate()) {
+      String nameFirst = _nameFirstController.text;
+      String nameLast = _nameLastController.text;
+      String email = _emailController.text;
+      String message = _messageController.text;
+      String phone = _phoneController.text;
+      String name = '$nameFirst $nameLast';
 
-    if (nameFirst.isNotEmpty && nameLast.isNotEmpty && email.isNotEmpty && message.isNotEmpty && phone.isNotEmpty) {
       await DatabaseService().contactUs(name, email, message, phone);
       widget.messageSent();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Empty fields...')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.blueGrey,
+          content: Center(
+            child: Text(
+              'Please fix the errors in the form.',
+              style: TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      );
     }
   }
 
@@ -191,152 +206,176 @@ class _ContactUsFormState extends State<ContactUsForm> {
       margin: const EdgeInsets.fromLTRB(0, 50, 0, 0),
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
       width: double.infinity,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Two side by side form input for first name and last name
-          Container(
-            margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-            width: double.infinity,
-            child: Row(
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
               children: [
-                // fist name input holder
                 Expanded(
-                  child: Container(
-                    margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                    width: double.infinity,
-                    child: TextFormField(
-                      controller: _nameFirstController,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'First Name',
-                        hintText: 'Enter your first name',
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'This field is required';
-                        }
-                        return null;
-                      },
-                      keyboardType: TextInputType.text,
-                    ),
+                  child: NameInput(
+                    controller: _nameFirstController,
+                    labelText: 'First Name',
                   ),
                 ),
-                // last name input holder
+                const SizedBox(width: 10),
                 Expanded(
-                  child: Container(
-                    margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                    width: double.infinity,
-                    child: TextFormField(
-                      controller: _nameLastController,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Last Name',
-                        hintText: 'Enter your last name',
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'This field is required';
-                        }
-                        return null;
-                      },
-                      keyboardType: TextInputType.text,
-                    ),
+                  child: NameInput(
+                    controller: _nameLastController,
+                    labelText: 'Last Name',
                   ),
                 ),
               ],
             ),
-          ),
-          // Email input holder single
-          Container(
-            margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-            width: double.infinity,
-            child: TextFormField(
-              controller: _emailController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Email',
-                hintText: 'Enter your email',
+            const SizedBox(height: 20),
+            EmailInput(emailController: _emailController),
+            const SizedBox(height: 20),
+            PhoneNumberInput(controller: _phoneController),
+            const SizedBox(height: 20),
+            MessageInput(controller: _messageController),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  _submit(context);
+                },
+                style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(60)),
+                child: const Text('SEND', style: TextStyle(fontSize: 20)),
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'This field is required';
-                }
-                return null;
-              },
-              keyboardType: TextInputType.emailAddress,
             ),
-          ),
-          // Phone input holder
-          Container(
-            margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-            width: double.infinity,
-            child: TextFormField(
-              controller: _phoneController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Phone',
-                hintText: 'Enter your phone',
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'This field is required';
-                }
-                return null;
-              },
-              keyboardType: TextInputType.phone,
-            ),
-          ),
-          // Message input holder ( text area auto resize and with some height )
-          Container(
-            margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-            width: double.infinity,
-            child: TextFormField(
-              controller: _messageController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Message',
-                hintText: 'Enter your message',
-                alignLabelWithHint: true,
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'This field is required';
-                }
-                return null;
-              },
-              keyboardType: TextInputType.multiline,
-              maxLines: null,
-              minLines: 5,
-            ),
-          ),
-          // A Big full width button ( SEND )
-          Container(
-            margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text(
-                  'Sending...',
-                )));
-
-                _submit(context);
-              },
-              style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(60)),
-              child: const Text('SEND', style: TextStyle(fontSize: 20)),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
+    );
+  }
+}
+
+///
+///
+///
+///
+///
+
+class NameInput extends StatelessWidget {
+  final TextEditingController controller;
+  final String labelText;
+
+  NameInput({
+    required this.controller,
+    required this.labelText,
+  });
+
+  String? _validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return '$labelText is required';
+    }
+
+    // You can add more specific validation criteria here.
+    // For example, ensuring that the name contains only letters and spaces:
+    if (!RegExp(r'^[A-Za-z\s]+$').hasMatch(value)) {
+      return '$labelText can only contain letters and spaces';
+    }
+
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hintText = 'Enter your $labelText';
+
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        hintText: hintText,
+        border: const OutlineInputBorder(),
+      ),
+      validator: _validateName, // Use the internal validator function
+      keyboardType: TextInputType.text,
+    );
+  }
+}
+
+///
+///
+///
+///
+///
+///
+class PhoneNumberInput extends StatelessWidget {
+  final TextEditingController controller;
+
+  PhoneNumberInput({required this.controller});
+
+  String? _validatePhoneNumber(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Phone number is required';
+    }
+
+    // Validate the phone number format using a regular expression.
+    if (!RegExp(r'^\d{10}$').hasMatch(value)) {
+      return 'Invalid phone number. Please enter 10 digits.';
+    }
+
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      decoration: const InputDecoration(
+        labelText: 'Phone',
+        hintText: 'Enter your phone number',
+        border: OutlineInputBorder(),
+      ),
+      validator: _validatePhoneNumber, // Use the internal validator function
+      keyboardType: TextInputType.phone,
+    );
+  }
+}
+
+///
+///
+///
+///
+class MessageInput extends StatelessWidget {
+  final TextEditingController controller;
+
+  MessageInput({
+    required this.controller,
+  });
+
+  String? _validateMessage(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Message is required';
+    }
+
+    // Check for code-like patterns using regular expressions.
+    if (RegExp(r'<[A-Za-z\/][^>]*>').hasMatch(value)) {
+      return 'Code input is not allowed';
+    }
+
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      decoration: const InputDecoration(
+        labelText: 'Message',
+        hintText: 'Enter your message',
+        border: OutlineInputBorder(),
+        alignLabelWithHint: true,
+      ),
+      validator: _validateMessage, // Use the internal validator function
+      keyboardType: TextInputType.multiline,
+      maxLines: null,
+      minLines: 5,
     );
   }
 }
@@ -352,9 +391,10 @@ class ContactUsMessageSent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isMobile = MediaQuery.of(context).size.width < Constants.breakPoint;
     return Container(
       margin: const EdgeInsets.fromLTRB(0, 150, 0, 0),
-      padding: const EdgeInsets.fromLTRB(100, 0, 100, 0),
+      padding: isMobile ? const EdgeInsets.fromLTRB(20, 0, 20, 0) : const EdgeInsets.fromLTRB(100, 0, 100, 0),
       width: double.infinity,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,

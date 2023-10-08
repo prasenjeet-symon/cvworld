@@ -60,7 +60,7 @@ class SectionTwoLeft extends StatelessWidget {
         Container(
           margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
           child: Text(
-            'Quick Resume Builder',
+            'QUICK RESUME BUILDER',
             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
             textAlign: isMobile ? TextAlign.center : TextAlign.left,
           ),
@@ -68,7 +68,7 @@ class SectionTwoLeft extends StatelessWidget {
         Container(
           margin: isMobile ? const EdgeInsets.fromLTRB(0, 0, 0, 10) : const EdgeInsets.fromLTRB(0, 0, 150, 15),
           child: Text(
-            'Effortlessly Create a Stunning Professional Resume',
+            'Effortlessly create a stunning professional resume',
             style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
             textAlign: isMobile ? TextAlign.center : TextAlign.left,
           ),

@@ -1,5 +1,7 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/utils.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class FooterSection extends StatelessWidget {
@@ -76,28 +78,34 @@ class FooterSocialLinks extends StatelessWidget {
         runSpacing: 10, // Adjust the run spacing as needed
         children: [
           IconButton(
-            icon: FaIcon(FontAwesomeIcons.instagram),
-            onPressed: () {},
+            icon: const FaIcon(FontAwesomeIcons.instagram),
+            onPressed: () {
+              _launchURL('https://instagram.com/cvworld.me');
+            },
           ),
           IconButton(
-            icon: FaIcon(FontAwesomeIcons.youtube),
-            onPressed: () {},
+            icon: const FaIcon(FontAwesomeIcons.youtube),
+            onPressed: () {
+              _launchURL('https://www.youtube.com/@cvworld.me.official');
+            },
           ),
           IconButton(
-            icon: FaIcon(FontAwesomeIcons.facebook),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: FaIcon(FontAwesomeIcons.twitter),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: FaIcon(FontAwesomeIcons.discord),
-            onPressed: () {},
+            icon: const FaIcon(FontAwesomeIcons.facebook),
+            onPressed: () {
+              _launchURL('https://www.facebook.com/profile.php?id=100068915222324&mibextid=LQQJ4d');
+            },
           ),
         ],
       ),
     );
+  }
+}
+
+void _launchURL(String url) async {
+  if (await canLaunch(url)) {
+    await launch(url, forceSafariVC: false, forceWebView: false);
+  } else {
+    throw 'Could not launch $url';
   }
 }
 
@@ -106,9 +114,10 @@ class FooterAllRightReserved extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    int currentYear = DateTime.now().year;
     return Container(
       margin: const EdgeInsets.all(25),
-      child: const Text('CV-World copyright © 2023 - All rights reserved'),
+      child: Text('CV World copyright © $currentYear - All rights reserved'),
     );
   }
 }
@@ -118,20 +127,54 @@ class FooterQuickLinks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ClickableLinks();
+  }
+}
+
+class ClickableLinks extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(25),
-      child: const Wrap(
+      child: Wrap(
         alignment: WrapAlignment.center,
         spacing: 20, // Adjust the spacing as needed
         runSpacing: 10, // Adjust the run spacing as needed
         children: [
-          Text('Contact Us'),
-          Text('Our Services'),
-          Text('Privacy Policy'),
-          Text('Terms & Condition'),
-          Text('Career'),
+          _buildLinkText('Privacy Policy', 'https://merchant.razorpay.com/policy/MUCeXANyEQNJAn/privacy'),
+          _buildLinkText('Terms & Condition', 'https://merchant.razorpay.com/policy/MUCeXANyEQNJAn/terms'),
+          _buildLinkText('Refund Policy', 'https://merchant.razorpay.com/policy/MUCeXANyEQNJAn/refund'),
         ],
       ),
     );
+  }
+
+  Widget _buildLinkText(String text, String url) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: RichText(
+        text: TextSpan(
+          style: TextStyle(color: Colors.blue),
+          children: [
+            TextSpan(
+              text: text,
+              style: TextStyle(decoration: TextDecoration.none),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {
+                  _launchURL(url);
+                },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url, forceSafariVC: false, forceWebView: false);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter_client/client/pages/home-page/components/footer.dart';
 import 'package:flutter_client/client/pages/signin-page/components/signin_form_mobile.dart';
 import 'package:flutter_client/client/pages/signup-page/components/signup_form_mobile.dart';
 import 'package:flutter_client/client/utils.dart';
+import 'package:flutter_client/routes/router.gr.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -37,7 +38,10 @@ class _SignupFormDesktopState extends State<SignupFormDesktop> {
                           left: 40,
                           child: TextButton.icon(
                             onPressed: () {
-                              context.navigateBack();
+                              context.router.pushAndPopUntil(
+                                const HomeRoute(),
+                                predicate: (_) => false, // Clear the stack
+                              );
                             },
                             icon: const Icon(Icons.arrow_back),
                             label: const Text('Back'),
@@ -58,8 +62,8 @@ class _SignupFormDesktopState extends State<SignupFormDesktop> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Heading(
-                                      title: 'Create an account',
-                                      subtitle: 'Take first step toward your dream job with cvworld',
+                                      title: 'Create an Account',
+                                      subtitle: 'Take the first step toward your dream job with CV World.',
                                     ),
                                     SizedBox(height: 50),
                                     SignUpForm(),

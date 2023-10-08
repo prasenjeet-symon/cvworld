@@ -1,3 +1,4 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
@@ -5,7 +6,6 @@ import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
 import 'package:flutter_client/client/utils.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rxdart/rxdart.dart';
 
 class LanguageSection extends StatefulWidget {
@@ -157,12 +157,41 @@ class _LanguageItemState extends State<LanguageItem> {
     }
   }
 
+  void deleteLanguage(BuildContext context, int languageId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Deletion'),
+          content: const Text('Are you sure you want to delete this language item?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // Close the dialog and delete the language item
+                widget.onDelete(languageId);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Close the dialog and cancel deletion
+                Navigator.of(context).pop();
+              },
+              child: const Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ExpandableCard(
       index: widget.index,
       title: 'Language Item',
-      onDelete: widget.onDelete,
+      onDelete: (int id) => deleteLanguage(context, id),
       children: Container(
         padding: const EdgeInsets.all(10),
         child: Column(
@@ -334,8 +363,6 @@ class CustomLanguageSection {
         await DatabaseService().deleteUserLanguage(DeleteDocuments(itemToRemove.id));
       }
     }
-
-    Fluttertoast.showToast(msg: 'Language removed', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white, fontSize: 16.0);
   }
 
   // update the item given id
@@ -355,8 +382,6 @@ class CustomLanguageSection {
     );
 
     await DatabaseService().addUpdateUserLanguage(itemForDatabaseUpdated);
-
-    Fluttertoast.showToast(msg: 'Language updated', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
   }
 
   // Add new item
@@ -390,7 +415,5 @@ class CustomLanguageSection {
     } else {
       item.add(itemToAdd);
     }
-
-    Fluttertoast.showToast(msg: 'Language added', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
   }
 }

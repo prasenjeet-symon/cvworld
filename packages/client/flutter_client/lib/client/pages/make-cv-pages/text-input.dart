@@ -1,5 +1,18 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
+
+// Function to parse a formatted date string back into a DateTime object
+DateTime parseDate(String formattedDate) {
+  final DateFormat formatter = DateFormat('yyyy-MM-dd'); // Match the date format you used when formatting
+  return formatter.parse(formattedDate);
+}
+
+// Function to format a DateTime object as a human-readable date
+String formatDateTime(DateTime dateTime) {
+  final DateFormat formatter = DateFormat('yyyy-MM-dd'); // You can change the date format as needed
+  return formatter.format(dateTime);
+}
 
 class CustomInputField extends StatefulWidget {
   final String label;
@@ -26,16 +39,13 @@ class _CustomInputFieldState extends State<CustomInputField> {
     var dateTime = await showDatePicker(
       context: context,
       initialDate: widget.controller.text.isEmpty ? DateTime.now() : DateTime.parse(widget.controller.text),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      firstDate: DateTime(1700),
+      lastDate: DateTime(2300),
     );
 
     if (dateTime == null) {
-      // DatePicker was closed
-      Fluttertoast.showToast(msg: 'DatePicker was closed');
     } else {
-      // DatePicker selected
-      widget.controller.text = (dateTime).toIso8601String();
+      widget.controller.text = formatDateTime(dateTime);
     }
   }
 
@@ -55,7 +65,6 @@ class _CustomInputFieldState extends State<CustomInputField> {
           borderSide: BorderSide.none,
         ),
         labelText: widget.label,
-        hintText: widget.isRequired ? 'Required' : 'Optional', // Show that it is optional if not required
       ),
       validator: widget.isRequired
           ? (value) {

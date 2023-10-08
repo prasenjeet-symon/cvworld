@@ -31,7 +31,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
       body: SingleChildScrollView(
           child: Center(
         child: userProfileLogic.isLoading
-            ? const CircularProgressIndicator()
+            ? const Center(
+                child: Padding(padding: EdgeInsets.all(50), child: CircularProgressIndicator()),
+              )
             : Container(
                 margin: const EdgeInsets.only(top: 50),
                 width: 800,
@@ -47,13 +49,18 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       const SizedBox(height: 10),
                       Text(userProfileLogic.user!.fullName, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 12),
-                      InputChip(
-                        label: Text(
-                          userProfileLogic.user!.subscription != null ? 'Subscriber' : 'Not a Subscriber',
-                          style: const TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.w500),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: userProfileLogic.user!.subscription != null ? Colors.green : Colors.red,
+                          borderRadius: BorderRadius.circular(4.0), // Adjust the border radius as needed
                         ),
-                        onPressed: () {},
-                        backgroundColor: userProfileLogic.user!.subscription != null ? Colors.green : Colors.red,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0), // Adjust padding as needed
+                          child: Text(
+                            userProfileLogic.user!.subscription != null ? 'Subscriber' : 'Not a Subscriber',
+                            style: const TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.w500),
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 20),
                       // border line
@@ -74,9 +81,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           // list all the bought template card with image and title and price in rupee
                           userProfileLogic.boughtTemplate!.isEmpty
                               ? const NoResultFound(
-                                  heading: 'No Bought Templates',
+                                  heading: 'No Templates Bought',
                                   icon: Icons.warning_amber_rounded,
-                                  description: 'Once this user will buy a template you will see it here',
+                                  description: 'Once this user buys a template, you will see it here',
                                 )
                               : ListView.builder(
                                   shrinkWrap: true,
@@ -112,7 +119,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           const SizedBox(height: 15),
                           // list all the transactions
                           userProfileLogic.transactions!.isEmpty
-                              ? const NoResultFound(heading: 'No Transactions', icon: Icons.warning_amber_rounded, description: 'Once this user will buy a template you will see all related transactions here')
+                              ? const NoResultFound(heading: 'No Transactions', icon: Icons.warning_amber_rounded, description: 'Once this user buys a template, you will see all related transactions here')
                               : ListView.builder(
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),

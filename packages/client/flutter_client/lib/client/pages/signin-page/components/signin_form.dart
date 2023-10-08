@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/home-page/components/footer.dart';
 import 'package:flutter_client/client/pages/signin-page/components/signin_form_mobile.dart';
-import 'package:flutter_client/client/pages/signin-page/signin-page.dart';
 import 'package:flutter_client/client/utils.dart';
+import 'package:flutter_client/routes/router.gr.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -38,7 +38,10 @@ class _SignInFormDesktopState extends State<SignInFormDesktop> {
                         left: 40,
                         child: TextButton.icon(
                           onPressed: () {
-                            context.popRoute(const SignInScreen());
+                            context.router.pushAndPopUntil(
+                              const HomeRoute(),
+                              predicate: (_) => false, // Clear the stack
+                            );
                           },
                           icon: const Icon(Icons.arrow_back),
                           label: const Text('Back'),
@@ -59,8 +62,8 @@ class _SignInFormDesktopState extends State<SignInFormDesktop> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Heading(
-                                    title: 'Welcome back',
-                                    subtitle: 'Ready to generate new cv just fill the details to login.',
+                                    title: 'Welcome back!',
+                                    subtitle: 'Ready to generate a new CV? Login to your account.',
                                     textAlign: TextAlign.left,
                                   ),
                                   SizedBox(height: 50),
@@ -107,17 +110,61 @@ class SignInLogic {
       await DatabaseService().signInUserWithEmailAndPassword(email, password);
     } catch (e) {
       if (e is NoUserException) {
-        await Fluttertoast.showToast(msg: e.message, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.red.withOpacity(0.8), textColor: Colors.white);
+        ScaffoldMessenger.of(ctx).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.red,
+            content: Center(
+              child: Text(
+                'No user found. Please check your email and try again.',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            duration: Duration(seconds: 30),
+          ),
+        );
       }
 
       if (e is WrongPasswordException) {
-        await Fluttertoast.showToast(msg: e.message, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.red.withOpacity(0.8), textColor: Colors.white);
+        ScaffoldMessenger.of(ctx).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.red,
+            content: Center(
+              child: Text(
+                'Wrong password. Please try again.',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            duration: Duration(seconds: 30),
+          ),
+        );
       }
 
       return;
     }
 
-    await Fluttertoast.showToast(msg: 'Sign in successful...', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.green.withOpacity(0.8), textColor: Colors.white);
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(ctx).showSnackBar(
+      const SnackBar(
+        dismissDirection: DismissDirection.horizontal,
+        backgroundColor: Colors.green,
+        content: Center(
+          child: Text(
+            'Welcome back!',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    );
+
     // ignore: use_build_context_synchronously
     ctx.navigateNamedTo('/dashboard');
   }

@@ -7,7 +7,6 @@ import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
 import 'package:flutter_client/client/utils.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rxdart/rxdart.dart';
 
 class CourseSection extends StatefulWidget {
@@ -153,12 +152,6 @@ class CourseItem extends StatefulWidget {
   State<CourseItem> createState() => _CourseItemState();
 }
 
-///
-///
-///
-///
-///
-///
 class _CourseItemState extends State<CourseItem> {
   bool isExpanded = true;
   String heading = 'Language Item';
@@ -182,12 +175,41 @@ class _CourseItemState extends State<CourseItem> {
     }
   }
 
+  void deleteCourse(BuildContext context, int courseId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Deletion'),
+          content: const Text('Are you sure you want to delete this course?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // Close the dialog and delete the course
+                widget.onDelete(courseId);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Close the dialog and cancel deletion
+                Navigator.of(context).pop();
+              },
+              child: const Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ExpandableCard(
       index: widget.index,
       title: 'Course Item',
-      onDelete: widget.onDelete,
+      onDelete: (int index) => deleteCourse(context, index),
       children: Container(
         padding: const EdgeInsets.all(10),
         child: Column(
@@ -338,10 +360,10 @@ class CustomCourseSection {
       institutionController.text = element.institution;
 
       var startDateController = _addController();
-      startDateController.text = element.startDate.toIso8601String();
+      startDateController.text = formatDateTime(element.startDate);
 
       var endDateController = _addController();
-      endDateController.text = element.endDate.toIso8601String();
+      endDateController.text = formatDateTime(element.endDate);
 
       var courseItem = CustomCoursesItem(
         id: getId(),
@@ -371,10 +393,10 @@ class CustomCourseSection {
       institutionController.text = element.institution;
 
       var startDateController = _addController();
-      startDateController.text = element.startDate.toIso8601String();
+      startDateController.text = formatDateTime(element.startDate);
 
       var endDateController = _addController();
-      endDateController.text = element.endDate.toIso8601String();
+      endDateController.text = formatDateTime(element.endDate);
 
       var courseItem = CustomCoursesItem(
         id: element.id,
@@ -448,9 +470,6 @@ class CustomCourseSection {
     } else {
       item.add(courseItem);
     }
-
-    // display flutter toast
-    Fluttertoast.showToast(msg: 'Course added', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white);
   }
 
   Future<void> removeItem(int index) async {
@@ -467,8 +486,6 @@ class CustomCourseSection {
         await DatabaseService().deleteUserCourse(DeleteDocuments(courseToDelete.id));
       }
     }
-
-    Fluttertoast.showToast(msg: 'Course removed', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white, fontSize: 16.0);
   }
 
   // update the item
@@ -492,7 +509,5 @@ class CustomCourseSection {
     if (savedItemIndexChanged != -1) {
       courses[savedItemIndexChanged] = updatedCourse;
     }
-
-    Fluttertoast.showToast(msg: 'Course updated', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white);
   }
 }

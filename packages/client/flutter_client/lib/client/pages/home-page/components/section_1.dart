@@ -65,7 +65,7 @@ class SectionOneRight extends StatelessWidget {
         Container(
           margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
           child: Text(
-            'Online resume builder',
+            'ONLINE RESUME BUILDER',
             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
             textAlign: isMobile ? TextAlign.center : TextAlign.left,
           ),
@@ -73,7 +73,7 @@ class SectionOneRight extends StatelessWidget {
         Container(
           margin: isMobile ? const EdgeInsets.fromLTRB(0, 0, 0, 15) : const EdgeInsets.fromLTRB(0, 0, 150, 15),
           child: Text(
-            'You get one first impression. CVWorld makes it count.',
+            'You get one first impression. CV World makes it count.',
             style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
             textAlign: isMobile ? TextAlign.center : TextAlign.left,
           ),
@@ -81,7 +81,7 @@ class SectionOneRight extends StatelessWidget {
         Container(
           margin: const EdgeInsets.fromLTRB(0, 0, 0, 15),
           child: Text(
-            'Make your first impression count with CVWorld. We understand the importance of a well-crafted CV, and our platform is here to help you stand out. Create professional resumes, showcase your skills, and land your dream job. Start building your future with CVWorld today',
+            'Make your first impression count with CV World. We understand the importance of a well-crafted CV, and our platform is here to help you stand out. Create professional resumes, showcase your skills, and land your dream job. Start building your future with CV World today',
             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w400, height: 1.5),
             textAlign: isMobile ? TextAlign.center : TextAlign.left,
           ),

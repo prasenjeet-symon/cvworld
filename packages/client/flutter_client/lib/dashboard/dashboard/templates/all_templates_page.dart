@@ -30,7 +30,9 @@ class _AllTemplatesPageState extends State<AllTemplatesPage> {
     return Scaffold(
       body: SingleChildScrollView(
         child: allTemplatesPageLogic.isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? const Center(
+                child: Padding(padding: EdgeInsets.all(50), child: CircularProgressIndicator()),
+              )
             : Center(
                 child: Container(
                   margin: const EdgeInsets.only(top: 20),
@@ -240,11 +242,27 @@ class AllTemplatesPageLogic {
   }
 
   // update template
-  Future<void> updateTemplate(int id, void Function(void Function()) setState) async {
+  Future<void> updateTemplate(BuildContext context, int id, void Function(void Function()) setState) async {
     var name = nameController.text;
     var price = int.parse(priceController.text);
+
     await DashboardDataService().updateMarketplaceTemplate(id, name, price);
-    Fluttertoast.showToast(msg: "Template updated", toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
+
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        backgroundColor: Colors.green,
+        content: Center(
+          child: Text(
+            'Template updated successfully!',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   // Fetch single marketplace template

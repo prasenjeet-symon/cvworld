@@ -38,45 +38,12 @@ class _AdminChangePasswordPageState extends State<AdminChangePasswordPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Big Heading "Change Password"
-                const Text(
-                  'Change Password',
-                  style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
-                ),
+                const Text('Change Password', style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 35),
-                // New Password
-                TextField(
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'New Password',
-                    hintText: 'Enter your new password',
-                  ),
-                  obscureText: true,
-                  controller: adminChangePasswordLogic.passwordController,
-                ),
-                const SizedBox(height: 10),
-                // Confirm Password
-                TextField(
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Confirm Password',
-                    hintText: 'Enter your confirm password',
-                  ),
-                  obscureText: true,
-                  controller: adminChangePasswordLogic.confirmPasswordController,
-                ),
-                const SizedBox(height: 50),
-                ElevatedButton(
-                  onPressed: () {
-                    adminChangePasswordLogic.changePassword();
-                    context.pushRoute(const SignInDashboardPage());
-                  },
-                  style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.fromLTRB(25, 20, 25, 20),
-                      backgroundColor: Colors.blue,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(50)),
-                      )),
-                  child: const Text('Change Password'),
+                AdminChangePasswordForm(
+                  newPasswordController: adminChangePasswordLogic.passwordController,
+                  confirmPasswordController: adminChangePasswordLogic.confirmPasswordController,
+                  onPasswordChange: () => adminChangePasswordLogic.changePassword(context),
                 )
               ],
             )
@@ -94,25 +61,186 @@ class AdminChangePasswordLogic {
   final TextEditingController confirmPasswordController = TextEditingController();
 
   // change password
-  Future<void> changePassword() async {
+  Future<void> changePassword(BuildContext context) async {
     var password = passwordController.text;
     var confirmPassword = confirmPasswordController.text;
 
     // check for the password
-    if (password.isEmpty || confirmPassword.isEmpty) {
-      Fluttertoast.showToast(msg: 'Empty fields...', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white);
-      return;
-    }
-
-    // check for the password
     if (password != confirmPassword) {
-      Fluttertoast.showToast(msg: 'Password not match...', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.red,
+          content: Center(
+            child: Text(
+              'Passwords do not match. Please try again.',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      );
+
       return;
     }
 
-    // update password
     await DashboardDataService().resetPassword(confirmPassword);
-    Fluttertoast.showToast(msg: 'Password updated', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white);
+
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        backgroundColor: Colors.green, // Use a green color for success
+        content: Center(
+          child: Text(
+            'Password updated successfully!',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    );
     return;
+  }
+}
+
+///
+///
+///
+///
+///
+///
+class AdminPasswordInputWithToggle extends StatefulWidget {
+  final TextEditingController passwordController;
+  final String labelText; // Add labelText as an input parameter
+
+  const AdminPasswordInputWithToggle({
+    Key? key,
+    required this.passwordController,
+    required this.labelText,
+  }) : super(key: key);
+
+  @override
+  _AdminPasswordInputWithToggleState createState() => _AdminPasswordInputWithToggleState();
+}
+
+class _AdminPasswordInputWithToggleState extends State<AdminPasswordInputWithToggle> {
+  bool _isPasswordVisible = false;
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter a password';
+    }
+
+    // Use the provided labelText in validation messages
+    if (value.length < 8) {
+      return '${widget.labelText} must be at least 8 characters long';
+    }
+
+    if (!value.contains(RegExp(r'[A-Z]'))) {
+      return '${widget.labelText} must contain at least one uppercase letter';
+    }
+
+    if (!value.contains(RegExp(r'[a-z]'))) {
+      return '${widget.labelText} must contain at least one lowercase letter';
+    }
+
+    if (!value.contains(RegExp(r'[0-9]'))) {
+      return '${widget.labelText} must contain at least one digit';
+    }
+
+    if (!value.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
+      return '${widget.labelText} must contain at least one special character';
+    }
+
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: widget.passwordController,
+      obscureText: !_isPasswordVisible,
+      decoration: InputDecoration(
+        hintText: 'Enter your ${widget.labelText.toLowerCase()}',
+        labelText: widget.labelText, // Use the provided labelText
+        border: const OutlineInputBorder(),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+            color: Colors.grey,
+          ),
+          onPressed: () {
+            setState(() {
+              _isPasswordVisible = !_isPasswordVisible;
+            });
+          },
+        ),
+      ),
+      validator: _validatePassword,
+    );
+  }
+}
+
+///
+///
+///
+///
+///
+class AdminChangePasswordForm extends StatefulWidget {
+  final TextEditingController newPasswordController;
+  final TextEditingController confirmPasswordController;
+  final void Function() onPasswordChange;
+
+  const AdminChangePasswordForm({
+    Key? key,
+    required this.newPasswordController,
+    required this.confirmPasswordController,
+    required this.onPasswordChange,
+  }) : super(key: key);
+
+  @override
+  _AdminChangePasswordFormState createState() => _AdminChangePasswordFormState();
+}
+
+class _AdminChangePasswordFormState extends State<AdminChangePasswordForm> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          AdminPasswordInputWithToggle(
+            labelText: 'New Password',
+            passwordController: widget.newPasswordController,
+          ),
+          const SizedBox(height: 10),
+          AdminPasswordInputWithToggle(
+            labelText: 'Confirm Password',
+            passwordController: widget.confirmPasswordController,
+          ),
+          const SizedBox(height: 50),
+          ElevatedButton(
+            onPressed: () {
+              if (_formKey.currentState!.validate()) {
+                widget.onPasswordChange();
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.fromLTRB(25, 20, 25, 20),
+              backgroundColor: Colors.blue,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(50)),
+              ),
+            ),
+            child: const Text('Change Password'),
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -106,7 +106,7 @@ class _CvMakerBodyState extends State<CvMakerBody> {
   @override
   Widget build(BuildContext context) {
     if (_logic.isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator()));
     }
 
     bool isMobile = MediaQuery.of(context).size.width < Constants.breakPoint;

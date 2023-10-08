@@ -1,9 +1,9 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
 import 'package:flutter_client/client/utils.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ProfessionalSummary extends StatefulWidget {
@@ -38,7 +38,7 @@ class ProfessionalSummaryState extends State<ProfessionalSummary> {
   void initState() {
     super.initState();
 
-    final CustomInputType textEditorType = CustomInputType('Summery', 'professionalSummery', true, _controller, TextInputType.multiline);
+    final CustomInputType textEditorType = CustomInputType('Summary', 'professionalSummery', true, _controller, TextInputType.multiline);
     textEditor = CustomInputField(label: textEditorType.label, isRequired: textEditorType.isRequired, controller: textEditorType.controller, type: textEditorType.type, isTextArea: true);
 
     fetchProfessionalSummary().then((value) => {setState(() {})});
@@ -82,8 +82,6 @@ class ProfessionalSummaryState extends State<ProfessionalSummary> {
       var updatedProfessionalSummary = UserProfessionalSummary(professionalSummary == null ? 1 : professionalSummary!.id, _controller.text, DateTime.now(), DateTime.now());
       await DatabaseService().addUpdateUserProfessionalSummary(updatedProfessionalSummary);
       professionalSummary = updatedProfessionalSummary;
-
-      Fluttertoast.showToast(msg: 'Professional summary updated', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
     }
   }
 

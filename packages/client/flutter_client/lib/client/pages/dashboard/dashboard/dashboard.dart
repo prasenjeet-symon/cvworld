@@ -117,6 +117,33 @@ class CreatedResumeItem extends StatelessWidget {
     required this.width,
   });
 
+  Future<void> _confirmDeleteResumeItem(BuildContext context, int id) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // Dialog cannot be dismissed by tapping outside
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Delete'),
+          content: const Text('Are you sure you want to delete this resume?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                deleteFunction(id);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final resumeImage = GestureDetector(
@@ -142,12 +169,9 @@ class CreatedResumeItem extends StatelessWidget {
             label: 'View Resume',
           ),
           ResumeActionButton(
-            onPressed: () => context.pushRoute(ViewResume(resumeID: resume.id)),
-            icon: Icons.download,
-            label: 'Download Resume',
-          ),
-          ResumeActionButton(
-            onPressed: () => deleteFunction(resume.id),
+            onPressed: () {
+              _confirmDeleteResumeItem(context, resume.id);
+            },
             icon: Icons.delete,
             label: 'Delete Resume',
           ),

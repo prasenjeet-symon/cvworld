@@ -1,3 +1,4 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
@@ -5,7 +6,6 @@ import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
 import 'package:flutter_client/client/utils.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rxdart/rxdart.dart';
 
 class WebsiteLinkSection extends StatefulWidget {
@@ -142,12 +142,41 @@ class _WebsiteLinkItemState extends State<WebsiteLinkItem> {
     super.dispose();
   }
 
+  void deleteWebsiteLink(BuildContext context, int linkId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Deletion'),
+          content: const Text('Are you sure you want to delete this website link item?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // Close the dialog and delete the website link item
+                Navigator.of(context).pop();
+                widget.onDelete(linkId);
+              },
+              child: const Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Close the dialog and cancel deletion
+                Navigator.of(context).pop();
+              },
+              child: const Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ExpandableCard(
       index: widget.index,
       title: 'Website & Link Item',
-      onDelete: widget.onDelete,
+      onDelete: (int id) => deleteWebsiteLink(context, id),
       children: Container(
         padding: const EdgeInsets.all(10),
         child: Column(
@@ -340,8 +369,6 @@ class CustomWebsiteLinkSection {
     } else {
       item.add(itemToAdd);
     }
-
-    Fluttertoast.showToast(msg: 'Added a new link', toastLength: Toast.LENGTH_LONG, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
   }
 
   // update the website link
@@ -363,8 +390,6 @@ class CustomWebsiteLinkSection {
     if (savedItemIndex != -1) {
       _userLinks[savedItemIndex] = itemForDatabase;
     }
-
-    Fluttertoast.showToast(msg: 'Link updated', toastLength: Toast.LENGTH_LONG, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
   }
 
   Future<void> removeItem(int index) async {
@@ -380,7 +405,5 @@ class CustomWebsiteLinkSection {
         await DatabaseService().deleteUserLink(DeleteDocuments(itemToRemove.id));
       }
     }
-
-    Fluttertoast.showToast(msg: 'Removed a link', toastLength: Toast.LENGTH_LONG, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white, fontSize: 16.0);
   }
 }

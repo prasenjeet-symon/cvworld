@@ -1,3 +1,4 @@
+// ignore: file_names
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/pages/dashboard/market-place/market-place.dart';
@@ -36,7 +37,7 @@ class _MarketPlaceMobileState extends State<MarketPlaceMobile> {
           },
           icon: const Icon(Icons.arrow_back),
         ),
-        title: const Text('Market Place'),
+        title: const Text('Marketplace Templates'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10),

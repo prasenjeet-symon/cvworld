@@ -33,14 +33,6 @@ class _DashboardMobileState extends State<DashboardMobile> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {
-              // Add your action here
-            },
-          ),
-        ],
       ),
       drawer: DashboardDrawer(logic: logic),
       body: const SingleChildScrollView(
@@ -79,6 +71,39 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
     super.initState();
   }
 
+  void showLogoutConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Logout'),
+          content: const Text('Are you sure you want to log out?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Perform the logout action
+                DatabaseService().logout().then((value) {
+                  // Close the dialog
+                  Navigator.of(context).pop();
+                  // Navigate to the SignInRoute after logout
+                  context.pushRoute(const SignInRoute());
+                });
+              },
+              child: const Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Close the dialog
+                Navigator.of(context).pop();
+              },
+              child: const Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     bool isSubscriber = false;
@@ -107,7 +132,7 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
                 ),
                 DrawerMenuItem(
                   icon: Icons.settings,
-                  title: 'Account Setting',
+                  title: 'Account Settings',
                   onTap: () {
                     context.pushRoute(const AccountSettingPage());
                   },
@@ -125,7 +150,7 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
                   icon: Icons.logout,
                   title: 'Logout',
                   onTap: () {
-                    DatabaseService().logout().then((value) => context.pushRoute(const SignInRoute()));
+                    showLogoutConfirmationDialog(context);
                   },
                 ),
                 const SizedBox(height: 20),

@@ -1,9 +1,9 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:flutter_client/client/datasource.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
 import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
 import 'package:flutter_client/client/utils.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rxdart/rxdart.dart';
 
 class HobbiesSection extends StatefulWidget {
@@ -53,7 +53,6 @@ class HobbiesSectionState extends State<HobbiesSection> {
   Future<void> updateHobby() async {
     var updatedHobby = UserHobby(hobby == null ? 1 : hobby!.id, _controller.text, DateTime.now(), DateTime.now());
     await DatabaseService().addUpdateUserHobby(updatedHobby);
-    Fluttertoast.showToast(msg: "Hobby updated", toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, backgroundColor: Colors.green.withOpacity(0.8), timeInSecForIosWeb: 1, textColor: Colors.white);
   }
 
   @override

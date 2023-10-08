@@ -38,31 +38,10 @@ class HeaderMenus extends StatelessWidget {
                 Container(
                   margin: const EdgeInsets.fromLTRB(0, 0, 40, 0),
                   child: TextButton(
-                    onPressed: () => {context.navigateNamedTo('/')},
-                    child: const Text('Home', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500)),
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.fromLTRB(0, 0, 40, 0),
-                  child: TextButton(
                     onPressed: () => {context.navigateNamedTo('/contact-us')},
                     child: const Text('Contact Us', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500)),
                   ),
                 ),
-                Container(
-                  margin: const EdgeInsets.fromLTRB(0, 0, 40, 0),
-                  child: TextButton(
-                    onPressed: () => {},
-                    child: const Text('About Us', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500)),
-                  ),
-                ),
-                // Container(
-                //   margin: const EdgeInsets.fromLTRB(0, 0, 40, 0),
-                //   child: TextButton(
-                //     onPressed: () => {pricingSectionCallback()},
-                //     child: const Text('Pricing', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500)),
-                //   ),
-                // ),
               ],
             ),
           )
@@ -107,15 +86,25 @@ class HeaderActions extends StatelessWidget {
 class HeaderLogo extends StatelessWidget {
   const HeaderLogo({super.key});
 
+  // Define a function to handle the tap action
+  void _handleLogoTap(BuildContext context) {
+    // Implement the action you want when the logo is clicked
+    // For example, you can navigate to a different screen.
+    context.pushRoute(const HomeRoute());
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-      width: 40,
-      height: 40,
-      child: Image.network(
-        'https://logos-download.com/wp-content/uploads/2016/06/General_Electric_logo_GE.png',
-        fit: BoxFit.cover,
+    return GestureDetector(
+      onTap: () => _handleLogoTap(context),
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+        width: 40,
+        height: 40,
+        child: Image.network(
+          'https://logos-download.com/wp-content/uploads/2016/06/General_Electric_logo_GE.png',
+          fit: BoxFit.cover,
+        ),
       ),
     );
   }

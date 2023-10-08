@@ -15,10 +15,40 @@ class AdminHomePage extends StatefulWidget {
 class _AdminHomePageState extends State<AdminHomePage> {
   AdminHomePageLogic adminHomePageLogic = AdminHomePageLogic();
 
-  Future<void> logout(BuildContext ctx) async {
-    await logoutAdmin();
-    // ignore: use_build_context_synchronously
-    ctx.pushRoute(const SignInDashboardPage());
+  Future<void> confirmLogout(BuildContext ctx) async {
+    // Show a confirmation dialog
+    final bool confirm = await showDialog(
+      context: ctx,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Logout'),
+          content: const Text('Are you sure you want to log out?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // Close the dialog and return false (cancel)
+                Navigator.of(context).pop(false);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Close the dialog and return true (confirm)
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    );
+
+    // If the user confirms, proceed with logout
+    if (confirm == true) {
+      await logoutAdmin();
+      // ignore: use_build_context_synchronously
+      ctx.pushRoute(const SignInDashboardPage());
+    }
   }
 
   @override
@@ -32,29 +62,33 @@ class _AdminHomePageState extends State<AdminHomePage> {
     return Scaffold(
       body: Center(
         child: adminHomePageLogic.isLoading
-            ? const CircularProgressIndicator()
+            ? const Center(
+                child: Padding(
+                padding: EdgeInsets.all(50),
+                child: CircularProgressIndicator(),
+              ))
             : Container(
                 margin: const EdgeInsets.only(top: 70),
                 width: 800,
                 child: Column(
                   children: [
-                    Text('Welcome ${adminHomePageLogic.admin!.fullName}', style: const TextStyle(fontSize: 50, fontWeight: FontWeight.bold)),
+                    Text('Welcome, ${adminHomePageLogic.admin!.fullName}.', style: const TextStyle(fontSize: 50, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 50),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        ActionCard(title: 'All Users', icon: Icons.people, onTap: () => context.pushRoute(const AdminAllUsersPage())),
-                        ActionCard(title: 'All Templates', icon: Icons.format_list_bulleted, onTap: () => {context.pushRoute(const AllTemplatesPage())}),
-                        ActionCard(title: 'Subscription Settings', icon: Icons.settings, onTap: () => context.pushRoute(const AdminSubscriptionSettingPage())),
+                        HoverCard(title: 'All Users', icon: Icons.people, onTap: () => context.pushRoute(const AdminAllUsersPage())),
+                        HoverCard(title: 'All Templates', icon: Icons.format_list_bulleted, onTap: () => {context.pushRoute(const AllTemplatesPage())}),
+                        HoverCard(title: 'Subscription Settings', icon: Icons.settings, onTap: () => context.pushRoute(const AdminSubscriptionSettingPage())),
                       ],
                     ),
                     const SizedBox(height: 50),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        ActionCard(title: 'Update Password', icon: Icons.password, onTap: () => context.pushRoute(const AdminChangePasswordPage())),
-                        ActionCard(title: 'Contact Us Messages', icon: Icons.message, onTap: () => context.pushRoute(const AdminContactUsPage())),
-                        ActionCard(title: 'Sign Out', icon: Icons.logout, onTap: () => logout(context)),
+                        HoverCard(title: 'Update Password', icon: Icons.password, onTap: () => context.pushRoute(const AdminChangePasswordPage())),
+                        HoverCard(title: 'Contact Us Messages', icon: Icons.message, onTap: () => context.pushRoute(const AdminContactUsPage())),
+                        HoverCard(title: 'Sign Out', icon: Icons.logout, onTap: () => confirmLogout(context)),
                       ],
                     )
                   ],
@@ -65,36 +99,60 @@ class _AdminHomePageState extends State<AdminHomePage> {
   }
 }
 
-class ActionCard extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final Function onTap;
+///
+///
+///
+///
 
-  const ActionCard({
-    super.key,
-    required this.title,
-    required this.icon,
-    required this.onTap,
-  });
+class HoverCard extends StatefulWidget {
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
+
+  HoverCard({required this.icon, required this.title, required this.onTap});
+
+  @override
+  _HoverCardState createState() => _HoverCardState();
+}
+
+class _HoverCardState extends State<HoverCard> {
+  bool isHovered = false;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => onTap(),
-      child: Card(
-        elevation: 3,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 35, 20, 35),
-          child: SizedBox(
-            width: 170,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Icon(icon, size: 48, color: Colors.blue),
-                const SizedBox(height: 8),
-                Text(title, style: const TextStyle(fontSize: 16), textAlign: TextAlign.center),
-              ],
+      onTap: widget.onTap, // Invoke the onTap callback when clicked
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) {
+          setState(() {
+            isHovered = true;
+          });
+        },
+        onExit: (_) {
+          setState(() {
+            isHovered = false;
+          });
+        },
+        child: Card(
+          elevation: isHovered ? 6 : 3, // Increase elevation on hover
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 35, 20, 35),
+            child: SizedBox(
+              width: 170,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(widget.icon, size: 48, color: isHovered ? Colors.red : Colors.blue), // Change icon color on hover
+                  const SizedBox(height: 8),
+                  Text(
+                    widget.title,
+                    style: TextStyle(fontSize: 16, color: isHovered ? Colors.red : Colors.black), // Change text color on hover
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
