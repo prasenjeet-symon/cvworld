@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_client/client/pages/home-page/components/footer.dart';
 import 'package:flutter_client/client/pages/home-page/components/header.dart';
 import 'package:flutter_client/client/pages/home-page/components/hero_section.dart';
-import 'package:flutter_client/client/pages/home-page/components/price_section.dart';
 import 'package:flutter_client/client/pages/home-page/components/section_1.dart';
 import 'package:flutter_client/client/pages/home-page/components/section_2.dart';
 

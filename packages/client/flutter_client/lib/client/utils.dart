@@ -12,7 +12,7 @@ class Constants {
   static const String appName = 'CV World';
   static const String appVersion = '1.0';
   static const int debounceTime = 1000;
-  static const googleClientId = '599994784077-8b5i8jsi9s75ddqv8p8v1031gk2mise7.apps.googleusercontent.com';
+  static const googleClientId = '526173453078-5bt1icrr45ub28erv39j62qkpnd5473m.apps.googleusercontent.com';
   static const googleClientIdAndroid = '599994784077-kq6slt22l90qfk6kjl81jti233o1e050.apps.googleusercontent.com';
   static const String razorpayKeyID = 'rzp_test_nkLYI55QVnJlaQ';
   static const int breakPoint = 600;

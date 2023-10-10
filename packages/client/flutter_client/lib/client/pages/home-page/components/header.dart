@@ -99,12 +99,9 @@ class HeaderLogo extends StatelessWidget {
       onTap: () => _handleLogoTap(context),
       child: Container(
         margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-        width: 40,
-        height: 40,
-        child: Image.network(
-          'https://logos-download.com/wp-content/uploads/2016/06/General_Electric_logo_GE.png',
-          fit: BoxFit.cover,
-        ),
+        width: 45,
+        height: 45,
+        child: Image.asset('assets/logo.png', fit: BoxFit.cover),
       ),
     );
   }

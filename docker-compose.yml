@@ -27,7 +27,7 @@ services:
     environment:
       - DATABASE_URL=mysql://root:root@mysql:3306/cvworld
       - ADMIN_EMAIL=iampawanbhatia@gmail.com
-      - ADMIN_PASSWORD=iampawanbhatia
+      - ADMIN_PASSWORD=IamPawanbhatia@134$
       - ADMIN_NAME=Pawan
       - JWT_SECRET=secret
       - RAZORPAY_KEY_ID=rzp_test_nkLYI55QVnJlaQ
