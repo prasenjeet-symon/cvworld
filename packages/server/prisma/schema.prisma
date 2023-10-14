@@ -279,7 +279,7 @@ model ContactUs {
   name       String
   email      String
   phone      String
-  message    String @db.LongText
+  message    String
   isResolved Boolean
   createdAt  DateTime @default(now())
   updatedAt  DateTime @default(now())
