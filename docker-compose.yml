@@ -61,11 +61,28 @@ services:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot/:ro
       - ./certbot/var:/var/lib/letsencrypt
+      - ./packages/web:/code
     depends_on:
       - server
       - client
     networks:
       - mynetwork
+
+  web:
+    container_name: web
+    image: php:7.4-fpm
+    volumes:
+      - ./packages/web:/code
+
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin
+    restart: always
+    environment:
+      - PMA_HOST=mysql
+      - PMA_ABSOLUTE_URI="https://www.cvworld.me/phpmyadmin/"
+    depends_on:
+      - mysql
 
   certbot:
     image: certbot/certbot
