@@ -15,7 +15,7 @@ export default function generateResumeHTML(resume:Resume ){
   </head>
 
   <body>
-    <section
+    <section id="resume" class="resume"
       style="
         font-family: 'Rubik', sans-serif;
         width: 210mm;

@@ -14,7 +14,7 @@ export default function generateResumeHTML(resume:Resume ){
         </style>
       </head>
       <body>
-        <section style="font-family: 'Rubik', sans-serif; width: 210mm; min-height: 297mm; margin: 0 auto; background-color: white; border: 1px solid gainsboro">
+        <section id="resume" class="resume" style="font-family: 'Rubik', sans-serif; width: 210mm; min-height: 297mm; margin: 0 auto; background-color: white; border: 1px solid gainsboro">
           <div style="padding: 15px; background-color: #303846; color: white">
             <div style="font-size: 1.5rem; font-weight: 600; display: ${resume.name ? 'block': 'none'}">${resume.name}</div>
             <div style="display: flex; align-items: center; margin-top: 10px">
