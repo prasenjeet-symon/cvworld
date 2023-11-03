@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/pages/signin-page/components/signin_form_mobile.dart';
-import 'package:flutter_client/client/pages/signup-page/components/signup_form.dart';
-import 'package:flutter_client/routes/router.gr.dart';
+import 'package:cvworld/client/pages/signin-page/components/signin_form_mobile.dart';
+import 'package:cvworld/client/pages/signup-page/components/signup_form.dart';
+import 'package:cvworld/routes/router.gr.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SignUpFormMobile extends StatefulWidget {

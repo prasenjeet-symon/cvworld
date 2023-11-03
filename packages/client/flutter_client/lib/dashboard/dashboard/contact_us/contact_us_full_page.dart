@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/utils.dart';
-import 'package:flutter_client/dashboard/dashboard/contact_us/contact_us_page.dart';
+import 'package:cvworld/client/utils.dart';
+import 'package:cvworld/dashboard/dashboard/contact_us/contact_us_page.dart';
 
 @RoutePage()
 class AdminContactUsFullPage extends StatefulWidget {

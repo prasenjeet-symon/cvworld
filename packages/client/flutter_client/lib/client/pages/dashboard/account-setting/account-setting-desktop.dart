@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/pages/dashboard/account-setting/account-setting.dart';
-import 'package:flutter_client/client/pages/dashboard/components/header.dart';
+import 'package:cvworld/client/pages/dashboard/account-setting/account-setting.dart';
+import 'package:cvworld/client/pages/dashboard/components/header.dart';
 
 class AccountSettingDesktop extends StatefulWidget {
   const AccountSettingDesktop({super.key});

@@ -4,11 +4,11 @@ import 'dart:async';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/datasource.dart';
-import 'package:flutter_client/client/pages/dashboard/view-resume/view-resume-desktop.dart';
-import 'package:flutter_client/client/pages/dashboard/view-resume/view-resume-mobile.dart';
-import 'package:flutter_client/client/utils.dart';
-import 'package:flutter_client/routes/router.gr.dart';
+import 'package:cvworld/client/datasource.dart';
+import 'package:cvworld/client/pages/dashboard/view-resume/view-resume-desktop.dart';
+import 'package:cvworld/client/pages/dashboard/view-resume/view-resume-mobile.dart';
+import 'package:cvworld/client/utils.dart';
+import 'package:cvworld/routes/router.gr.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 @RoutePage()

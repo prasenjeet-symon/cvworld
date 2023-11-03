@@ -11,45 +11,26 @@
 import 'package:auto_route/auto_route.dart' as _i21;
 import 'package:flutter/foundation.dart' as _i22;
 import 'package:flutter/material.dart' as _i23;
-import 'package:flutter_client/client/pages/contact-us-page/contact-us-page.dart'
-    as _i1;
-import 'package:flutter_client/client/pages/dashboard/account-setting/account-setting.dart'
-    as _i2;
-import 'package:flutter_client/client/pages/dashboard/dashboard/dashboard.dart'
-    as _i3;
-import 'package:flutter_client/client/pages/dashboard/market-place/market-place.dart'
-    as _i4;
-import 'package:flutter_client/client/pages/dashboard/view-resume/view-resume.dart'
-    as _i5;
-import 'package:flutter_client/client/pages/home-page/home-page.dart' as _i6;
-import 'package:flutter_client/client/pages/intro-slides/intro-slides.dart'
-    as _i7;
-import 'package:flutter_client/client/pages/make-cv-pages/cv-maker-page.dart'
-    as _i8;
-import 'package:flutter_client/client/pages/signin-page/signin-page.dart'
-    as _i9;
-import 'package:flutter_client/client/pages/signup-page/signup-page.dart'
-    as _i10;
-import 'package:flutter_client/dashboard/dashboard/change_password/change_password.dart'
-    as _i13;
-import 'package:flutter_client/dashboard/dashboard/contact_us/contact_us_full_page.dart'
-    as _i20;
-import 'package:flutter_client/dashboard/dashboard/contact_us/contact_us_page.dart'
-    as _i19;
-import 'package:flutter_client/dashboard/dashboard/home_page/home_page.dart'
-    as _i12;
-import 'package:flutter_client/dashboard/dashboard/subscription_setting/subscription_setting.dart'
-    as _i14;
-import 'package:flutter_client/dashboard/dashboard/templates/all_templates_page.dart'
-    as _i17;
-import 'package:flutter_client/dashboard/dashboard/templates/update_template.dart'
-    as _i18;
-import 'package:flutter_client/dashboard/dashboard/users/all_users_page.dart'
-    as _i15;
-import 'package:flutter_client/dashboard/dashboard/users/user_profile_page.dart'
-    as _i16;
-import 'package:flutter_client/dashboard/sign_in_page/sign_in_page.dart'
-    as _i11;
+import 'package:cvworld/client/pages/contact-us-page/contact-us-page.dart' as _i1;
+import 'package:cvworld/client/pages/dashboard/account-setting/account-setting.dart' as _i2;
+import 'package:cvworld/client/pages/dashboard/dashboard/dashboard.dart' as _i3;
+import 'package:cvworld/client/pages/dashboard/market-place/market-place.dart' as _i4;
+import 'package:cvworld/client/pages/dashboard/view-resume/view-resume.dart' as _i5;
+import 'package:cvworld/client/pages/home-page/home-page.dart' as _i6;
+import 'package:cvworld/client/pages/intro-slides/intro-slides.dart' as _i7;
+import 'package:cvworld/client/pages/make-cv-pages/cv-maker-page.dart' as _i8;
+import 'package:cvworld/client/pages/signin-page/signin-page.dart' as _i9;
+import 'package:cvworld/client/pages/signup-page/signup-page.dart' as _i10;
+import 'package:cvworld/dashboard/dashboard/change_password/change_password.dart' as _i13;
+import 'package:cvworld/dashboard/dashboard/contact_us/contact_us_full_page.dart' as _i20;
+import 'package:cvworld/dashboard/dashboard/contact_us/contact_us_page.dart' as _i19;
+import 'package:cvworld/dashboard/dashboard/home_page/home_page.dart' as _i12;
+import 'package:cvworld/dashboard/dashboard/subscription_setting/subscription_setting.dart' as _i14;
+import 'package:cvworld/dashboard/dashboard/templates/all_templates_page.dart' as _i17;
+import 'package:cvworld/dashboard/dashboard/templates/update_template.dart' as _i18;
+import 'package:cvworld/dashboard/dashboard/users/all_users_page.dart' as _i15;
+import 'package:cvworld/dashboard/dashboard/users/user_profile_page.dart' as _i16;
+import 'package:cvworld/dashboard/sign_in_page/sign_in_page.dart' as _i11;
 
 abstract class $AppRouter extends _i21.RootStackRouter {
   $AppRouter({super.navigatorKey});
@@ -82,9 +63,7 @@ abstract class $AppRouter extends _i21.RootStackRouter {
     },
     ViewResume.name: (routeData) {
       final pathParams = routeData.inheritedPathParams;
-      final args = routeData.argsAs<ViewResumeArgs>(
-          orElse: () =>
-              ViewResumeArgs(resumeID: pathParams.getInt('resumeID')));
+      final args = routeData.argsAs<ViewResumeArgs>(orElse: () => ViewResumeArgs(resumeID: pathParams.getInt('resumeID')));
       return _i21.AutoRoutePage<dynamic>(
         routeData: routeData,
         child: _i5.ViewResume(
@@ -165,9 +144,7 @@ abstract class $AppRouter extends _i21.RootStackRouter {
     },
     UserProfilePage.name: (routeData) {
       final pathParams = routeData.inheritedPathParams;
-      final args = routeData.argsAs<UserProfilePageArgs>(
-          orElse: () =>
-              UserProfilePageArgs(userId: pathParams.getString('userId')));
+      final args = routeData.argsAs<UserProfilePageArgs>(orElse: () => UserProfilePageArgs(userId: pathParams.getString('userId')));
       return _i21.AutoRoutePage<dynamic>(
         routeData: routeData,
         child: _i16.UserProfilePage(
@@ -184,9 +161,7 @@ abstract class $AppRouter extends _i21.RootStackRouter {
     },
     AdminUpdateTemplatePage.name: (routeData) {
       final pathParams = routeData.inheritedPathParams;
-      final args = routeData.argsAs<AdminUpdateTemplatePageArgs>(
-          orElse: () => AdminUpdateTemplatePageArgs(
-              templateId: pathParams.getString('templateId')));
+      final args = routeData.argsAs<AdminUpdateTemplatePageArgs>(orElse: () => AdminUpdateTemplatePageArgs(templateId: pathParams.getString('templateId')));
       return _i21.AutoRoutePage<dynamic>(
         routeData: routeData,
         child: _i18.AdminUpdateTemplatePage(
@@ -203,9 +178,7 @@ abstract class $AppRouter extends _i21.RootStackRouter {
     },
     AdminContactUsFullPage.name: (routeData) {
       final pathParams = routeData.inheritedPathParams;
-      final args = routeData.argsAs<AdminContactUsFullPageArgs>(
-          orElse: () => AdminContactUsFullPageArgs(
-              messageId: pathParams.getString('messageId')));
+      final args = routeData.argsAs<AdminContactUsFullPageArgs>(orElse: () => AdminContactUsFullPageArgs(messageId: pathParams.getString('messageId')));
       return _i21.AutoRoutePage<dynamic>(
         routeData: routeData,
         child: _i20.AdminContactUsFullPage(
@@ -292,8 +265,7 @@ class ViewResume extends _i21.PageRouteInfo<ViewResumeArgs> {
 
   static const String name = 'ViewResume';
 
-  static const _i21.PageInfo<ViewResumeArgs> page =
-      _i21.PageInfo<ViewResumeArgs>(name);
+  static const _i21.PageInfo<ViewResumeArgs> page = _i21.PageInfo<ViewResumeArgs>(name);
 }
 
 class ViewResumeArgs {
@@ -364,8 +336,7 @@ class CvMakerRoute extends _i21.PageRouteInfo<CvMakerRouteArgs> {
 
   static const String name = 'CvMakerRoute';
 
-  static const _i21.PageInfo<CvMakerRouteArgs> page =
-      _i21.PageInfo<CvMakerRouteArgs>(name);
+  static const _i21.PageInfo<CvMakerRouteArgs> page = _i21.PageInfo<CvMakerRouteArgs>(name);
 }
 
 class CvMakerRouteArgs {
@@ -504,8 +475,7 @@ class UserProfilePage extends _i21.PageRouteInfo<UserProfilePageArgs> {
 
   static const String name = 'UserProfilePage';
 
-  static const _i21.PageInfo<UserProfilePageArgs> page =
-      _i21.PageInfo<UserProfilePageArgs>(name);
+  static const _i21.PageInfo<UserProfilePageArgs> page = _i21.PageInfo<UserProfilePageArgs>(name);
 }
 
 class UserProfilePageArgs {
@@ -540,8 +510,7 @@ class AllTemplatesPage extends _i21.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i18.AdminUpdateTemplatePage]
-class AdminUpdateTemplatePage
-    extends _i21.PageRouteInfo<AdminUpdateTemplatePageArgs> {
+class AdminUpdateTemplatePage extends _i21.PageRouteInfo<AdminUpdateTemplatePageArgs> {
   AdminUpdateTemplatePage({
     _i23.Key? key,
     required String templateId,
@@ -558,8 +527,7 @@ class AdminUpdateTemplatePage
 
   static const String name = 'AdminUpdateTemplatePage';
 
-  static const _i21.PageInfo<AdminUpdateTemplatePageArgs> page =
-      _i21.PageInfo<AdminUpdateTemplatePageArgs>(name);
+  static const _i21.PageInfo<AdminUpdateTemplatePageArgs> page = _i21.PageInfo<AdminUpdateTemplatePageArgs>(name);
 }
 
 class AdminUpdateTemplatePageArgs {
@@ -594,8 +562,7 @@ class AdminContactUsPage extends _i21.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i20.AdminContactUsFullPage]
-class AdminContactUsFullPage
-    extends _i21.PageRouteInfo<AdminContactUsFullPageArgs> {
+class AdminContactUsFullPage extends _i21.PageRouteInfo<AdminContactUsFullPageArgs> {
   AdminContactUsFullPage({
     _i23.Key? key,
     required String messageId,
@@ -612,8 +579,7 @@ class AdminContactUsFullPage
 
   static const String name = 'AdminContactUsFullPage';
 
-  static const _i21.PageInfo<AdminContactUsFullPageArgs> page =
-      _i21.PageInfo<AdminContactUsFullPageArgs>(name);
+  static const _i21.PageInfo<AdminContactUsFullPageArgs> page = _i21.PageInfo<AdminContactUsFullPageArgs>(name);
 }
 
 class AdminContactUsFullPageArgs {

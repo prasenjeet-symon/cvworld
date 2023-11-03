@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/pages/dashboard/view-resume/view-resume.dart';
+import 'package:cvworld/client/pages/dashboard/view-resume/view-resume.dart';
 
 class ViewResumeMobile extends StatefulWidget {
   final int resumeID;

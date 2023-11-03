@@ -1,16 +1,16 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
-import 'package:flutter_client/client/pages/make-cv-pages/cv-maker-logic.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/education-section.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/employment-history-section.dart';
+import 'package:cvworld/client/pages/make-cv-pages/cv-maker-logic.dart';
+import 'package:cvworld/client/pages/make-cv-pages/education-section.dart';
+import 'package:cvworld/client/pages/make-cv-pages/employment-history-section.dart';
 
-import 'package:flutter_client/client/pages/make-cv-pages/personal-details-section.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/professional-summry-section.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/skills-section.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/website-links-section.dart';
-import 'package:flutter_client/client/utils.dart';
-import 'package:flutter_client/routes/router.gr.dart';
+import 'package:cvworld/client/pages/make-cv-pages/personal-details-section.dart';
+import 'package:cvworld/client/pages/make-cv-pages/professional-summry-section.dart';
+import 'package:cvworld/client/pages/make-cv-pages/skills-section.dart';
+import 'package:cvworld/client/pages/make-cv-pages/website-links-section.dart';
+import 'package:cvworld/client/utils.dart';
+import 'package:cvworld/routes/router.gr.dart';
 
 @RoutePage()
 class CvMakerScreen extends StatelessWidget {

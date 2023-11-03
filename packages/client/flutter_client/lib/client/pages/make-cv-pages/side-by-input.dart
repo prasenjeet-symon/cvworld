@@ -1,7 +1,7 @@
 // ignore: file_names
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
-import 'package:flutter_client/client/utils.dart';
+import 'package:cvworld/client/pages/make-cv-pages/text-input.dart';
+import 'package:cvworld/client/utils.dart';
 
 class SideBySideInputs extends StatelessWidget {
   final List<CustomInputField> inputFields;

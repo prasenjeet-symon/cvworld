@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/utils.dart';
-import 'package:flutter_client/dashboard/dashboard/users/user_profile_page.dart';
-import 'package:flutter_client/dashboard/datasource_dashboard.dart';
-import 'package:flutter_client/routes/router.gr.dart' as router;
+import 'package:cvworld/client/utils.dart';
+import 'package:cvworld/dashboard/dashboard/users/user_profile_page.dart';
+import 'package:cvworld/dashboard/datasource_dashboard.dart';
+import 'package:cvworld/routes/router.gr.dart' as router;
 
 @RoutePage()
 class AdminAllUsersPage extends StatefulWidget {

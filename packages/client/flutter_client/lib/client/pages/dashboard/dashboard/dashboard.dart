@@ -1,11 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/datasource.dart';
-import 'package:flutter_client/client/pages/dashboard/dashboard/dashboard-desktop.dart';
-import 'package:flutter_client/client/pages/dashboard/dashboard/dashboard-mobile.dart';
-import 'package:flutter_client/client/utils.dart';
-import 'package:flutter_client/routes/router.gr.dart';
+import 'package:cvworld/client/datasource.dart';
+import 'package:cvworld/client/pages/dashboard/dashboard/dashboard-desktop.dart';
+import 'package:cvworld/client/pages/dashboard/dashboard/dashboard-mobile.dart';
+import 'package:cvworld/client/utils.dart';
+import 'package:cvworld/routes/router.gr.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 @RoutePage()

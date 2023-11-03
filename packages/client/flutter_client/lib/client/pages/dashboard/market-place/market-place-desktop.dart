@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/pages/dashboard/market-place/market-place.dart';
+import 'package:cvworld/client/pages/dashboard/market-place/market-place.dart';
 
 class MarketPlaceDesktop extends StatefulWidget {
   const MarketPlaceDesktop({super.key});

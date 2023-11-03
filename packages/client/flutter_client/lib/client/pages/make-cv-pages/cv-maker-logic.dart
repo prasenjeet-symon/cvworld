@@ -1,18 +1,18 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/datasource.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/courses-section.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/education-section.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/employment-history-section.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/hobbie-section.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/internship-section.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/language-section.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/personal-details-section.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/professional-summry-section.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/skills-section.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/website-links-section.dart';
-import 'package:flutter_client/routes/router.gr.dart';
+import 'package:cvworld/client/datasource.dart';
+import 'package:cvworld/client/pages/make-cv-pages/courses-section.dart';
+import 'package:cvworld/client/pages/make-cv-pages/education-section.dart';
+import 'package:cvworld/client/pages/make-cv-pages/employment-history-section.dart';
+import 'package:cvworld/client/pages/make-cv-pages/hobbie-section.dart';
+import 'package:cvworld/client/pages/make-cv-pages/internship-section.dart';
+import 'package:cvworld/client/pages/make-cv-pages/language-section.dart';
+import 'package:cvworld/client/pages/make-cv-pages/personal-details-section.dart';
+import 'package:cvworld/client/pages/make-cv-pages/professional-summry-section.dart';
+import 'package:cvworld/client/pages/make-cv-pages/skills-section.dart';
+import 'package:cvworld/client/pages/make-cv-pages/website-links-section.dart';
+import 'package:cvworld/routes/router.gr.dart';
 
 class CVMakerLogic {
   final String educationSectionTitle = 'Education';
@@ -254,7 +254,7 @@ class CVMakerLogic {
   // init
   init() async {
     await fetchResume();
-    if (oldResume!= null) {
+    if (oldResume != null) {
       addCourse();
       addInternship();
       addHobbies();

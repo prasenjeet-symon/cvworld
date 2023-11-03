@@ -1,12 +1,12 @@
 // ignore: file_names
 
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/datasource.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/expandable-card.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/side-by-input.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/text-input.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
-import 'package:flutter_client/client/utils.dart';
+import 'package:cvworld/client/datasource.dart';
+import 'package:cvworld/client/pages/make-cv-pages/expandable-card.dart';
+import 'package:cvworld/client/pages/make-cv-pages/side-by-input.dart';
+import 'package:cvworld/client/pages/make-cv-pages/text-input.dart';
+import 'package:cvworld/client/pages/make-cv-pages/types.dart';
+import 'package:cvworld/client/utils.dart';
 import 'package:rxdart/rxdart.dart';
 
 class CourseSection extends StatefulWidget {

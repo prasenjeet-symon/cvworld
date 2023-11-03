@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_client/client/datasource.dart' as client;
-import 'package:flutter_client/client/utils.dart';
-import 'package:flutter_client/dashboard/datasource_dashboard.dart';
+import 'package:cvworld/client/datasource.dart' as client;
+import 'package:cvworld/client/utils.dart';
+import 'package:cvworld/dashboard/datasource_dashboard.dart';
 import 'package:intl/intl.dart';
 
 @RoutePage()

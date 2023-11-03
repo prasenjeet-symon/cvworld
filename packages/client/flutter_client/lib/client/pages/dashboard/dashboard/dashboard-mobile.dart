@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/datasource.dart';
-import 'package:flutter_client/client/pages/dashboard/dashboard/dashboard-body.dart';
-import 'package:flutter_client/routes/router.gr.dart';
+import 'package:cvworld/client/datasource.dart';
+import 'package:cvworld/client/pages/dashboard/dashboard/dashboard-body.dart';
+import 'package:cvworld/routes/router.gr.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class DashboardMobile extends StatefulWidget {

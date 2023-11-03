@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_client/routes/router.dart';
+import 'package:cvworld/routes/router.dart';
 
 void main() async {
   runApp(const MyApp());

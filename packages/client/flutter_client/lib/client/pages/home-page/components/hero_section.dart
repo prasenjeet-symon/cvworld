@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/utils.dart';
+import 'package:cvworld/client/utils.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class HeroSection extends StatelessWidget {

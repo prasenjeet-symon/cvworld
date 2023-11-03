@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/pages/dashboard/components/header.dart';
-import 'package:flutter_client/client/pages/dashboard/view-resume/view-resume.dart';
+import 'package:cvworld/client/pages/dashboard/components/header.dart';
+import 'package:cvworld/client/pages/dashboard/view-resume/view-resume.dart';
 
 class ViewResumeDesktop extends StatefulWidget {
   final int resumeID;

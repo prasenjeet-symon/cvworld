@@ -1,7 +1,7 @@
 // ignore: file_names
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/pages/dashboard/market-place/market-place.dart';
+import 'package:cvworld/client/pages/dashboard/market-place/market-place.dart';
 
 class MarketPlaceMobile extends StatefulWidget {
   const MarketPlaceMobile({super.key});

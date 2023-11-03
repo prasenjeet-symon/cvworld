@@ -2,19 +2,19 @@ import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/datasource.dart';
-import 'package:flutter_client/client/pages/dashboard/account-setting/account-setting-mobile.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/courses-section.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/education-section.dart' show EducationSection;
-import 'package:flutter_client/client/pages/make-cv-pages/employment-history-section.dart' show EmploymentHistorySection;
-import 'package:flutter_client/client/pages/make-cv-pages/hobbie-section.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/internship-section.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/language-section.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/personal-details-section.dart' show PersonalDetailSection;
-import 'package:flutter_client/client/pages/make-cv-pages/professional-summry-section.dart' show ProfessionalSummary;
-import 'package:flutter_client/client/pages/make-cv-pages/skills-section.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/website-links-section.dart' show WebsiteLinkSection;
-import 'package:flutter_client/client/utils.dart';
+import 'package:cvworld/client/datasource.dart';
+import 'package:cvworld/client/pages/dashboard/account-setting/account-setting-mobile.dart';
+import 'package:cvworld/client/pages/make-cv-pages/courses-section.dart';
+import 'package:cvworld/client/pages/make-cv-pages/education-section.dart' show EducationSection;
+import 'package:cvworld/client/pages/make-cv-pages/employment-history-section.dart' show EmploymentHistorySection;
+import 'package:cvworld/client/pages/make-cv-pages/hobbie-section.dart';
+import 'package:cvworld/client/pages/make-cv-pages/internship-section.dart';
+import 'package:cvworld/client/pages/make-cv-pages/language-section.dart';
+import 'package:cvworld/client/pages/make-cv-pages/personal-details-section.dart' show PersonalDetailSection;
+import 'package:cvworld/client/pages/make-cv-pages/professional-summry-section.dart' show ProfessionalSummary;
+import 'package:cvworld/client/pages/make-cv-pages/skills-section.dart';
+import 'package:cvworld/client/pages/make-cv-pages/website-links-section.dart' show WebsiteLinkSection;
+import 'package:cvworld/client/utils.dart';
 
 import 'account-setting-desktop.dart';
 

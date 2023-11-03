@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/pages/dashboard/account-setting/account-setting.dart';
+import 'package:cvworld/client/pages/dashboard/account-setting/account-setting.dart';
 
 class AccountSettingMobile extends StatefulWidget {
   const AccountSettingMobile({super.key});

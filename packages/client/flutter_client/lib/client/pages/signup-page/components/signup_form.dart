@@ -1,11 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/datasource.dart';
-import 'package:flutter_client/client/pages/home-page/components/footer.dart';
-import 'package:flutter_client/client/pages/signin-page/components/signin_form_mobile.dart';
-import 'package:flutter_client/client/pages/signup-page/components/signup_form_mobile.dart';
-import 'package:flutter_client/client/utils.dart';
-import 'package:flutter_client/routes/router.gr.dart';
+import 'package:cvworld/client/datasource.dart';
+import 'package:cvworld/client/pages/home-page/components/footer.dart';
+import 'package:cvworld/client/pages/signin-page/components/signin_form_mobile.dart';
+import 'package:cvworld/client/pages/signup-page/components/signup_form_mobile.dart';
+import 'package:cvworld/client/utils.dart';
+import 'package:cvworld/routes/router.gr.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 

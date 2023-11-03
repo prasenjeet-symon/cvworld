@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/pages/dashboard/components/header.dart';
-import 'package:flutter_client/client/pages/dashboard/dashboard/dashboard-body.dart';
+import 'package:cvworld/client/pages/dashboard/components/header.dart';
+import 'package:cvworld/client/pages/dashboard/dashboard/dashboard-body.dart';
 
 class DashboardDesktop extends StatefulWidget {
   const DashboardDesktop({super.key});

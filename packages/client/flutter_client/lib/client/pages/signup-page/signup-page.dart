@@ -1,8 +1,8 @@
 // ignore: file_names
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/pages/signup-page/components/signup_form_mobile.dart';
-import 'package:flutter_client/client/utils.dart';
+import 'package:cvworld/client/pages/signup-page/components/signup_form_mobile.dart';
+import 'package:cvworld/client/utils.dart';
 
 import 'components/signup_form.dart';
 

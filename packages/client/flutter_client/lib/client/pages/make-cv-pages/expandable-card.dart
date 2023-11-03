@@ -1,7 +1,7 @@
 // expandable_card.dart
 
 import 'package:flutter/material.dart';
-import 'package:flutter_client/client/pages/make-cv-pages/types.dart';
+import 'package:cvworld/client/pages/make-cv-pages/types.dart';
 
 class ExpandableCardHeader extends StatelessWidget {
   final String title;
