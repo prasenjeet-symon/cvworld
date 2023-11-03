@@ -751,7 +751,7 @@ class DashboardDataService {
   late Uri adminDetailsRoute;
 
   DashboardDataService() {
-    origin = 'www.cvworld.me';
+    origin = 'https://www.cvworld.me';
     // origin = 'http://localhost:8081';
     signInRoute = Uri.parse('$origin/server/auth/sign_in_as_admin');
     resetPasswordRoute = Uri.parse('$origin/server/api_admin/reset_password');
