@@ -98,9 +98,10 @@ class HeaderLogo extends StatelessWidget {
     return GestureDetector(
       onTap: () => _handleLogoTap(context),
       child: Container(
-        margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+        margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
         width: 45,
         height: 45,
+        color: Colors.white,
         child: Image.asset('assets/logo.png', fit: BoxFit.cover),
       ),
     );

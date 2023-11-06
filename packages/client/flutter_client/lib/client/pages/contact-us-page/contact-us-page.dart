@@ -124,7 +124,20 @@ class _ContactUsPageDesktopBodyState extends State<ContactUsPageDesktopBody> {
                         padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
                         width: double.infinity,
                         child: Text(
-                          ' We will answer all your questions and help you 24/7! ',
+                          'We will answer all your questions and help you 24/7! ',
+                          style: TextStyle(
+                            color: Colors.black.withOpacity(0.7),
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      // Contact us information
+                      Container(
+                        margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                        width: double.infinity,
+                        child: Text(
+                          '\nAddress: Sector 14 west, Chandigarh \nEmail: support@cvworld.me',
                           style: TextStyle(
                             color: Colors.black.withOpacity(0.7),
                             fontSize: 16,
