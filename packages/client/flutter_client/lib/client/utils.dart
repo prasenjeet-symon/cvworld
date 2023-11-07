@@ -15,7 +15,7 @@ class Constants {
   static const int debounceTime = 1000;
   static const googleClientId = '526173453078-5bt1icrr45ub28erv39j62qkpnd5473m.apps.googleusercontent.com';
   static const googleClientIdAndroid = '599994784077-kq6slt22l90qfk6kjl81jti233o1e050.apps.googleusercontent.com';
-  static const String razorpayKeyID = 'rzp_test_nkLYI55QVnJlaQ';
+  static const String razorpayKeyID = 'rzp_test_PYD4xAkex4oV9g';
   static const int breakPoint = 600;
 }
 
