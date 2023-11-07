@@ -312,6 +312,7 @@ class AccountSettingBody extends StatelessWidget {
                     ),
                   ),
                 const PricingPlanCard(),
+                ImageCard(),
                 const AccountCard(),
               ],
             ),

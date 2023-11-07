@@ -21,7 +21,7 @@ const profileUpload = multer({
   storage: profilePictureUpload,
   limits: { fileSize: 10000000 },
   fileFilter: (req, file, cb) => {
-    if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+    if (file.mimetype === "image/jpeg" || file.mimetype === "image/png" ||  file.mimetype === "application/octet-stream") {
       cb(null, true);
     }
   },
@@ -39,6 +39,7 @@ const router = express.Router();
 router.post("/update_user_profile_picture", profileUpload.single("profilePicture"), async (req, res) => {
   const email = res.locals.email;
   const prisma = PrismaClientSingleton.prisma;
+
 
   if ("file" in req && req.file) {
     const filePath = req.file.destination.replace("public", "") + "/" + req.file.filename;

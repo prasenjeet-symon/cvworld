@@ -264,6 +264,7 @@ class Languages {
 }
 
 class Resume {
+  final String profilePicture;
   final String name;
   final String profession;
   final String profile;
@@ -278,6 +279,7 @@ class Resume {
   final List<Skills> skills;
 
   Resume(
+    this.profilePicture,
     this.name,
     this.profession,
     this.profile,
@@ -319,6 +321,7 @@ class Resume {
     List<Skills> skills = (json['skills'] as List<dynamic>).map((e) => Skills(e['skill'], e['level'])).toList();
 
     return Resume(
+      json['profilePicture'] != null ? DatabaseService().publicResource(json['profilePicture']) : '',
       json['name'],
       json['profession'],
       json['profile'],
@@ -336,6 +339,7 @@ class Resume {
 
   toJson() {
     var jsonData = {
+      'profilePicture': profilePicture,
       'name': name,
       'profession': profession,
       'profile': profile,
@@ -2535,24 +2539,54 @@ class DatabaseService {
     }
   }
 
-  // media/update_user_profile_picture receive a file
   Future<User?> updateUserProfilePicture(
-    File file,
+    String fileName,
+    Uint8List? imageBytes,
   ) async {
-    // multi part request
-    var multipartRequest = http.MultipartRequest('POST', updateUserProfilePictureRoute);
-    multipartRequest.files.add(await http.MultipartFile.fromPath('file', file.path));
-
-    var response = await http.Response.fromStream(await multipartRequest.send());
-
-    if (response.statusCode == 200) {
-      var user = await fetchUser();
-      return user;
-    } else {
-      if (kDebugMode) {
-        print('Something went wrong while updating user profile picture');
+    try {
+      if (imageBytes == null) {
+        throw Exception('Image bytes are missing');
       }
 
+      // Multi-part request
+      var request = http.MultipartRequest('POST', updateUserProfilePictureRoute);
+
+      // Create a multipart file from the bytes
+      var multipartFile = http.MultipartFile.fromBytes(
+        'profilePicture',
+        imageBytes,
+        filename: fileName,
+      );
+
+      // Add the multipart file to the request
+      request.files.add(multipartFile);
+
+      // Get the bearer token from your JWT client
+      var client = JwtClient();
+      var bearerToken = await client.getToken();
+
+      // Set the 'Authorization' header with the bearer token
+      request.headers['Authorization'] = 'Bearer $bearerToken';
+
+      print('Sending the request...');
+
+      // Send the request and get the response
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+      print('Received response with status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        var user = await fetchUser(); // Implement fetchUser to get the updated user
+        return user;
+      } else {
+        print('Failed to update user profile picture. Status Code: ${response.statusCode}');
+        print('Response: ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Error during updating user profile picture: $e');
       return null;
     }
   }

@@ -174,7 +174,7 @@ class CVMakerLogic {
     Navigator.of(context, rootNavigator: true).pop();
   }
 
-  Resume getData() {
+  Future<Resume> getData() async {
     // Get data from various sections or provide default values
     var employmentHistoryData = employmentHisKey.currentState?.getData() ?? [];
     var educationSectionData = educationSectionKey.currentState?.getData() ?? [];
@@ -202,8 +202,12 @@ class CVMakerLogic {
     var profile = professionalData?['profile'] ?? '';
     var details = detailsData!; // Replace 'PersonalDetails()' with the default constructor of your 'PersonalDetails' class
 
+    var user = await DatabaseService().fetchUser();
+    var profilePicture = DatabaseService().publicResource(user!.profilePicture!) as String;
+
     // Create and return the Resume object
     return Resume(
+      profilePicture,
       name,
       profession,
       profile,
@@ -225,7 +229,7 @@ class CVMakerLogic {
     int resumeID;
 
     try {
-      var payload = getData();
+      var payload = await getData();
 
       if (oldResume == null) {
         var generatedResume = await DatabaseService().generateResume(

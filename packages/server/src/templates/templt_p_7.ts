@@ -37,7 +37,7 @@ export default function generateResumeHTML(resume:Resume ){
           <div style="margin-top: 15px">
             <img
               style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; object-position: center center"
-              src="https://www.w3schools.com/howto/img_avatar.png"
+              src="${resume.profilePicture}"
               alt=""
               srcset=""
             />

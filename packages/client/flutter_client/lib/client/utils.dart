@@ -1,9 +1,10 @@
 // a function to determine the page width given the context
 
 import 'package:auto_route/auto_route.dart';
+import 'package:cvworld/client/datasource.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:cvworld/client/datasource.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -193,5 +194,129 @@ PlatformType detectPlatformType() {
     return PlatformType.mobile;
   } else {
     return PlatformType.desktop;
+  }
+}
+
+///
+///
+///
+/// Widget to choose profile picture
+
+class ImagePickerWidget extends StatefulWidget {
+  final Function(List<PlatformFile>) onImageSelected;
+
+  const ImagePickerWidget({super.key, required this.onImageSelected});
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _ImagePickerWidgetState createState() => _ImagePickerWidgetState();
+}
+
+class _ImagePickerWidgetState extends State<ImagePickerWidget> {
+  Future<void> _pickImage() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      widget.onImageSelected(result.files);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        ElevatedButton(
+          onPressed: _pickImage,
+          child: const Text('Choose Image'),
+        ),
+      ],
+    );
+  }
+}
+
+class ImageCard extends StatefulWidget {
+  @override
+  State<ImageCard> createState() => _ImageCardState();
+}
+
+class _ImageCardState extends State<ImageCard> {
+  List<PlatformFile> _pickedImage = [];
+  User? user;
+  bool isLoading = true;
+
+  // upload profile pic
+  Future<void> _uploadProfile() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    var user = await DatabaseService().updateUserProfilePicture(_pickedImage.first.name, _pickedImage.first.bytes!);
+    user = user;
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    DatabaseService().fetchUser().then((value) => user = value).then((value) => setState(() {
+          isLoading = false;
+        }));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.black.withOpacity(0.03),
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+      margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
+      child: Row(
+        children: [
+          Container(
+            width: 100, // Adjust the width as needed
+            child: isLoading
+                ? CircularProgressIndicator()
+                : _pickedImage.isNotEmpty
+                    ? CircleAvatar(
+                        backgroundImage: MemoryImage(_pickedImage.first.bytes!),
+                        radius: 50, // Adjust the radius as needed
+                      )
+                    : CircleAvatar(
+                        backgroundImage: NetworkImage(user!.profilePicture!),
+                        radius: 50,
+                      ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Upload a Profile Picture',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ImagePickerWidget(
+                    onImageSelected: (List<PlatformFile> files) {
+                      // Handle the selected image here
+                      _pickedImage = files;
+                      setState(() {
+                        _uploadProfile();
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

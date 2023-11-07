@@ -50,6 +50,7 @@ dependencies:
   intro_slider: ^4.2.0
   intl: ^0.18.1
   flutter_file_downloader: ^1.1.2
+  file_picker: ^6.1.1
 
 dev_dependencies:
   flutter_test:

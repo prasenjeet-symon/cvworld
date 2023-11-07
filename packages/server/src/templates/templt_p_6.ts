@@ -29,7 +29,7 @@ export default function generateResumeHTML(resume:Resume ){
      >
      <div style="position: absolute; top: 0; background-color: #fef3f0; height: 200px;width: 100%; z-index: +2; display: flex; align-items: center;">
         <!-- floating name and profile section  -->
-        <div style="flex: 2.5; display: flex; align-items: center; justify-content: center;"> <img style="width: 80%; height: 80%; border-radius: 50%;" src="https://www.w3schools.com/howto/img_avatar.png" alt="" srcset=""> </div>
+        <div style="flex: 2.5; display: flex; align-items: center; justify-content: center;"> <img style="width: 80%; height: 80%; border-radius: 50%;" src="${resume.profilePicture}" alt="" srcset=""> </div>
         <div style="flex: 5; display: flex; flex-direction: column; align-items: center; justify-content: center;">
             <div style="text-transform: uppercase; font-size: 2.5rem; font-weight: 600;display: ${resume.name ? 'block' : 'none'}">${resume.name}</div>
             <div style="font-size: 1rem; font-weight: 400; margin-top: 20px; letter-spacing: 0.8rem;display: ${resume.profession ? 'block' : 'none'}"> ${resume.profession} </div>

@@ -15,7 +15,7 @@ router.post("/update_resume", async (req, res) => {
   }
 
   const email = res.locals.email;
-  const resume = req.body.resume;
+  let resume = req.body.resume as Resume;
   const resumeID = req.body.id;
 
   // fetched old resume
@@ -25,6 +25,7 @@ router.post("/update_resume", async (req, res) => {
       email: email,
     },
     select: {
+      profilePicture: true,
       resumes: {
         where: {
           id: resumeID,

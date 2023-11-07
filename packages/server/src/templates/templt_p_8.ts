@@ -29,7 +29,7 @@ export default function generateResumeHTML(resume:Resume ){
         align-items: flex-start;
         ">
          <div style="flex: 2.5;background-color: white;">
-            <div style="padding: 15px; display: flex; flex-direction: column; align-items: center;"> <img style="width: 150px; height: 150px;border-radius: 5%;" src="https://www.w3schools.com/howto/img_avatar.png" alt="" srcset=""> </div>
+            <div style="padding: 15px; display: flex; flex-direction: column; align-items: center;"> <img style="width: 150px; height: 150px;border-radius: 5%;" src="${resume.profilePicture}" alt="" srcset=""> </div>
             <div style="padding: 10px; margin-bottom: 15px; margin-top: 0px">
                 <div style="border-bottom: 0px solid gainsboro; font-size: 1rem; padding: 5px; margin-bottom: 10px">Personal Details</div>
                 <div style="display: ${resume.details.email ? 'flex' : 'none'}; align-items: flex-start; font-size: 0.8rem; padding: 5px; margin-bottom: 2px">

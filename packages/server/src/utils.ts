@@ -1147,6 +1147,7 @@ export interface Resume {
   name: string;
   profession: string;
   profile: string;
+  profilePicture: string;
   employmentHistory: {
     job: string;
     employer: string;
@@ -1207,6 +1208,7 @@ import axios from "axios";
 // Generate dummy data for the Resume interface
 export function generateDummyResume(): Resume {
   const resume: Resume = {
+    profilePicture: 'https://picsum.photos/200/200',
     name: faker.name.fullName(),
     profession: faker.name.jobTitle(),
     profile: faker.lorem.paragraph(),
