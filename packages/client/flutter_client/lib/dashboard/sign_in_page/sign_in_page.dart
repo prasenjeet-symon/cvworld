@@ -63,7 +63,10 @@ class SignInForm extends StatelessWidget {
         children: [
           EmailInput(emailController: emailController),
           const SizedBox(height: 15),
-          PasswordInputWithToggle(passwordController: passwordController),
+          PasswordInputWithToggle(
+            passwordController: passwordController,
+            canValidate: false,
+          ),
           const SizedBox(height: 50),
           ElevatedButton(
             onPressed: () {

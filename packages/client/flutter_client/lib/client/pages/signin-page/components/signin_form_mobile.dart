@@ -218,8 +218,9 @@ class SignUpText extends StatelessWidget {
 ///
 class PasswordInputWithToggle extends StatefulWidget {
   final TextEditingController passwordController;
+  bool canValidate = true;
 
-  const PasswordInputWithToggle({super.key, required this.passwordController});
+  PasswordInputWithToggle({super.key, required this.passwordController, this.canValidate = true});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -234,7 +235,7 @@ class _PasswordInputWithToggleState extends State<PasswordInputWithToggle> {
       return 'Please enter a password';
     }
 
-    // Check if the password is at least 8 characters long.
+    //Check if the password is at least 8 characters long.
     if (value.length < 8) {
       return 'Password must be at least 8 characters long';
     }
@@ -284,7 +285,7 @@ class _PasswordInputWithToggleState extends State<PasswordInputWithToggle> {
           },
         ),
       ),
-      validator: (value) => _validatePassword(value!),
+      validator: widget.canValidate ? (value) => _validatePassword(value!) : null,
     );
   }
 }

@@ -122,7 +122,7 @@ class SignInLogic {
                 ),
               ),
             ),
-            duration: Duration(seconds: 30),
+            duration: Duration(seconds: 5),
           ),
         );
       }
@@ -140,7 +140,7 @@ class SignInLogic {
                 ),
               ),
             ),
-            duration: Duration(seconds: 30),
+            duration: Duration(seconds: 5),
           ),
         );
       }
@@ -162,6 +162,7 @@ class SignInLogic {
             ),
           ),
         ),
+        duration: Duration(seconds: 5),
       ),
     );
 

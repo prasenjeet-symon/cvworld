@@ -410,7 +410,7 @@ router.post("/update_marketplace_template", async (req, res) => {
     },
     data: {
       price: price,
-      name: name,
+      displayName: name,
       updatedAt: new Date(),
     }
   });

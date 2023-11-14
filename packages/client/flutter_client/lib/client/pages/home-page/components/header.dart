@@ -42,6 +42,13 @@ class HeaderMenus extends StatelessWidget {
                     child: const Text('Contact Us', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500)),
                   ),
                 ),
+                Container(
+                  margin: const EdgeInsets.fromLTRB(0, 0, 40, 0),
+                  child: TextButton(
+                    onPressed: () => {context.navigateNamedTo('/about-us')},
+                    child: const Text('About Us', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500)),
+                  ),
+                ),
               ],
             ),
           )

@@ -47,14 +47,14 @@ class _AllTemplatesPageState extends State<AllTemplatesPage> {
                         context.popRoute(const AllTemplatesPage());
                       }),
                       const SizedBox(height: 50),
-                      // Text heading "Marketplace Templates"
-                      const Text('Marketplace Templates', style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 35),
-                      // add new template , we need form for adding new template
-                      // template name input
-                      NewTemplateForm(onSubmit: (name, price) => {allTemplatesPageLogic.addTemplate(name, int.parse(price.toString()), setState)}),
-                      const SizedBox(height: 50),
-                      // text heading "All Templates"
+                      // // Text heading "Marketplace Templates"
+                      // const Text('Marketplace Templates', style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+                      // const SizedBox(height: 35),
+                      // // add new template , we need form for adding new template
+                      // // template name input
+                      // NewTemplateForm(onSubmit: (name, price) => {allTemplatesPageLogic.addTemplate(name, int.parse(price.toString()), setState)}),
+                      // const SizedBox(height: 50),
+                      // // text heading "All Templates"
                       const Text('All Templates', style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 35),
                       // list of all templates
@@ -269,7 +269,7 @@ class AllTemplatesPageLogic {
   Future<MarketplaceTemplate?> getSingleTemplate(int id, void Function(void Function()) setState) async {
     setState(() => isLoading = true);
     var data = await DashboardDataService().getSingleMarketplaceTemplate(id);
-    nameController.text = data!.name;
+    nameController.text = data!.displayName;
     priceController.text = data.price.toString();
     setState(() => isLoading = false);
   }

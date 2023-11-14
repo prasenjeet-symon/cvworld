@@ -160,7 +160,10 @@ class CreatedResumeItem extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(10),
-            child: Text('${resume.resume.profession}.pdf', style: const TextStyle(fontSize: 20)),
+            child: Text(
+              '${resume.resume.profession.length > 20 ? resume.resume.profession.substring(0, 20) + "..." : resume.resume.profession}.pdf',
+              style: const TextStyle(fontSize: 20),
+            ),
           ),
           const SizedBox(height: 5),
           ResumeActionButton(

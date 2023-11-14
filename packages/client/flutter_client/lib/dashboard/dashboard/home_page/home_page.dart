@@ -72,7 +72,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                 width: 800,
                 child: Column(
                   children: [
-                    Text('Welcome, ${adminHomePageLogic.admin!.fullName}.', style: const TextStyle(fontSize: 50, fontWeight: FontWeight.bold)),
+                    Text('Welcome, ${adminHomePageLogic.admin!.fullName} !', style: const TextStyle(fontSize: 50, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 50),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,

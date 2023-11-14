@@ -219,6 +219,7 @@ class MarketPlaceTemplates extends StatelessWidget {
         ...filteredTemplates.map(
           (template) => MarketPlaceTemplateItem(
             templateName: template.name,
+            templateDisplayName: template.displayName,
             imageUrl: template.previewImgUrl,
             price: template.price,
             isBought: template.isBought,
@@ -330,6 +331,7 @@ class MarketPlaceTemplateItem extends StatelessWidget {
   final bool isPremium;
   final bool isBought;
   final String templateName;
+  final String templateDisplayName;
   final double width;
   final double height;
 
@@ -340,6 +342,7 @@ class MarketPlaceTemplateItem extends StatelessWidget {
     this.isPremium = false,
     this.isBought = false,
     required this.templateName,
+    required this.templateDisplayName,
     required this.width,
     required this.height,
   }) : super(key: key);
@@ -361,6 +364,20 @@ class MarketPlaceTemplateItem extends StatelessWidget {
           height: height,
           child: Column(
             children: [
+              Container(
+                width: width,
+                padding: const EdgeInsets.all(5), // Adjust padding as needed
+                color: Colors.blue, // Set the background color
+                child: Text(
+                  templateDisplayName,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: Colors.white, // Set the text color
+                  ),
+                ),
+              ),
               TemplateImage(imageUrl: imageUrl, width: width, height: height),
               PriceAndIcons(
                 price: price,

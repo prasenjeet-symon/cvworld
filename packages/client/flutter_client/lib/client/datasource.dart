@@ -1248,6 +1248,8 @@ class IsBought {
 class TemplateMarketPlace {
   final int id;
   final String name;
+  final String displayName;
+  final String displayDescription;
   final double price;
   final String previewImgUrl;
   final DateTime createdAt;
@@ -1258,6 +1260,8 @@ class TemplateMarketPlace {
   TemplateMarketPlace({
     required this.id,
     required this.name,
+    required this.displayName,
+    required this.displayDescription,
     required this.price,
     required this.previewImgUrl,
     required this.createdAt,
@@ -1270,6 +1274,8 @@ class TemplateMarketPlace {
     return TemplateMarketPlace(
       id: json['id'],
       name: json['name'],
+      displayName: json['displayName'],
+      displayDescription: json['displayDescription'],
       price: double.parse(json['price'].toString()),
       previewImgUrl: DatabaseService().publicResource(json['previewImgUrl']),
       createdAt: DateTime.parse(json['createdAt']),
@@ -1283,6 +1289,8 @@ class TemplateMarketPlace {
     return {
       'id': id,
       'name': name,
+      'displayName': displayName,
+      'displayDescription': displayDescription,
       'price': price,
       'previewImgUrl': previewImgUrl,
       'createdAt': createdAt.toUtc().toIso8601String(),

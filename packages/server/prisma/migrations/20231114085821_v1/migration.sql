@@ -275,7 +275,7 @@ CREATE TABLE `ContactUs` (
     `name` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
     `phone` VARCHAR(191) NOT NULL,
-    `message` VARCHAR(191) NOT NULL,
+    `message` LONGTEXT NOT NULL,
     `isResolved` BOOLEAN NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -378,6 +378,8 @@ CREATE TABLE `NetBankingPayment` (
 CREATE TABLE `ResumeTemplateMarketplace` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
+    `displayName` VARCHAR(191) NOT NULL DEFAULT '',
+    `displayDescription` VARCHAR(191) NOT NULL DEFAULT '',
     `price` DOUBLE NOT NULL,
     `previewImgUrl` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),

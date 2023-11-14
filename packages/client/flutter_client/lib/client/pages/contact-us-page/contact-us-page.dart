@@ -328,10 +328,10 @@ class PhoneNumberInput extends StatelessWidget {
       return 'Phone number is required';
     }
 
-    // Validate the phone number format using a regular expression.
-    if (!RegExp(r'^\d{10}$').hasMatch(value)) {
-      return 'Invalid phone number. Please enter 10 digits.';
-    }
+    // // Validate the phone number format using a regular expression.
+    // if (!RegExp(r'^\d{10}$').hasMatch(value)) {
+    //   return 'Invalid phone number. Please enter 10 digits.';
+    // }
 
     return null;
   }

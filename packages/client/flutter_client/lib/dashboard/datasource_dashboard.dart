@@ -172,7 +172,7 @@ class User {
       id: json['id'] as int,
       email: json['email'] as String,
       fullName: json['fullName'] as String,
-      profilePicture: json['profilePicture'] as String,
+      profilePicture: DatabaseService().publicResource(json['profilePicture'] as String),
       password: json['password'] as String,
       reference: json['reference'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
@@ -529,6 +529,8 @@ String paymentMethodToString(PaymentMethod method) {
 class MarketplaceTemplate {
   final int id;
   final String name;
+  final String displayName;
+  final String displayDescription;
   final int price; // in paisa
   final String previewImageUrl;
   final DateTime createdAt;
@@ -537,6 +539,8 @@ class MarketplaceTemplate {
   MarketplaceTemplate({
     required this.id,
     required this.name,
+    required this.displayName,
+    required this.displayDescription,
     required this.price,
     required this.previewImageUrl,
     required this.createdAt,
@@ -547,6 +551,8 @@ class MarketplaceTemplate {
     return MarketplaceTemplate(
       id: json['id'],
       name: json['name'],
+      displayName: json['displayName'],
+      displayDescription: json['displayDescription'],
       price: int.parse(json['price'].toString()),
       previewImageUrl: DatabaseService().publicResource(json['previewImgUrl']),
       createdAt: DateTime.parse(json['createdAt'] as String),
@@ -558,6 +564,8 @@ class MarketplaceTemplate {
     return {
       'id': id,
       'name': name,
+      'displayName': displayName,
+      'displayDescription': displayDescription,
       'price': price,
       'previewImgUrl': previewImageUrl,
       'createdAt': createdAt.toUtc().toIso8601String(),
@@ -752,7 +760,7 @@ class DashboardDataService {
 
   DashboardDataService() {
     origin = 'https://cvworld.me';
-    //origin = 'http://localhost:8081';
+    // origin = 'http://localhost:8081';
     signInRoute = Uri.parse('$origin/server/auth/sign_in_as_admin');
     resetPasswordRoute = Uri.parse('$origin/server/api_admin/reset_password');
     addTemplateRoute = Uri.parse('$origin/server/api_admin/add_template');
