@@ -198,12 +198,12 @@ class _ContactUsFormState extends State<ContactUsForm> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          backgroundColor: Colors.blueGrey,
+          backgroundColor: Colors.red,
           content: Center(
             child: Text(
-              'Please fix the errors in the form.',
+              'Please fill all the required fields',
               style: TextStyle(
-                color: Colors.red,
+                color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -328,10 +328,10 @@ class PhoneNumberInput extends StatelessWidget {
       return 'Phone number is required';
     }
 
-    // // Validate the phone number format using a regular expression.
-    // if (!RegExp(r'^\d{10}$').hasMatch(value)) {
-    //   return 'Invalid phone number. Please enter 10 digits.';
-    // }
+    // Validate the phone number format using a regular expression.
+    if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
+      return 'Invalid phone number. Please enter only numeric digits.';
+    }
 
     return null;
   }

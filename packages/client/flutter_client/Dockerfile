@@ -17,8 +17,9 @@ RUN flutter pub get
 # Copy the rest of the project files to the container
 COPY . .
 
+
 # Build the Flutter web application
-RUN flutter build web
+RUN flutter build web --release
 
 # Use a lightweight web server to serve the built files
 FROM nginx:alpine

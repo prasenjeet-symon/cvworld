@@ -1,9 +1,10 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/utils.dart';
 import 'package:cvworld/dashboard/dashboard/users/user_profile_page.dart';
 import 'package:cvworld/dashboard/datasource_dashboard.dart';
 import 'package:cvworld/routes/router.gr.dart' as router;
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 @RoutePage()
 class AdminAllUsersPage extends StatefulWidget {
@@ -77,11 +78,25 @@ class AdminAllUsersLogic {
   List<User> users = [];
 
   Future<void> fetchAllUsers(void Function(void Function()) setState) async {
-    // fetch
-    var response = await DashboardDataService().getUsers();
-    if (response != null) {
-      users = response;
-      setState(() {});
+    try {
+      // Fetch users
+      var response = await DashboardDataService().getUsers();
+
+      // Check if response is not null and not empty
+      if (response != null && response.isNotEmpty) {
+        // Update the users list
+        users = response;
+      } else {
+        // Handle the case when the response is null or empty
+        if (kDebugMode) {
+          print('Error: Empty or null response from getUsers');
+        }
+      }
+    } catch (e) {
+      // Handle any errors that occurred during the fetch operation
+      if (kDebugMode) {
+        print('Error fetching users: $e');
+      }
     }
   }
 }

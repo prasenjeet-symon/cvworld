@@ -54,38 +54,14 @@ services:
     image: nginx
     ports:
       - 80:80
-      - 443:443
     restart: always
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot/:ro
-      - ./certbot/var:/var/lib/letsencrypt
+      - ./nginx-local.conf:/etc/nginx/nginx.conf
     depends_on:
       - server
       - client
     networks:
       - mynetwork
-
-  adminer:
-    image: adminer:latest
-    container_name: adminer
-    environment:
-      ADMINER_DEFAULT_SERVER: mysql
-    restart: always
-    ports:
-      - 7777:8080
-
-  certbot:
-    image: certbot/certbot
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot:rw
-      - ./certbot/var:/var/lib/letsencrypt
-    networks:
-      - mynetwork
-    command: certonly --webroot --webroot-path=/var/www/certbot --force-renewal --email pawan.apexinfosys@gmail.com --agree-tos --no-eff-email -d cvworld.me -d www.cvworld.me
-
 
 networks:
   mynetwork:

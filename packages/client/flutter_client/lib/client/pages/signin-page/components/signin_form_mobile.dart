@@ -235,6 +235,10 @@ class _PasswordInputWithToggleState extends State<PasswordInputWithToggle> {
       return 'Please enter a password';
     }
 
+    if (!widget.canValidate) {
+      return null;
+    }
+
     //Check if the password is at least 8 characters long.
     if (value.length < 8) {
       return 'Password must be at least 8 characters long';
@@ -285,7 +289,7 @@ class _PasswordInputWithToggleState extends State<PasswordInputWithToggle> {
           },
         ),
       ),
-      validator: widget.canValidate ? (value) => _validatePassword(value!) : null,
+      validator: (value) => _validatePassword(value!),
     );
   }
 }
