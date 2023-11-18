@@ -948,12 +948,6 @@ export async function signUpWithEmailAndPassword(req: Request, res: Response) {
       return;
     }
 
-    // if the password is week or less than 8 characters, return
-    if (isWeakPassword(password)) {
-      res.status(403).json({ message: "Password is weak" });
-      return;
-    }
-
     const hashedPassword = hashPassword(password);
 
     // Save the user to the database or perform any desired actions
@@ -1804,7 +1798,7 @@ export async function generatePDF(resume: Resume, resumeMaker: null | ((resume: 
   // create the resume.pdf file in the public folder
   const resumeName = resumeUUID ? resumeUUID : v4();
   const resumeFilePath = path.join(publicFolderPath, `${resumeName}.pdf`);
-  await page.pdf({ path: resumeFilePath, format: "A4" });
+  await page.pdf({ path: resumeFilePath, format: "A4", printBackground: true });
   return `${resumeName}.pdf`;
 }
 
