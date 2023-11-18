@@ -21,9 +21,10 @@ class PersonalDetailSection extends StatefulWidget {
 
 class PersonalDetailSectionState extends State<PersonalDetailSection> {
   final List<TextEditingController> _controllers = [];
+  final BehaviorSubject<int> _userDetailsSubject = BehaviorSubject();
+
   bool _canShowInputs = false;
   UserDetails? _userDetails;
-  final BehaviorSubject<int> _userDetailsSubject = BehaviorSubject();
 
   final List<CustomInputType> inputs = [];
   late final List<CustomInputField> _upperInputs;
@@ -50,7 +51,7 @@ class PersonalDetailSectionState extends State<PersonalDetailSection> {
       inputs.firstWhere((element) => element.jsonKey == 'drivingLicense').controller.text,
       inputs.firstWhere((element) => element.jsonKey == 'nationality').controller.text,
       inputs.firstWhere((element) => element.jsonKey == 'placeOfBirth').controller.text,
-      DateTime.parse(inputs.firstWhere((element) => element.jsonKey == 'dateOfBirth').controller.text.isEmpty ? DateTime.now().toIso8601String() : inputs.firstWhere((element) => element.jsonKey == 'dateOfBirth').controller.text),
+      parseDate(inputs.firstWhere((element) => element.jsonKey == 'dateOfBirth').controller.text.isEmpty ? formatDateTime(getCurrentDatetime()) : inputs.firstWhere((element) => element.jsonKey == 'dateOfBirth').controller.text),
     );
   }
 
@@ -177,7 +178,6 @@ class PersonalDetailSectionState extends State<PersonalDetailSection> {
     }
 
     _userDetailsSubject.close();
-
     super.dispose();
   }
 
@@ -245,7 +245,7 @@ class PersonalDetailSectionState extends State<PersonalDetailSection> {
 
     // Patch the personal details by updating the controller
     // for the first name
-    inputs.firstWhere((element) => element.jsonKey == 'firstName').controller.text = userDetail!.name.split(' ')[0];
+    inputs.firstWhere((element) => element.jsonKey == 'firstName').controller.text = userDetail.name.split(' ')[0];
 
     // for the last name
     inputs.firstWhere((element) => element.jsonKey == 'lastName').controller.text = userDetail.name.split(' ')[1];
@@ -314,7 +314,6 @@ class PersonalDetailSectionState extends State<PersonalDetailSection> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isMobile = MediaQuery.of(context).size.width < Constants.breakPoint;
     return Container(
       margin: const EdgeInsets.fromLTRB(0, 45, 0, 45),
       child: Column(

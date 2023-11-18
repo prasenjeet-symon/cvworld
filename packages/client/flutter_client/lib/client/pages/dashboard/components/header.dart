@@ -1,8 +1,9 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/datasource.dart';
 import 'package:cvworld/client/pages/dashboard/components/profile.dart';
 import 'package:cvworld/routes/router.gr.dart';
+import 'package:flutter/material.dart';
+import 'package:rxdart/subjects.dart';
 
 // Business Logic Class for DashboardHeader
 class DashboardHeaderLogic {
@@ -23,7 +24,9 @@ class DashboardHeaderLogic {
 }
 
 class DashboardHeader extends StatefulWidget {
-  const DashboardHeader({super.key});
+  BehaviorSubject<bool>? canRefresh;
+
+  DashboardHeader({super.key, this.canRefresh});
 
   @override
   State<DashboardHeader> createState() => _DashboardHeaderState();
@@ -37,6 +40,14 @@ class _DashboardHeaderState extends State<DashboardHeader> {
     super.initState();
     dashboardHeaderLogic = DashboardHeaderLogic(setStateCallback: _updateState);
     dashboardHeaderLogic.fetchUser();
+
+    if (widget.canRefresh != null) {
+      widget.canRefresh!.listen((event) {
+        if (event) {
+          dashboardHeaderLogic.fetchUser();
+        }
+      });
+    }
   }
 
   void _updateState() {
@@ -78,7 +89,7 @@ class _DashboardHeaderState extends State<DashboardHeader> {
           Row(
             children: [
               if (!(user.subscription != null) || !user.subscription!.isActive) _buildUpgradeButton(context),
-              const ProfileOptions(),
+              ProfileOptions(canRefresh: widget.canRefresh),
             ],
           ),
         ],

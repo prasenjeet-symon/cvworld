@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:cvworld/client/datasource.dart';
 import 'package:cvworld/routes/router.gr.dart';
+import 'package:rxdart/subjects.dart';
 
 // Business Logic Class for ProfileOptions
 class ProfileOptionsLogic {
@@ -27,7 +28,9 @@ class ProfileOptionsLogic {
 }
 
 class ProfileOptions extends StatefulWidget {
-  const ProfileOptions({super.key});
+  BehaviorSubject<bool>? canRefresh;
+
+  ProfileOptions({super.key, this.canRefresh});
 
   @override
   State<ProfileOptions> createState() => _ProfileOptionsState();
@@ -41,6 +44,14 @@ class _ProfileOptionsState extends State<ProfileOptions> {
     super.initState();
     profileOptionsLogic = ProfileOptionsLogic(setStateCallback: _updateState);
     _fetchPersonalDetails();
+
+    if (widget.canRefresh != null) {
+      widget.canRefresh!.listen((event) {
+        if (event) {
+          _fetchPersonalDetails();
+        }
+      });
+    }
   }
 
   void _updateState() {

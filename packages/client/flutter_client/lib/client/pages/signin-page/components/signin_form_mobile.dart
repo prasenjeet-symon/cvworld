@@ -220,7 +220,7 @@ class PasswordInputWithToggle extends StatefulWidget {
   final TextEditingController passwordController;
   bool canValidate = true;
 
-  PasswordInputWithToggle({super.key, required this.passwordController, this.canValidate = true});
+  PasswordInputWithToggle({super.key, required this.passwordController, this.canValidate = false});
 
   @override
   // ignore: library_private_types_in_public_api

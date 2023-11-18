@@ -2,13 +2,13 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/datasource.dart';
 import 'package:cvworld/client/pages/dashboard/view-resume/view-resume-desktop.dart';
 import 'package:cvworld/client/pages/dashboard/view-resume/view-resume-mobile.dart';
 import 'package:cvworld/client/utils.dart';
 import 'package:cvworld/routes/router.gr.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 @RoutePage()
@@ -91,16 +91,15 @@ class ResumeViewerLogic {
   late GeneratedResume? resume;
   bool isLoading = true;
   bool canDownload = false;
-  late Timer timer;
+  Timer? timer;
+  int buyTemplateCallbackCount = 0;
 
   final Function setStateCallback;
 
   ResumeViewerLogic({required this.setStateCallback});
 
   dispose() {
-    if (timer != null) {
-      timer.cancel();
-    }
+    timer?.cancel();
   }
 
   // Initialize the logic with the given resume ID
@@ -143,7 +142,7 @@ class ResumeViewerLogic {
   Future<bool> checkIsBought(GeneratedResume resume) async {
     var isBought = await DatabaseService().isTemplateBought(resume.templateName);
     if (isBought != null) {
-      return isBought!.isBought;
+      return isBought.isBought;
     } else {
       return false;
     }
@@ -152,23 +151,25 @@ class ResumeViewerLogic {
   // Check if the user is a subscriber
   Future<bool> checkSubscriber() async {
     var user = await DatabaseService().fetchUser();
-    if (user != null) {
-      if (user!.subscription != null && user.subscription!.isActive) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
+    return user?.subscription?.isActive ?? false;
   }
 
   // Buy the template for the given resume
-  Future<void> buyTemplate(String templateName) async {
+  Future<void> buyTemplate(String templateName, Function callback) async {
+    timer?.cancel();
+    buyTemplateCallbackCount = 0;
+
     var url = await DatabaseService().buyTemplate(templateName);
-    Timer.periodic(const Duration(seconds: 15), (timer) {
-      timer = timer;
-      init(resume!.id);
+
+    timer = Timer.periodic(const Duration(seconds: 2), (timer) async {
+      canDownload = await checkIsBought(resume!);
+      setStateCallback();
+      // If bought then show thanks popup
+      if (canDownload && buyTemplateCallbackCount == 0) {
+        buyTemplateCallbackCount = 1;
+        timer.cancel();
+        callback();
+      }
     });
 
     openLinkInBrowser(url.toString());
@@ -201,6 +202,7 @@ class _ResumeViewerState extends State<ResumeViewer> {
       }
     });
 
+    _logic.dispose();
     _logic.init(widget.resumeID);
   }
 
@@ -208,6 +210,45 @@ class _ResumeViewerState extends State<ResumeViewer> {
   void dispose() {
     _logic.dispose();
     super.dispose();
+  }
+
+  Future<void> _showGratitudePopup(BuildContext context, Function callback) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Thank You for Buying Our Template!',
+            textAlign: TextAlign.center,
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'We appreciate your support.',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20.0),
+              ElevatedButton(
+                onPressed: () {
+                  callback();
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Download Resume'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -236,6 +277,7 @@ class _ResumeViewerState extends State<ResumeViewer> {
                   Container(
                     margin: const EdgeInsets.fromLTRB(0, 25, 0, 0),
                     child: BackButtonApp(onPressed: () {
+                      _logic.dispose();
                       context.popRoute(ViewResume(resumeID: widget.resumeID));
                     }),
                   ),
@@ -255,7 +297,7 @@ class _ResumeViewerState extends State<ResumeViewer> {
                       margin: const EdgeInsets.fromLTRB(0, 0, 20, 0),
                       child: ViewResumeButton(
                         onPressed: () {
-                          // Add your download functionality here
+                          _logic.dispose();
                           context.pushRoute(CvMakerRoute(resumeID: widget.resumeID, templateName: 'Edit'));
                         },
                         buttonText: 'Edit',
@@ -269,6 +311,7 @@ class _ResumeViewerState extends State<ResumeViewer> {
                       child: canDownload
                           ? ViewResumeButton(
                               onPressed: () {
+                                _logic.dispose();
                                 if (kIsWeb) {
                                   downloadFile(_logic.resume!.resumeLink.pdfUrl, _logic.resume!.resumeLink.pdfUrl);
                                 } else {
@@ -282,7 +325,15 @@ class _ResumeViewerState extends State<ResumeViewer> {
                             )
                           : ViewResumeButton(
                               onPressed: () {
-                                _logic.buyTemplate(_logic.resume!.templateName);
+                                _logic.buyTemplate(_logic.resume!.templateName, () {
+                                  _showGratitudePopup(context, () {
+                                    if (kIsWeb) {
+                                      downloadFile(_logic.resume!.resumeLink.pdfUrl, _logic.resume!.resumeLink.pdfUrl);
+                                    } else {
+                                      DatabaseService().downloadAndSavePdf(_logic.resume!.resumeLink.pdfUrl);
+                                    }
+                                  });
+                                });
                               },
                               buttonText: 'Buy Now',
                               backgroundColor: Colors.blue,

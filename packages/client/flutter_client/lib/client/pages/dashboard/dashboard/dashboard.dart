@@ -136,6 +136,7 @@ class CreatedResumeItem extends StatelessWidget {
               child: const Text('Delete'),
               onPressed: () {
                 deleteFunction(id);
+                Navigator.of(context).pop();
               },
             ),
           ],
