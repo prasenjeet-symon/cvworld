@@ -217,11 +217,17 @@ class _ResumeViewerState extends State<ResumeViewer> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Thank You for Buying Our Template!'),
+          title: const Text(
+            'Thank You for Buying Our Template!',
+            textAlign: TextAlign.center,
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('We appreciate your support.'),
+              const Text(
+                'We appreciate your support.',
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: () {

@@ -239,11 +239,17 @@ class _PricingPlanCardState extends State<PricingPlanCard> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Cancel Subscription'),
+          title: const Text(
+            'Cancel Subscription',
+            textAlign: TextAlign.center,
+          ),
           content: const Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Are you sure you want to cancel your subscription?'),
+              Text(
+                'Are you sure you want to cancel your subscription?',
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
           actions: [
@@ -276,11 +282,17 @@ class _PricingPlanCardState extends State<PricingPlanCard> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Congratulations!'),
+          title: const Text(
+            'Congratulations!',
+            textAlign: TextAlign.center,
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('Thank you for becoming a Premium Member.'),
+              const Text(
+                'Thank you for becoming a Premium Member.',
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 20.0),
               Image.asset(
                 'assets/premium_member_image.png', // Replace with your premium member image asset
