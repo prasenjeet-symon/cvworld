@@ -17,7 +17,7 @@ class _ViewResumeDesktopState extends State<ViewResumeDesktop> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const DashboardHeader(),
+            DashboardHeader(),
             ResumeViewer(resumeID: widget.resumeID),
           ],
         ),

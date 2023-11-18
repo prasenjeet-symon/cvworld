@@ -2,16 +2,24 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+// Convert UTC ( from server date ) to local datetime
+DateTime toLocalDateTime(DateTime utcDateTime) {
+  return utcDateTime.toLocal();
+}
+
 // Function to parse a formatted date string back into a DateTime object
 DateTime parseDate(String formattedDate) {
-  final DateFormat formatter = DateFormat('yyyy-MM-dd'); // Match the date format you used when formatting
-  return formatter.parse(formattedDate);
+  return DateFormat('yyyy-MM-dd').parse(formattedDate).toLocal();
 }
 
 // Function to format a DateTime object as a human-readable date
-String formatDateTime(DateTime dateTime) {
-  final DateFormat formatter = DateFormat('yyyy-MM-dd'); // You can change the date format as needed
-  return formatter.format(dateTime);
+String formatDateTime(DateTime utcDateTime) {
+  String formattedDate = DateFormat('yyyy-MM-dd').format(toLocalDateTime(utcDateTime));
+  return formattedDate;
+}
+
+DateTime getCurrentDatetime() {
+  return DateTime.now().toLocal();
 }
 
 class CustomInputField extends StatefulWidget {
@@ -38,13 +46,12 @@ class _CustomInputFieldState extends State<CustomInputField> {
   Future<void> _showDatePicker() async {
     var dateTime = await showDatePicker(
       context: context,
-      initialDate: widget.controller.text.isEmpty ? DateTime.now() : DateTime.parse(widget.controller.text),
-      firstDate: DateTime(1700),
-      lastDate: DateTime(2300),
+      initialDate: widget.controller.text.isEmpty ? getCurrentDatetime() : parseDate(widget.controller.text),
+      firstDate: DateTime(1700).toLocal(),
+      lastDate: getCurrentDatetime(),
     );
 
-    if (dateTime == null) {
-    } else {
+    if (dateTime != null) {
       widget.controller.text = formatDateTime(dateTime);
     }
   }
@@ -59,18 +66,21 @@ class _CustomInputFieldState extends State<CustomInputField> {
       decoration: InputDecoration(
         fillColor: Colors.grey[200], // Set the background color
         filled: true, // Fill the input field
-        border: OutlineInputBorder(
-          // Customize the border
-          borderRadius: BorderRadius.circular(1.0),
-          borderSide: BorderSide.none,
-        ),
-        labelText: widget.label,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(1.0), borderSide: BorderSide.none),
+        labelText: widget.type == TextInputType.datetime ? 'Choose Date' : widget.label,
+        suffixIcon: widget.type == TextInputType.datetime
+            ? IconButton(
+                icon: const Icon(Icons.calendar_month),
+                onPressed: () => _showDatePicker(),
+              )
+            : null,
       ),
       validator: widget.isRequired
           ? (value) {
               if (value == null || value.isEmpty) {
                 return 'This field is required';
               }
+
               return null;
             }
           : null,

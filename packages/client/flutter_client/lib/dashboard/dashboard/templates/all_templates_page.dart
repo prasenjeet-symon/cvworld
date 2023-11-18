@@ -195,7 +195,7 @@ class TemplateCard extends StatelessWidget {
             const SizedBox(height: 10),
             // Title
             Text(
-              template.name,
+              template.displayName ?? '',
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -263,6 +263,9 @@ class AllTemplatesPageLogic {
         ),
       ),
     );
+
+    // navigate back
+    context.navigateBack();
   }
 
   // Fetch single marketplace template

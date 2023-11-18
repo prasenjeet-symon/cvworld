@@ -23,7 +23,7 @@ class _AccountSettingMobileState extends State<AccountSettingMobile> {
         ),
         title: const Text('Account Settings'),
       ),
-      body: const Padding(
+      body: Padding(
         padding: EdgeInsets.all(10),
         child: SingleChildScrollView(
           child: AccountSettingBody(),

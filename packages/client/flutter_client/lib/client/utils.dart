@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:rxdart/subjects.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // SOME APPLICATION CONSTANTS
@@ -235,6 +236,10 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
 }
 
 class ImageCard extends StatefulWidget {
+  BehaviorSubject<bool>? canRefresh;
+
+  ImageCard({super.key, this.canRefresh});
+
   @override
   State<ImageCard> createState() => _ImageCardState();
 }
@@ -256,14 +261,22 @@ class _ImageCardState extends State<ImageCard> {
     setState(() {
       isLoading = false;
     });
+
+    if (widget.canRefresh != null) {
+      widget.canRefresh!.add(true);
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    DatabaseService().fetchUser().then((value) => user = value).then((value) => setState(() {
-          isLoading = false;
-        }));
+    DatabaseService().fetchUser().then((value) => user = value).then(
+          (value) => setState(
+            () {
+              isLoading = false;
+            },
+          ),
+        );
   }
 
   @override
@@ -271,13 +284,13 @@ class _ImageCardState extends State<ImageCard> {
     return Container(
       color: Colors.black.withOpacity(0.03),
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-      margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
+      margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
       child: Row(
         children: [
-          Container(
+          SizedBox(
             width: 100, // Adjust the width as needed
             child: isLoading
-                ? CircularProgressIndicator()
+                ? const CircularProgressIndicator()
                 : _pickedImage.isNotEmpty
                     ? CircleAvatar(
                         backgroundImage: MemoryImage(_pickedImage.first.bytes!),

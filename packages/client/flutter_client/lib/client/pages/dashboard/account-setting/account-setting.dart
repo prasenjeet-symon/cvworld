@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/datasource.dart';
 import 'package:cvworld/client/pages/dashboard/account-setting/account-setting-mobile.dart';
 import 'package:cvworld/client/pages/make-cv-pages/courses-section.dart';
@@ -15,6 +14,9 @@ import 'package:cvworld/client/pages/make-cv-pages/professional-summry-section.d
 import 'package:cvworld/client/pages/make-cv-pages/skills-section.dart';
 import 'package:cvworld/client/pages/make-cv-pages/website-links-section.dart' show WebsiteLinkSection;
 import 'package:cvworld/client/utils.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:rxdart/subjects.dart';
 
 import 'account-setting-desktop.dart';
 
@@ -45,17 +47,23 @@ class PricingPlanCardLogic {
   SubscriptionPlan? subscriptionPlan;
   User? user;
   bool isLoading = true;
-  late Timer? timer;
+  Timer? timer;
   final Function setStateCallback;
 
   PricingPlanCardLogic({required this.setStateCallback});
 
   Future<void> fetchUser({bool enableLoading = true}) async {
-    isLoading = enableLoading;
-    setStateCallback();
+    if (enableLoading) {
+      isLoading = true;
+      setStateCallback();
+    }
+
     user = await DatabaseService().fetchUser();
-    isLoading = false;
-    setStateCallback();
+
+    if (enableLoading) {
+      isLoading = false;
+      setStateCallback();
+    }
   }
 
   Future<void> fetchAllPlans() async {
@@ -77,24 +85,49 @@ class PricingPlanCardLogic {
     return link;
   }
 
-  Future<void> startTick() async {
-    Timer.periodic(const Duration(seconds: 15), (Timer timer) async {
-      this.timer = timer;
-      await fetchUser(enableLoading: false);
-      setStateCallback();
+  Future<void> startTick(Function callback) async {
+    timer = Timer.periodic(const Duration(seconds: 2), (Timer timer) {
+      _fetchUserAndSetState(callback);
     });
   }
 
-  Future<void> subscribeNow() async {
-    startTick();
+  Future<void> _fetchUserAndSetState(Function callback) async {
+    try {
+      await fetchUser(enableLoading: false);
+      setStateCallback();
+
+      // If user is a subscriber
+      if (user?.subscription?.isActive ?? false) {
+        timer?.cancel();
+        callback();
+      }
+    } catch (error) {
+      timer?.cancel();
+      // Handle errors, log, or take appropriate action
+      if (kDebugMode) {
+        print(error);
+      }
+    }
+  }
+
+  Future<void> subscribeNow(Function callback) async {
+    timer?.cancel();
+    startTick(callback);
+
     var link = await subscribeToPremium(subscriptionPlan!);
+
+    if (link == null) {
+      timer?.cancel();
+    }
+
     openLinkInBrowser(link ?? '');
   }
 
   // cancel the subscription
   Future<void> cancelSubscription() async {
-    startTick();
+    startTick(() {});
     await DatabaseService().cancelSubscription();
+    timer?.cancel();
   }
 
   void dispose() {
@@ -172,7 +205,9 @@ class PlanCardWidget extends StatelessWidget {
 ///
 ///
 class PricingPlanCard extends StatefulWidget {
-  const PricingPlanCard({super.key});
+  BehaviorSubject? canRefresh;
+
+  PricingPlanCard({super.key, this.canRefresh});
 
   @override
   State<PricingPlanCard> createState() => _PricingPlanCardState();
@@ -189,6 +224,7 @@ class _PricingPlanCardState extends State<PricingPlanCard> {
         setState(() {});
       }
     });
+
     logic.fetchUser().then((value) => logic.fetchAllPlans());
   }
 
@@ -196,6 +232,74 @@ class _PricingPlanCardState extends State<PricingPlanCard> {
   void dispose() {
     logic.dispose();
     super.dispose();
+  }
+
+  Future<void> _showCancelSubscriptionPopup(BuildContext context) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Cancel Subscription'),
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Are you sure you want to cancel your subscription?'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('No'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Add logic to cancel subscription
+                logic.cancelSubscription();
+                Navigator.of(context).pop();
+              },
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showGreetingPopup(BuildContext context) async {
+    if (widget.canRefresh != null) {
+      widget.canRefresh!.add(true);
+    }
+
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Congratulations!'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Thank you for becoming a Premium Member.'),
+              const SizedBox(height: 20.0),
+              Image.asset(
+                'assets/premium_member_image.png', // Replace with your premium member image asset
+                height: 100.0,
+                width: 100.0,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -222,14 +326,18 @@ class _PricingPlanCardState extends State<PricingPlanCard> {
                   description: 'You are on premium plan. You can use any resume template',
                   isPremium: true,
                   onPressed: () {
-                    logic.cancelSubscription();
+                    _showCancelSubscriptionPopup(context);
                   },
                 )
               : PlanCardWidget(
                   planName: 'Free Plan',
                   description: 'You are on the free plan. You can use free resume template only. Upgrade for PDF downloads & premium templates.',
                   isPremium: false,
-                  onPressed: () => logic.subscribeNow(),
+                  onPressed: () => logic.subscribeNow(
+                    () {
+                      _showGreetingPopup(context);
+                    },
+                  ),
                 ),
         ],
       ),
@@ -280,7 +388,9 @@ class _AccountCardState extends State<AccountCard> {
 ///
 ///
 class AccountSettingBody extends StatelessWidget {
-  const AccountSettingBody({super.key});
+  BehaviorSubject<bool>? canRefresh;
+
+  AccountSettingBody({super.key, this.canRefresh});
 
   @override
   Widget build(BuildContext context) {
@@ -311,8 +421,8 @@ class AccountSettingBody extends StatelessWidget {
                       ],
                     ),
                   ),
-                const PricingPlanCard(),
-                ImageCard(),
+                PricingPlanCard(canRefresh: canRefresh),
+                ImageCard(canRefresh: canRefresh),
                 const AccountCard(),
               ],
             ),

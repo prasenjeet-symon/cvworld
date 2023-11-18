@@ -136,9 +136,9 @@ class NameInput extends StatelessWidget {
       return 'Please enter a name';
     }
 
-    // Check if the name contains only letters and spaces.
-    if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
-      return 'Name can only contain letters and spaces';
+    // Check if the name contains only alphanumeric characters, spaces, hyphens, and underscores.
+    if (!RegExp(r'^[a-zA-Z0-9\s\-_]+$').hasMatch(value)) {
+      return 'Name can only contain letters, numbers, spaces, hyphens, and underscores';
     }
 
     // Check if the name doesn't start or end with a space.

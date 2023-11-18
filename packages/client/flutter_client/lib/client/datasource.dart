@@ -2771,6 +2771,10 @@ class DatabaseService {
 
   Future<Uri> buyTemplate(String templateName) async {
     var token = await getToken();
+    if (token == null) {
+      return Uri.parse('');
+    }
+
     var url = Uri.parse('$origin/server/api/template/$templateName');
 
     // Create a new Map to hold the query parameters and include the 'token'
