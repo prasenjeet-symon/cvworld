@@ -6,10 +6,10 @@ services:
     ports:
       - 3306:3306
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: cvworld
-      MYSQL_USER: cvworld
-      MYSQL_PASSWORD: cvworld
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
@@ -25,15 +25,15 @@ services:
     depends_on:
       - mysql
     environment:
-      - DATABASE_URL=mysql://root:root@mysql:3306/cvworld
-      - ADMIN_EMAIL=iampawanbhatia@gmail.com
-      - ADMIN_PASSWORD=IamPawanbhatia@134
-      - ADMIN_NAME=Pawan
-      - JWT_SECRET=secret
-      - RAZORPAY_KEY_ID=rzp_test_PYD4xAkex4oV9g
-      - RAZORPAY_KEY_SECRET=UzjzcIMtEJjNj8UWjqZNRA93
-      - RAZORPAY_WEBHOOK_SECRET=cvworld
-      - IS_SERVERLESS=true
+      DATABASE_URL: "${DATABASE_URL}"
+      ADMIN_EMAIL: "${ADMIN_EMAIL}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
+      ADMIN_NAME: "${ADMIN_NAME}"
+      JWT_SECRET: "${JWT_SECRET}"
+      RAZORPAY_KEY_ID: "${RAZORPAY_KEY_ID}"
+      RAZORPAY_KEY_SECRET: "${RAZORPAY_KEY_SECRET}"
+      RAZORPAY_WEBHOOK_SECRET: "${RAZORPAY_WEBHOOK_SECRET}"
+      IS_SERVERLESS: "${IS_SERVERLESS}"
     command: sh -c "npx prisma migrate deploy && npm run start"
     volumes:
       - ./public:/app/public
