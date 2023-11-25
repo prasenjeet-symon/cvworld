@@ -1,7 +1,8 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/utils.dart';
+import 'package:cvworld/routes/router.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 
 class SectionTwo extends StatelessWidget {
   const SectionTwo({super.key});
@@ -59,19 +60,11 @@ class SectionTwoLeft extends StatelessWidget {
       children: [
         Container(
           margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-          child: Text(
-            'QUICK RESUME BUILDER',
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
-            textAlign: isMobile ? TextAlign.center : TextAlign.left,
-          ),
+          child: Text('QUICK RESUME BUILDER', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400), textAlign: isMobile ? TextAlign.center : TextAlign.left),
         ),
         Container(
           margin: isMobile ? const EdgeInsets.fromLTRB(0, 0, 0, 10) : const EdgeInsets.fromLTRB(0, 0, 150, 15),
-          child: Text(
-            'Effortlessly create a stunning professional resume',
-            style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
-            textAlign: isMobile ? TextAlign.center : TextAlign.left,
-          ),
+          child: Text('Effortlessly create a stunning professional resume', style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w600), textAlign: isMobile ? TextAlign.center : TextAlign.left),
         ),
         Container(
           margin: const EdgeInsets.fromLTRB(0, 0, 0, 15),
@@ -150,7 +143,7 @@ class SectionTwoLeft extends StatelessWidget {
           ),
         ),
         ElevatedButton(
-          onPressed: () => context.navigateNamedTo('/dashboard'),
+          onPressed: () => context.pushNamed(RouteNames.dashboard),
           style: ElevatedButton.styleFrom(foregroundColor: Colors.white, backgroundColor: Colors.blue, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)), padding: const EdgeInsets.fromLTRB(20, 15, 20, 15)),
           child: const Row(
             mainAxisSize: MainAxisSize.min,

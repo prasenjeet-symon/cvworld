@@ -52,7 +52,7 @@ router.post("/reset_password", async (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  const user = await PrismaClientSingleton.prisma.user.findUnique({
+  const user = await PrismaClientSingleton.prisma.admin.findUnique({
     where: {
       email: email,
     },
@@ -63,12 +63,7 @@ router.post("/reset_password", async (req, res) => {
     return;
   }
 
-  if (isWeakPassword(password)) {
-    res.status(400).json({ message: "Password is too weak" });
-    return;
-  }
-
-  await PrismaClientSingleton.prisma.user.update({
+  await PrismaClientSingleton.prisma.admin.update({
     where: {
       email: email,
     },

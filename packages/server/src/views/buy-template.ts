@@ -68,7 +68,7 @@ export function buyTemplate(imageUrl: string, price : number, orderId: string, f
       <body>
         <section class="cvWorldBuyTemplate">
           <img
-            src="${hostName + imageUrl}"
+            src="${hostName + '/server/media/' + imageUrl}"
           />
           <div>
             <div></div>
@@ -92,7 +92,7 @@ export function buyTemplate(imageUrl: string, price : number, orderId: string, f
                 console.log("Payment successful!", response);
                 // redirect to success page
                 const {razorpay_payment_id, razorpay_order_id, razorpay_signature } = response;
-                const URL = "${hostName}" + "server/api_public/payment_success?razorpay_payment_id=" + razorpay_payment_id + "&razorpay_order_id=" + razorpay_order_id + "&razorpay_signature=" + razorpay_signature + "&price=" + ${price};
+                const URL = "${hostName}" + "/server/api_public/payment_success?razorpay_payment_id=" + razorpay_payment_id + "&razorpay_order_id=" + razorpay_order_id + "&razorpay_signature=" + razorpay_signature + "&price=" + ${price};
                 window.location.href = URL;
             },
             "prefill": {

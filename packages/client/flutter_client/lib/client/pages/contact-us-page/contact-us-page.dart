@@ -1,13 +1,14 @@
-// ignore: file_names
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/datasource.dart';
 import 'package:cvworld/client/pages/signin-page/components/signin_form_mobile.dart';
+import 'package:cvworld/routes/router.dart';
+// ignore: file_names
+
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../utils.dart';
 import '../home-page/components/footer.dart';
 
-@RoutePage()
 class ContactUsPage extends StatelessWidget {
   const ContactUsPage({super.key});
 
@@ -99,7 +100,7 @@ class _ContactUsPageDesktopBodyState extends State<ContactUsPageDesktopBody> {
                           width: double.infinity,
                           child: Row(children: [
                             BackButtonApp(onPressed: () {
-                              context.navigateBack();
+                              Navigator.pop(context);
                             }),
                             const Expanded(child: SizedBox()),
                           ]),
@@ -464,7 +465,7 @@ class ContactUsMessageSent extends StatelessWidget {
             width: 400,
             child: ElevatedButton(
               onPressed: () {
-                context.navigateBack();
+                Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(55)),
               child: const Text('BACK TO HOME', style: TextStyle(fontSize: 20)),
@@ -494,16 +495,21 @@ class _ContactUsPageMobileState extends State<ContactUsPageMobile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-            title: const Text('Contact Us'),
-            leading: IconButton(
-              onPressed: () {
-                // ignore: deprecated_member_use
-                context.navigateBack();
-              },
-              icon: const Icon(Icons.arrow_back),
-            )),
-        body: const SingleChildScrollView(child: Column(children: [ContactUsPageDesktopBody()])));
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text('Contact Us'),
+        leading: IconButton(
+          onPressed: () {
+            context.pop();
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
+      ),
+      body: const SingleChildScrollView(
+        child: Column(
+          children: [ContactUsPageDesktopBody()],
+        ),
+      ),
+    );
   }
 }

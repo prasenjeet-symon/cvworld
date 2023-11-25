@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cvworld/client/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:cvworld/client/utils.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart' show FlutterSecureStorage;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+
+import '../config.dart';
 
 class EmploymentHistory {
   final String job;
@@ -295,30 +297,17 @@ class Resume {
   );
 
   factory Resume.fromJson(Map<String, dynamic> json) {
-    List<EmploymentHistory> employmentHistory = (json['employmentHistory'] as List<dynamic>)
-        .map((e) => EmploymentHistory(e['job'] as String, e['employer'] as String, DateTime.parse(e['startDate'] as String), DateTime.parse(e['endDate'] as String), e['city'] as String, e['description'] as String))
-        .toList();
-
-    List<Education> education = (json['education'] as List<dynamic>)
-        .map((e) => Education(e['school'] as String, DateTime.parse(e['startDate'] as String), DateTime.parse(e['endDate'] as String), e['degree'] as String, e['city'] as String, e['description'] as String))
-        .toList();
-
-    List<Internship> internship = (json['internship'] as List<dynamic>)
-        .map((e) => Internship(e['job'] as String, e['employer'] as String, DateTime.parse(e['startDate'] as String), DateTime.parse(e['endDate'] as String), e['city'] as String, e['description'] as String))
-        .toList();
-
-    List<Courses> courses = (json['courses'] as List<dynamic>).map((e) => Courses(e['course'] as String, e['institution'] as String, DateTime.parse(e['startDate'] as String), DateTime.parse(e['endDate'] as String))).toList();
+    List<EmploymentHistory> employmentHistory = json['employmentHistory'] != null ? List.from(json['employmentHistory']).map((e) => EmploymentHistory.fromJson(e)).toList() : [];
+    List<Education> education = json['education'] != null ? List.from(json['education']).map((e) => Education.fromJson(e)).toList() : [];
+    List<Internship> internship = json['internship'] != null ? List.from(json['internship']).map((e) => Internship.fromJson(e)).toList() : [];
+    List<Courses> courses = json['courses'] != null ? List.from(json['courses']).map((e) => Courses.fromJson(e)).toList() : [];
 
     dynamic detailJson = json['details'];
+    Details details = Details.fromJson(detailJson);
 
-    Details details = Details(detailJson['email'], detailJson['phone'], detailJson['country'], detailJson['city'], detailJson['address'], detailJson['postalCode'], detailJson['drivingLicense'], detailJson['nationality'], detailJson['placeOfBirth'],
-        DateTime.parse(detailJson['dateOfBirth']));
-
-    List<Links> links = (json['links'] as List<dynamic>).map((e) => Links(e['title'], e['url'])).toList();
-
-    List<Languages> languages = (json['languages'] as List<dynamic>).map((e) => Languages(e['language'], e['level'])).toList();
-
-    List<Skills> skills = (json['skills'] as List<dynamic>).map((e) => Skills(e['skill'], e['level'])).toList();
+    List<Links> links = json['links'] != null ? List.from(json['links']).map((e) => Links.fromJson(e)).toList() : [];
+    List<Languages> languages = json['languages'] != null ? List.from(json['languages']).map((e) => Languages.fromJson(e)).toList() : [];
+    List<Skills> skills = json['skills'] != null ? List.from(json['skills']).map((e) => Skills.fromJson(e)).toList() : [];
 
     return Resume(
       json['profilePicture'] != null ? DatabaseService().publicResource(json['profilePicture']) : '',
@@ -370,7 +359,7 @@ class ResumeLink {
   }
 
   factory ResumeLink.fromJson(Map<String, dynamic> json) {
-    return ResumeLink(json['imageUrl'], json['pdfUrl']);
+    return ResumeLink(DatabaseService().publicResource(json['imageUrl']), DatabaseService().publicResource(json['pdfUrl']));
   }
 }
 
@@ -395,12 +384,12 @@ class GeneratedResume {
 
   factory GeneratedResume.fromJson(Map<String, dynamic> json) {
     return GeneratedResume(
-      json['id'],
-      json['userId'],
+      int.parse(json['id'].toString()),
+      int.parse(json['userId'].toString()),
       DateTime.parse(json['createdAt']),
       DateTime.parse(json['updatedAt']),
       Resume.fromJson(json['resume']),
-      ResumeLink(DatabaseService().publicResource(json['imageUrl']), DatabaseService().publicResource(json['pdfUrl'])),
+      ResumeLink.fromJson(json),
       json['templateName'],
     );
   }
@@ -416,6 +405,7 @@ class GeneratedResume {
       'pdfUrl': resumeLink.pdfUrl,
       'templateName': templateName
     };
+
     return jsonData;
   }
 }
@@ -445,7 +435,7 @@ class IsLoggedIn {
   IsLoggedIn(this.userId, this.email, this.isAdmin);
 
   factory IsLoggedIn.fromJson(Map<String, dynamic> json) {
-    return IsLoggedIn(json['userId'], json['email'], json['isAdmin']);
+    return IsLoggedIn(json['userId'], json['email'], bool.parse(json['isAdmin'].toString()));
   }
 
   toJson() {
@@ -463,9 +453,9 @@ class GenerateNewResume {
 
   factory GenerateNewResume.fromJson(Map<String, dynamic> json) {
     return GenerateNewResume(
-      json['imageUrl'],
-      json['pdfUrl'],
-      json['id'],
+      DatabaseService().publicResource(json['imageUrl']),
+      DatabaseService().publicResource(json['pdfUrl']),
+      int.parse(json['id'].toString()),
     );
   }
 
@@ -527,7 +517,7 @@ class UserDetails {
 
   factory UserDetails.fromJson(Map<String, dynamic> json) {
     return UserDetails(
-      json['id'],
+      int.parse(json['id'].toString()),
       json['profession'],
       json['name'],
       json['email'],
@@ -591,7 +581,7 @@ class UserSkill {
 
   factory UserSkill.fromJson(Map<String, dynamic> json) {
     return UserSkill(
-      json['id'],
+      int.parse(json['id'].toString()),
       json['skill'],
       double.parse(json['level'].toString()),
       DateTime.parse(json['createdAt']),
@@ -632,7 +622,7 @@ class UserHobby {
 
   factory UserHobby.fromJson(Map<String, dynamic> json) {
     return UserHobby(
-      json['id'],
+      int.parse(json['id'].toString()),
       json['hobby'],
       DateTime.parse(json['createdAt']),
       DateTime.parse(json['updatedAt']),
@@ -671,7 +661,7 @@ class UserProfessionalSummary {
 
   factory UserProfessionalSummary.fromJson(Map<String, dynamic> json) {
     return UserProfessionalSummary(
-      json['id'],
+      int.parse(json['id'].toString()),
       json['profile'],
       DateTime.parse(json['createdAt']),
       DateTime.parse(json['updatedAt']),
@@ -713,7 +703,7 @@ class UserLanguage {
 
   factory UserLanguage.fromJson(Map<String, dynamic> json) {
     return UserLanguage(
-      json['id'],
+      int.parse(json['id'].toString()),
       json['language'],
       double.parse(json['level'].toString()),
       DateTime.parse(json['createdAt']),
@@ -763,7 +753,7 @@ class UserCourse {
 
   factory UserCourse.fromJson(Map<String, dynamic> json) {
     return UserCourse(
-      json['id'],
+      int.parse(json['id'].toString()),
       json['course'],
       json['institution'],
       DateTime.parse(json['startDate']),
@@ -823,7 +813,7 @@ class UserEducation {
 
   factory UserEducation.fromJson(Map<String, dynamic> json) {
     return UserEducation(
-      json['id'],
+      int.parse(json['id'].toString()),
       json['school'],
       DateTime.parse(json['startDate']),
       DateTime.parse(json['endDate']),
@@ -887,7 +877,7 @@ class UserEmployment {
 
   factory UserEmployment.fromJson(Map<String, dynamic> json) {
     return UserEmployment(
-      json['id'],
+      int.parse(json['id'].toString()),
       json['job'],
       json['employer'],
       DateTime.parse(json['startDate']),
@@ -951,7 +941,7 @@ class UserInternship {
 
   factory UserInternship.fromJson(Map<String, dynamic> json) {
     return UserInternship(
-      json['id'],
+      int.parse(json['id'].toString()),
       json['job'],
       json['employer'],
       DateTime.parse(json['startDate']),
@@ -1003,7 +993,7 @@ class UserLink {
 
   factory UserLink.fromJson(Map<String, dynamic> json) {
     return UserLink(
-      json['id'],
+      int.parse(json['id'].toString()),
       json['title'],
       json['url'],
       DateTime.parse(json['createdAt']),
@@ -1062,9 +1052,9 @@ class UserSubscription {
 
   factory UserSubscription.fromJson(Map<String, dynamic> json) {
     return UserSubscription(
-      json['id'],
+      int.parse(json['id'].toString()),
       json['planName'],
-      json['isActive'],
+      bool.parse(json['isActive'].toString()),
       DateTime.parse(json['expireOn']),
       DateTime.parse(json['activatedOn']),
       json['cycle'],
@@ -1103,6 +1093,8 @@ class User {
   final String email;
   // fullName
   final String fullName;
+  // timeZone
+  final String timeZone;
   // profilePicture
   final String profilePicture;
   // reference
@@ -1117,6 +1109,7 @@ class User {
     this.createdAt,
     this.email,
     this.fullName,
+    this.timeZone,
     this.profilePicture,
     this.reference,
     this.updatedAt,
@@ -1125,10 +1118,11 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      json['id'],
+      int.parse(json['id'].toString()),
       DateTime.parse(json['createdAt']),
       json['email'],
       json['fullName'],
+      json['timeZone'],
       DatabaseService().publicResource(json['profilePicture']),
       json['reference'],
       DateTime.parse(json['updatedAt']),
@@ -1142,10 +1136,11 @@ class User {
       'createdAt': createdAt.toUtc().toIso8601String(),
       'email': email,
       'fullName': fullName,
+      'timeZone': timeZone,
       'profilePicture': profilePicture,
       'reference': reference,
       'updatedAt': updatedAt.toUtc().toIso8601String(),
-      'subscription': subscription!.toJson(),
+      'subscription': subscription?.toJson(),
     };
 
     return jsonData;
@@ -1160,7 +1155,7 @@ class DeleteDocuments {
   DeleteDocuments(this.id);
 
   factory DeleteDocuments.fromJson(Map<String, dynamic> json) {
-    return DeleteDocuments(json['id']);
+    return DeleteDocuments(int.parse(json['id'].toString()));
   }
 
   toJson() {
@@ -1201,10 +1196,10 @@ class ContactUs {
 
   factory ContactUs.fromJson(Map<String, dynamic> json) {
     return ContactUs(
-      json['id'],
+      int.parse(json['id'].toString()),
       DateTime.parse(json['createdAt']),
       json['email'],
-      json['isResolved'],
+      bool.parse(json['isResolved'].toString()),
       json['message'],
       json['name'],
       DateTime.parse(json['updatedAt']),
@@ -1235,7 +1230,7 @@ class IsBought {
   IsBought(this.isBought);
 
   factory IsBought.fromJson(Map<String, dynamic> json) {
-    return IsBought(json['isBought']);
+    return IsBought(bool.parse(json['isBought'].toString()));
   }
 
   toJson() {
@@ -1272,7 +1267,7 @@ class TemplateMarketPlace {
 
   factory TemplateMarketPlace.fromJson(Map<String, dynamic> json) {
     return TemplateMarketPlace(
-      id: json['id'],
+      id: int.parse(json['id'].toString()),
       name: json['name'],
       displayName: json['displayName'],
       displayDescription: json['displayDescription'],
@@ -1280,8 +1275,8 @@ class TemplateMarketPlace {
       previewImgUrl: DatabaseService().publicResource(json['previewImgUrl']),
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
-      isFree: json['isFree'],
-      isBought: json['isBought'],
+      isFree: bool.parse(json['isFree'].toString()),
+      isBought: bool.parse(json['isBought'].toString()),
     );
   }
 
@@ -1342,7 +1337,7 @@ class TemplateOrder {
       receipt: json['receipt'],
       offerId: json['offer_id'],
       status: json['status'],
-      attempts: json['attempts'],
+      attempts: int.parse(json['attempts'].toString()),
       notes: json['notes'],
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['created_at'] * 1000),
     );
@@ -1395,7 +1390,7 @@ class SubscriptionPlan {
 
   factory SubscriptionPlan.fromJson(Map<String, dynamic> json) {
     return SubscriptionPlan(
-      id: json['id'],
+      id: int.parse(json['id'].toString()),
       planID: json['planID'],
       name: json['name'],
       price: double.parse(json['price'].toString()),
@@ -1584,8 +1579,8 @@ class DatabaseService {
   DatabaseService() {
     // const apiBaseUrl = 'https://native-humorous-mule.ngrok-free.app';
     // const localBaseUrl = 'http://localhost:8081';
-    origin = 'https://cvworld.me';
-    //origin = 'http://localhost:8081';
+    //origin = 'https://cvworld.me';
+    origin = ApplicationConfiguration.API_URL;
 
     authRoute = Uri.parse('$origin/server/auth');
     apiRoute = Uri.parse('$origin/server/api');
@@ -1744,7 +1739,7 @@ class DatabaseService {
 
   /// Sign up the user with email and password
   Future<SignUpSignInWithEmailAndPassword?> signUpUserWithEmailAndPassword(String email, String password, String name) async {
-    var requestBody = {'email': email, 'password': password, 'name': name};
+    var requestBody = {'email': email, 'password': password, 'name': name, 'timeZone': await getCurrentTimeZone()};
     var response = await http.post(signUpRoute, body: requestBody);
 
     if (response.statusCode == 200) {
@@ -1779,7 +1774,7 @@ class DatabaseService {
 
   // continue with google
   Future<SignUpSignInWithEmailAndPassword?> continueWithGoogle(String googleToken) async {
-    var response = await http.post(continueWithGoogleRoute, body: {'google_token': googleToken});
+    var response = await http.post(continueWithGoogleRoute, body: {'google_token': googleToken, 'timeZone': await getCurrentTimeZone()});
     if (response.statusCode == 200) {
       var responseData = SignUpSignInWithEmailAndPassword.fromJson(json.decode(response.body));
       const storage = FlutterSecureStorage();
@@ -1810,8 +1805,8 @@ class DatabaseService {
     var response = await client.post(allResumeRoute);
 
     if (response.statusCode == 200) {
-      var decodedJson = json.decode(response.body) as List<dynamic>;
-      var responseData = decodedJson;
+      var decodedJson = json.decode(response.body);
+      var responseData = List<Map<String, dynamic>>.from(decodedJson);
       var finalData = responseData.map((e) => GeneratedResume.fromJson(e)).toList();
       client.dispose();
       return finalData;
@@ -1968,7 +1963,7 @@ class DatabaseService {
 
     var response = await client.post(userSkillsRoute);
     if (response.statusCode == 200) {
-      var responseData = (json.decode(response.body) as List<dynamic>);
+      var responseData = List<Map<String, dynamic>>.from(json.decode(response.body));
       var finalData = responseData.map((e) => UserSkill.fromJson(e)).toList();
       client.dispose();
       return finalData;
@@ -2048,6 +2043,7 @@ class DatabaseService {
     var client = JwtClient();
 
     var response = await client.post(getUserProfessionalSummaryRoute);
+
     if (response.statusCode == 200) {
       var responseData = UserProfessionalSummary.fromJson(json.decode(response.body));
       client.dispose();
@@ -2110,7 +2106,7 @@ class DatabaseService {
 
     var response = await client.post(getUserLanguagesRoute);
     if (response.statusCode == 200) {
-      var responseData = (json.decode(response.body) as List<dynamic>);
+      var responseData = List<Map<String, dynamic>>.from(json.decode(response.body));
       var finalData = responseData.map((e) => UserLanguage.fromJson(e)).toList();
       client.dispose();
       return finalData;
@@ -2172,7 +2168,7 @@ class DatabaseService {
 
     var response = await client.post(getUserCoursesRoute);
     if (response.statusCode == 200) {
-      var responseData = (json.decode(response.body) as List<dynamic>);
+      var responseData = List<Map<String, dynamic>>.from(json.decode(response.body));
       var finalData = responseData.map((e) => UserCourse.fromJson(e)).toList();
       client.dispose();
       return finalData;
@@ -2234,7 +2230,7 @@ class DatabaseService {
 
     var response = await client.post(getUserEducationsRoute);
     if (response.statusCode == 200) {
-      var responseData = (json.decode(response.body) as List<dynamic>);
+      var responseData = List<Map<String, dynamic>>.from(json.decode(response.body));
       var finalData = responseData.map((e) => UserEducation.fromJson(e)).toList();
       client.dispose();
       return finalData;
@@ -2293,7 +2289,7 @@ class DatabaseService {
     var client = JwtClient();
     var response = await client.post(getUserEmploymentHistoriesRoute);
     if (response.statusCode == 200) {
-      var responseData = (json.decode(response.body) as List<dynamic>);
+      var responseData = List<Map<String, dynamic>>.from(json.decode(response.body));
       var finalData = responseData.map((e) => UserEmployment.fromJson(e)).toList();
       client.dispose();
       return finalData;
@@ -2350,7 +2346,7 @@ class DatabaseService {
     var client = JwtClient();
     var response = await client.post(getUserInternshipsRoute);
     if (response.statusCode == 200) {
-      var responseData = (json.decode(response.body) as List<dynamic>);
+      var responseData = List<Map<String, dynamic>>.from(json.decode(response.body));
       var finalData = responseData.map((e) => UserInternship.fromJson(e)).toList();
 
       client.dispose();
@@ -2412,7 +2408,7 @@ class DatabaseService {
 
     var response = await client.post(getUserLinksRoute);
     if (response.statusCode == 200) {
-      var responseData = (json.decode(response.body) as List<dynamic>);
+      var responseData = List<Map<String, dynamic>>.from(json.decode(response.body));
       var finalData = responseData.map((e) => UserLink.fromJson(e)).toList();
 
       client.dispose();
@@ -2684,7 +2680,7 @@ class DatabaseService {
     var client = JwtClient();
     var response = await client.post(getMarketplaceTemplatesRoute);
     if (response.statusCode == 200) {
-      var responseData = (json.decode(response.body) as List<dynamic>);
+      var responseData = List<Map<String, dynamic>>.from(json.decode(response.body));
       var finalData = responseData.map((e) => TemplateMarketPlace.fromJson(e)).toList();
       client.dispose();
       return finalData;

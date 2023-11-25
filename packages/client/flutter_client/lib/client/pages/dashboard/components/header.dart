@@ -1,32 +1,12 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:cvworld/client/datasource.dart';
 import 'package:cvworld/client/pages/dashboard/components/profile.dart';
-import 'package:cvworld/routes/router.gr.dart';
+import 'package:cvworld/routes/router.dart';
 import 'package:flutter/material.dart';
-import 'package:rxdart/subjects.dart';
-
-// Business Logic Class for DashboardHeader
-class DashboardHeaderLogic {
-  User? user;
-  Function() setStateCallback; // Callback to call setState in the parent widget
-  bool isLoading = true;
-
-  DashboardHeaderLogic({required this.setStateCallback});
-
-  Future<User?> fetchUser() async {
-    isLoading = true;
-    setStateCallback(); // Trigger UI update to show loading indicator
-    user = await DatabaseService().fetchUser();
-    isLoading = false;
-    setStateCallback(); // Trigger UI update with fetched user data
-    return user;
-  }
-}
+import 'package:go_router/go_router.dart';
+import 'package:cvworld/client/utils.dart';
 
 class DashboardHeader extends StatefulWidget {
-  BehaviorSubject<bool>? canRefresh;
-
-  DashboardHeader({super.key, this.canRefresh});
+  const DashboardHeader({super.key});
 
   @override
   State<DashboardHeader> createState() => _DashboardHeaderState();
@@ -41,13 +21,11 @@ class _DashboardHeaderState extends State<DashboardHeader> {
     dashboardHeaderLogic = DashboardHeaderLogic(setStateCallback: _updateState);
     dashboardHeaderLogic.fetchUser();
 
-    if (widget.canRefresh != null) {
-      widget.canRefresh!.listen((event) {
-        if (event) {
-          dashboardHeaderLogic.fetchUser();
-        }
-      });
-    }
+    MySubjectSingleton.instance.dashboardHeaderSubject.listen((value) {
+      if (value) {
+        dashboardHeaderLogic.fetchUser(enableLoading: false);
+      }
+    });
   }
 
   void _updateState() {
@@ -88,8 +66,8 @@ class _DashboardHeaderState extends State<DashboardHeader> {
           const Expanded(child: SizedBox()),
           Row(
             children: [
-              if (!(user.subscription != null) || !user.subscription!.isActive) _buildUpgradeButton(context),
-              ProfileOptions(canRefresh: widget.canRefresh),
+              if (!(user.subscription?.isActive ?? false)) _buildUpgradeButton(context),
+              const ProfileOptions(),
             ],
           ),
         ],
@@ -101,7 +79,7 @@ class _DashboardHeaderState extends State<DashboardHeader> {
     return Container(
       margin: const EdgeInsets.fromLTRB(0, 0, 15, 0),
       child: ElevatedButton(
-        onPressed: () => context.pushRoute(const AccountSettingPage()),
+        onPressed: () => context.pushNamed(RouteNames.dashboardAccountSetting),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue, // Set the button color
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
@@ -114,10 +92,7 @@ class _DashboardHeaderState extends State<DashboardHeader> {
               Icon(Icons.upcoming_rounded),
               Padding(
                 padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-                child: Text(
-                  'Upgrade Now',
-                  style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.w600, color: Colors.white),
-                ),
+                child: Text('Upgrade Now', style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.w600, color: Colors.white)),
               ),
             ],
           ),
@@ -140,7 +115,7 @@ class DashboardHeaderSecondary extends StatelessWidget {
           const Expanded(child: Text('Resumes', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22))),
           TextButton(
             style: TextButton.styleFrom(padding: const EdgeInsets.fromLTRB(40, 20, 40, 20)),
-            onPressed: () => context.pushRoute(const MarketPlacePage()),
+            onPressed: () => context.pushNamed(RouteNames.chooseTemplate),
             child: const Row(
               children: [Icon(Icons.add), Text('Create')],
             ),
@@ -148,5 +123,24 @@ class DashboardHeaderSecondary extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class DashboardHeaderLogic {
+  User? user;
+  Function() setStateCallback; // Callback to call setState in the parent widget
+  bool isLoading = true;
+
+  DashboardHeaderLogic({required this.setStateCallback});
+
+  Future<User?> fetchUser({bool enableLoading = true}) async {
+    isLoading = enableLoading;
+    setStateCallback(); // Trigger UI update to show loading indicator
+
+    user = await DatabaseService().fetchUser();
+
+    isLoading = false;
+    setStateCallback(); // Trigger UI update with fetched user data
+    return user;
   }
 }

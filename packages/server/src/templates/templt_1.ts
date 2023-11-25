@@ -1,6 +1,6 @@
 import { Resume, formatDate } from "../utils";
 
-export default function generateResumeHTML(resume: Resume) {
+export default function generateResumeHTML(resume: Resume, timeZone: string) {
   return `
         <!DOCTYPE html>
       <html lang="en">
@@ -261,7 +261,7 @@ export default function generateResumeHTML(resume: Resume) {
                             return `
                           <div class="employmentHistoryItem">
                           <div>${p.job} at ${p.employer} , ${p.city}</div>
-                          <div>${formatDate(p.startDate)} -- ${formatDate(p.endDate)}</div>
+                          <div>${formatDate(p.startDate, timeZone)} -- ${formatDate(p.endDate, timeZone)}</div>
                           <div>${p.description}</div>
                           </div>
                           `;
@@ -287,7 +287,7 @@ export default function generateResumeHTML(resume: Resume) {
                         return `
                       <div class="educationSectionItem">
                       <div>${p.degree}, ${p.school}, ${p.city}</div>
-                      <div>${formatDate(p.startDate)} -- ${formatDate(p.endDate)}</div>
+                      <div>${formatDate(p.startDate, timeZone)} -- ${formatDate(p.endDate , timeZone)}</div>
                       <div></div>
                       </div>
                       `;
@@ -315,7 +315,7 @@ export default function generateResumeHTML(resume: Resume) {
                         return `
                       <div class="internshipSectionItem">
                       <div>${p.job}, ${p.employer}, ${p.city}</div>
-                      <div>${formatDate(p.startDate)} -- ${formatDate(p.endDate)}</div>
+                      <div>${formatDate(p.startDate, timeZone)} -- ${formatDate(p.endDate, timeZone)}</div>
                       <div>${p.description}</div>
                       </div>
                       `;
@@ -343,7 +343,7 @@ export default function generateResumeHTML(resume: Resume) {
                         return `
                       <div class="coursesSectionItem">
                       <div>${p.course}, ${p.institution}</div>
-                      <div>${formatDate(p.startDate)} -- ${formatDate(p.endDate)}</div>
+                      <div>${formatDate(p.startDate, timeZone)} -- ${formatDate(p.endDate, timeZone)}</div>
                       <div></div>
                       </div>
                       `;
@@ -370,7 +370,7 @@ export default function generateResumeHTML(resume: Resume) {
                   <div>
                     <div>Date/Place of birth</div>
                     <div>
-                      ${formatDate(resume.details.dateOfBirth)} <br />
+                      ${formatDate(resume.details.dateOfBirth, timeZone)} <br />
                       ${resume.details.placeOfBirth}
                     </div>
                   </div>

@@ -1,9 +1,9 @@
-import 'package:auto_route/auto_route.dart';
+import 'package:cvworld/client/pages/signin-page/components/signin_form.dart';
+import 'package:cvworld/routes/router.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:cvworld/client/pages/signin-page/components/signin_form.dart';
-import 'package:cvworld/routes/router.gr.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 
 class SigninFormMobile extends StatefulWidget {
   const SigninFormMobile({super.key});
@@ -98,6 +98,7 @@ class _SigninFormState extends State<SigninForm> {
 
   // Sign in using the email and password
   void signInEmailAndPassword(BuildContext context) {
+    print('Hello');
     SignInLogic(email: _emailController.text, password: _passwordController.text).signInNow(context);
   }
 
@@ -198,11 +199,7 @@ class SignUpText extends StatelessWidget {
               TextSpan(
                 text: 'Sign Up',
                 style: const TextStyle(color: Colors.blue),
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () {
-                    // Handle navigation to SignUp screen here
-                    context.pushRoute(const SignUpRoute());
-                  },
+                recognizer: TapGestureRecognizer()..onTap = () => context.pushNamed(RouteNames.signup),
               ),
             ],
           ),
@@ -330,7 +327,8 @@ class EmailPasswordForm extends StatefulWidget {
   final TextEditingController passwordController;
   final void Function(BuildContext) onSubmit;
 
-  EmailPasswordForm({
+  const EmailPasswordForm({
+    super.key,
     required this.emailController,
     required this.passwordController,
     required this.onSubmit,

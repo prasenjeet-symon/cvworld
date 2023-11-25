@@ -1,13 +1,10 @@
-// ignore: file_names
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/pages/home-page/components/footer.dart';
 import 'package:cvworld/client/pages/home-page/components/header.dart';
 import 'package:cvworld/client/pages/home-page/components/hero_section.dart';
 import 'package:cvworld/client/pages/home-page/components/section_1.dart';
 import 'package:cvworld/client/pages/home-page/components/section_2.dart';
+import 'package:flutter/material.dart';
 
-@RoutePage()
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 

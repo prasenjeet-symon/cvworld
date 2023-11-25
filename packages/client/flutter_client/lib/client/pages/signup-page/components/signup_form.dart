@@ -1,12 +1,14 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/datasource.dart';
 import 'package:cvworld/client/pages/home-page/components/footer.dart';
 import 'package:cvworld/client/pages/signin-page/components/signin_form_mobile.dart';
 import 'package:cvworld/client/pages/signup-page/components/signup_form_mobile.dart';
 import 'package:cvworld/client/utils.dart';
-import 'package:cvworld/routes/router.gr.dart';
+import 'package:cvworld/config.dart';
+import 'package:cvworld/routes/router.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class SignupFormDesktop extends StatefulWidget {
@@ -37,12 +39,7 @@ class _SignupFormDesktopState extends State<SignupFormDesktop> {
                           top: 40,
                           left: 40,
                           child: TextButton.icon(
-                            onPressed: () {
-                              context.router.pushAndPopUntil(
-                                const HomeRoute(),
-                                predicate: (_) => false, // Clear the stack
-                              );
-                            },
+                            onPressed: () => {context.pushNamed(RouteNames.home)},
                             icon: const Icon(Icons.arrow_back),
                             label: const Text('Back'),
                           ),
@@ -118,7 +115,7 @@ class SignUpLogic {
       if (e is UserAlreadyExistsException) {
         await Fluttertoast.showToast(msg: e.message, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.red.withOpacity(0.8), textColor: Colors.white);
         // ignore: use_build_context_synchronously
-        ctx.navigateNamedTo('/signin');
+        ctx.pushNamed(RouteNames.signin);
       }
 
       if (e is WeekPasswordException) {
@@ -130,18 +127,18 @@ class SignUpLogic {
 
     await Fluttertoast.showToast(msg: 'Welcome $name', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.red.withOpacity(0.8), textColor: Colors.white);
     // ignore: use_build_context_synchronously
-    ctx.navigateNamedTo('/dashboard');
+    ctx.pushNamed(RouteNames.dashboard);
   }
 
   void signInWithGoogle(BuildContext ctx) async {
-    final GoogleSignIn googleSignIn = GoogleSignIn(clientId: Constants.googleClientId);
+    final GoogleSignIn googleSignIn = GoogleSignIn(clientId: kIsWeb ? ApplicationConfiguration.GOOGLE_WEB_CLIENT_ID : Constants.googleClientIdAndroid);
     final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
     if (googleUser != null) {
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       var accessToken = googleAuth.accessToken!;
       await DatabaseService().continueWithGoogle(accessToken);
       // ignore: use_build_context_synchronously
-      ctx.navigateNamedTo('/dashboard');
+      ctx.pushNamed(RouteNames.dashboard);
     }
   }
 }

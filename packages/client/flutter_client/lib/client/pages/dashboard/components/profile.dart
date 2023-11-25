@@ -1,36 +1,11 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/datasource.dart';
-import 'package:cvworld/routes/router.gr.dart';
-import 'package:rxdart/subjects.dart';
-
-// Business Logic Class for ProfileOptions
-class ProfileOptionsLogic {
-  User? userDetails;
-  bool isLoading = true;
-  Function() setStateCallback; // Callback to call setState in the parent widget
-
-  ProfileOptionsLogic({required this.setStateCallback});
-
-  // Fetch user details from the database
-  Future<void> fetchPersonalDetails() async {
-    isLoading = true;
-    setStateCallback(); // Trigger UI update to show loading indicator
-    userDetails = await DatabaseService().fetchUser();
-    isLoading = false;
-    setStateCallback(); // Trigger UI update to show user details
-  }
-
-  // Log out the user
-  void logOutUser(BuildContext context) {
-    DatabaseService().logout().then((value) => context.navigateNamedTo('/signin'));
-  }
-}
+import 'package:cvworld/client/utils.dart';
+import 'package:cvworld/routes/router.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ProfileOptions extends StatefulWidget {
-  BehaviorSubject<bool>? canRefresh;
-
-  ProfileOptions({super.key, this.canRefresh});
+  const ProfileOptions({super.key});
 
   @override
   State<ProfileOptions> createState() => _ProfileOptionsState();
@@ -43,15 +18,13 @@ class _ProfileOptionsState extends State<ProfileOptions> {
   void initState() {
     super.initState();
     profileOptionsLogic = ProfileOptionsLogic(setStateCallback: _updateState);
-    _fetchPersonalDetails();
+    profileOptionsLogic.fetchPersonalDetails();
 
-    if (widget.canRefresh != null) {
-      widget.canRefresh!.listen((event) {
-        if (event) {
-          _fetchPersonalDetails();
-        }
-      });
-    }
+    MySubjectSingleton.instance.dashboardHeaderSubject.listen((value) {
+      if (value) {
+        profileOptionsLogic.fetchPersonalDetails(enableLoading: false);
+      }
+    });
   }
 
   void _updateState() {
@@ -60,21 +33,17 @@ class _ProfileOptionsState extends State<ProfileOptions> {
     }
   }
 
-  Future<void> _fetchPersonalDetails() async {
-    await profileOptionsLogic.fetchPersonalDetails();
-  }
-
   void _handleMenuItemSelection(String value) {
     switch (value) {
       case 'account_settings':
-        context.pushRoute(const AccountSettingPage());
+        context.pushNamed(RouteNames.dashboardAccountSetting);
         break;
       case 'logout':
         profileOptionsLogic.logOutUser(context);
         break;
       case 'dashboard':
         // Handle Dashboard option tap
-        context.navigateNamedTo('/dashboard');
+        context.pushNamed(RouteNames.dashboard);
         break;
     }
   }
@@ -144,5 +113,27 @@ class _ProfileOptionsState extends State<ProfileOptions> {
             radius: 20,
             backgroundImage: NetworkImage(profileOptionsLogic.userDetails!.profilePicture), // Replace with your profile image
           );
+  }
+}
+
+class ProfileOptionsLogic {
+  User? userDetails;
+  bool isLoading = true;
+  Function() setStateCallback; // Callback to call setState in the parent widget
+
+  ProfileOptionsLogic({required this.setStateCallback});
+
+  // Fetch user details from the database
+  Future<void> fetchPersonalDetails({bool enableLoading = true}) async {
+    isLoading = enableLoading;
+    setStateCallback(); // Trigger UI update to show loading indicator
+    userDetails = await DatabaseService().fetchUser();
+    isLoading = false;
+    setStateCallback(); // Trigger UI update to show user details
+  }
+
+  // Log out the user
+  void logOutUser(BuildContext context) {
+    DatabaseService().logout().then((value) => context.pushNamed(RouteNames.signin));
   }
 }

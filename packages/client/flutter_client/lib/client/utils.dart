@@ -1,12 +1,13 @@
 // a function to determine the page width given the context
-
-import 'package:auto_route/auto_route.dart';
 import 'package:cvworld/client/datasource.dart';
+import 'package:cvworld/routes/router.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:go_router/go_router.dart';
 import 'package:rxdart/subjects.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // SOME APPLICATION CONSTANTS
@@ -14,10 +15,9 @@ class Constants {
   static const String appName = 'CV World';
   static const String appVersion = '1.0';
   static const int debounceTime = 1000;
-  static const googleClientId = '526173453078-5bt1icrr45ub28erv39j62qkpnd5473m.apps.googleusercontent.com';
   static const googleClientIdAndroid = '599994784077-kq6slt22l90qfk6kjl81jti233o1e050.apps.googleusercontent.com';
-  static const String razorpayKeyID = 'rzp_test_PYD4xAkex4oV9g';
   static const int breakPoint = 600;
+  static const refreshSeconds = 5;
 }
 
 double pageWidth(BuildContext context) {
@@ -26,51 +26,6 @@ double pageWidth(BuildContext context) {
 
 int flexNumber(BuildContext context) {
   return MediaQuery.of(context).size.width >= Constants.breakPoint ? 1 : 0;
-}
-
-class AuthGuard extends AutoRouteGuard {
-  @override
-  void onNavigation(NavigationResolver resolver, StackRouter router) async {
-    var isAuthenticated = await DatabaseService().isAuthenticated();
-    if (!isAuthenticated) {
-      router.navigateNamed('/signin');
-      return;
-    } else {
-      resolver.next(true);
-    }
-  }
-}
-
-class RouteGuard extends AutoRouteGuard {
-  @override
-  void onNavigation(NavigationResolver resolver, StackRouter router) async {
-    var isAuthenticated = await DatabaseService().isAuthenticated();
-    if (isAuthenticated) {
-      router.navigateNamed('/dashboard');
-      return;
-    } else {
-      resolver.next(true);
-    }
-  }
-}
-
-class PathGuard extends AutoRouteGuard {
-  @override
-  void onNavigation(NavigationResolver resolver, StackRouter router) async {
-    var isTutorialCompleted = await DatabaseService().isTutorialCompleted();
-
-    if (!isTutorialCompleted && !kIsWeb) {
-      router.navigateNamed('/intro-slider');
-      return;
-    }
-
-    if (!kIsWeb) {
-      router.navigateNamed('/dashboard');
-      return;
-    }
-
-    resolver.next(true);
-  }
 }
 
 Future<void> downloadFile(String url, String fileName) async {
@@ -97,7 +52,7 @@ Future<void> logOutUser(BuildContext context) async {
   const storage = FlutterSecureStorage();
   await storage.delete(key: 'JWT');
   // ignore: use_build_context_synchronously
-  context.navigateNamedTo('/signin');
+  context.pushNamed(RouteNames.signin);
 }
 
 class BackButtonApp extends StatelessWidget {
@@ -236,9 +191,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
 }
 
 class ImageCard extends StatefulWidget {
-  BehaviorSubject<bool>? canRefresh;
-
-  ImageCard({super.key, this.canRefresh});
+  const ImageCard({super.key});
 
   @override
   State<ImageCard> createState() => _ImageCardState();
@@ -249,7 +202,6 @@ class _ImageCardState extends State<ImageCard> {
   User? user;
   bool isLoading = true;
 
-  // upload profile pic
   Future<void> _uploadProfile() async {
     setState(() {
       isLoading = true;
@@ -262,21 +214,13 @@ class _ImageCardState extends State<ImageCard> {
       isLoading = false;
     });
 
-    if (widget.canRefresh != null) {
-      widget.canRefresh!.add(true);
-    }
+    MySubjectSingleton.instance.dashboardHeaderSubject.add(true);
   }
 
   @override
   void initState() {
     super.initState();
-    DatabaseService().fetchUser().then((value) => user = value).then(
-          (value) => setState(
-            () {
-              isLoading = false;
-            },
-          ),
-        );
+    DatabaseService().fetchUser().then((value) => user = value).then((value) => setState(() => isLoading = false));
   }
 
   @override
@@ -331,5 +275,32 @@ class _ImageCardState extends State<ImageCard> {
         ],
       ),
     );
+  }
+}
+
+// Get timezone
+Future<String> getCurrentTimeZone() async {
+  return await FlutterNativeTimezone.getLocalTimezone();
+}
+
+class MySubjectSingleton {
+  // Private constructor
+  MySubjectSingleton._();
+
+  // Single instance of the class
+  static final MySubjectSingleton _instance = MySubjectSingleton._();
+
+  // Getter to access the instance
+  static MySubjectSingleton get instance => _instance;
+
+  // Behavior subject for some data
+  final BehaviorSubject<bool> _dashboardHeaderSubject = BehaviorSubject<bool>.seeded(false);
+
+  // Getter to access the behavior subject
+  BehaviorSubject<bool> get dashboardHeaderSubject => _dashboardHeaderSubject;
+
+  // Dispose method to close the subject when it's no longer needed
+  void dispose() {
+    _dashboardHeaderSubject.close();
   }
 }

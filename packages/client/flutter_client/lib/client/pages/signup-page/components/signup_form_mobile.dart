@@ -1,10 +1,10 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/pages/signin-page/components/signin_form_mobile.dart';
 import 'package:cvworld/client/pages/signup-page/components/signup_form.dart';
-import 'package:cvworld/routes/router.gr.dart';
+import 'package:cvworld/routes/router.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 
 class SignUpFormMobile extends StatefulWidget {
   const SignUpFormMobile({super.key});
@@ -82,7 +82,7 @@ class _SignUpFormState extends State<SignUpForm> {
           icon: FontAwesomeIcons.google,
         ),
         const SizedBox(height: 50),
-        AlreadyHaveAccount(mainText: 'Already have an account?', linkedText: ' Sign In', onTap: () => context.pushRoute(const SignInRoute()))
+        AlreadyHaveAccount(mainText: 'Already have an account?', linkedText: ' Sign In', onTap: () => context.pushNamed(RouteNames.signin))
       ],
     );
   }

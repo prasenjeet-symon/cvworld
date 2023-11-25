@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
 
+import 'package:cvworld/client/utils.dart';
+import 'package:flutter/material.dart';
 import 'dashboard.dart';
 
 class DashboardBodyContent extends StatefulWidget {
@@ -12,6 +14,7 @@ class DashboardBodyContent extends StatefulWidget {
 
 class _DashboardBodyContentState extends State<DashboardBodyContent> {
   late final DashboardContentLogic logic;
+  Timer? timer;
 
   _updateState() {
     if (mounted) {
@@ -24,6 +27,16 @@ class _DashboardBodyContentState extends State<DashboardBodyContent> {
     super.initState();
     logic = DashboardContentLogic(setStateCallback: _updateState);
     logic.fetchAllCreatedResume();
+
+    timer = Timer.periodic(const Duration(seconds: Constants.refreshSeconds), (timer) async {
+      await logic.fetchAllCreatedResume(canShowLoading: false);
+    });
+  }
+
+  @override
+  void dispose() {
+    timer!.cancel();
+    super.dispose();
   }
 
   @override

@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/pages/dashboard/account-setting/account-setting.dart';
 import 'package:cvworld/client/pages/dashboard/components/header.dart';
-import 'package:rxdart/subjects.dart';
+import 'package:flutter/material.dart';
 
 class AccountSettingDesktop extends StatefulWidget {
   const AccountSettingDesktop({super.key});
@@ -11,27 +10,13 @@ class AccountSettingDesktop extends StatefulWidget {
 }
 
 class _AccountSettingDesktopState extends State<AccountSettingDesktop> {
-  // init the behavior subject
-  BehaviorSubject<bool> canRefresh = BehaviorSubject.seeded(true);
-
-  @override
-  void dispose() {
-    canRefresh.close();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: EdgeInsets.all(10),
         child: SingleChildScrollView(
-          child: Column(children: [
-            DashboardHeader(canRefresh: canRefresh),
-            AccountSettingBody(
-              canRefresh: canRefresh,
-            )
-          ]),
+          child: Column(children: [DashboardHeader(), AccountSettingBody()]),
         ),
       ),
     );

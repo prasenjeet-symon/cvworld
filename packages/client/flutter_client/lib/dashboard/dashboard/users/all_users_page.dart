@@ -1,12 +1,13 @@
-import 'package:auto_route/auto_route.dart';
+import 'dart:async';
+
 import 'package:cvworld/client/utils.dart';
 import 'package:cvworld/dashboard/dashboard/users/user_profile_page.dart';
 import 'package:cvworld/dashboard/datasource_dashboard.dart';
-import 'package:cvworld/routes/router.gr.dart' as router;
+import 'package:cvworld/routes/router.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-@RoutePage()
 class AdminAllUsersPage extends StatefulWidget {
   const AdminAllUsersPage({super.key});
 
@@ -16,27 +17,34 @@ class AdminAllUsersPage extends StatefulWidget {
 
 class _AdminAllUsersPageState extends State<AdminAllUsersPage> {
   final AdminAllUsersLogic adminAllUsersLogic = AdminAllUsersLogic();
-  bool isLoading = false;
+  Timer? timer;
 
   @override
   void initState() {
     super.initState();
+    adminAllUsersLogic.fetchAllUsers(setState, canShowLoading: true);
 
-    setState(() {
-      isLoading = true;
+    timer = Timer.periodic(const Duration(seconds: Constants.refreshSeconds), (timer) async {
+      await adminAllUsersLogic.fetchAllUsers(setState, canShowLoading: false);
     });
+  }
 
-    adminAllUsersLogic.fetchAllUsers(setState).then((value) {
-      setState(() {
-        isLoading = false;
-      });
-    });
+  @override
+  void dispose() {
+    timer!.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    adminAllUsersLogic.fetchAllUsers(setState, canShowLoading: false);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: isLoading
+      body: adminAllUsersLogic.isLoading
           ? const Center(child: Padding(padding: EdgeInsets.all(50), child: CircularProgressIndicator()))
           : Center(
               child: Container(
@@ -47,7 +55,7 @@ class _AdminAllUsersPageState extends State<AdminAllUsersPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    BackButtonApp(onPressed: () => {context.popRoute(const router.AdminAllUsersPage())}),
+                    BackButtonApp(onPressed: () => {Navigator.pop(context)}),
                     const SizedBox(height: 50),
                     const Text('Registered Users', style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 35),
@@ -56,12 +64,17 @@ class _AdminAllUsersPageState extends State<AdminAllUsersPage> {
                           ? const NoResultFound(icon: Icons.warning_amber_rounded, heading: 'No Users', description: 'No users registered yet! Please add some users')
                           : ListView.builder(
                               itemCount: adminAllUsersLogic.users.length,
+                              physics: const BouncingScrollPhysics(),
+                              shrinkWrap: true,
+                              scrollDirection: Axis.vertical,
                               itemBuilder: (context, index) {
                                 return ListTile(
-                                  onTap: () => {context.pushRoute(router.UserProfilePage(userId: adminAllUsersLogic.users[index].reference))},
+                                  onTap: () => {
+                                    context.pushNamed(RouteNames.adminUserProfile, pathParameters: {"userId": adminAllUsersLogic.users[index].reference})
+                                  },
                                   leading: CircleAvatar(backgroundImage: NetworkImage(adminAllUsersLogic.users[index].profilePicture)),
                                   title: Text(adminAllUsersLogic.users[index].fullName),
-                                  subtitle: Text(adminAllUsersLogic.users[index].subscription != null ? 'Subscriber' : 'Not a Subscriber'),
+                                  subtitle: Text(adminAllUsersLogic.users[index].subscription?.isActive ?? false ? 'Subscriber' : 'Not a Subscriber'),
                                 );
                               },
                             ),
@@ -76,22 +89,34 @@ class _AdminAllUsersPageState extends State<AdminAllUsersPage> {
 
 class AdminAllUsersLogic {
   List<User> users = [];
+  bool isLoading = false;
 
-  Future<void> fetchAllUsers(void Function(void Function()) setState) async {
+  Future<void> fetchAllUsers(void Function(void Function()) setState, {bool canShowLoading = true}) async {
     try {
-      // Fetch users
-      var response = await DashboardDataService().getUsers();
+      debugPrint('Will fetch');
 
-      // Check if response is not null and not empty
-      if (response != null && response.isNotEmpty) {
-        // Update the users list
-        users = response;
-      } else {
-        // Handle the case when the response is null or empty
-        if (kDebugMode) {
-          print('Error: Empty or null response from getUsers');
-        }
+      setState(() {
+        isLoading = canShowLoading;
+      });
+
+      List<User>? response = await DashboardDataService().getUsers();
+      debugPrint('Got response');
+
+      if (response == null) {
+        setState(() {
+          isLoading = false;
+          users = [];
+        });
+
+        return;
       }
+
+      setState(() {
+        isLoading = false;
+        users = response;
+      });
+
+      debugPrint('Fetched ${users.length} users');
     } catch (e) {
       // Handle any errors that occurred during the fetch operation
       if (kDebugMode) {

@@ -1,9 +1,7 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/utils.dart';
 import 'package:cvworld/dashboard/datasource_dashboard.dart';
+import 'package:flutter/material.dart';
 
-@RoutePage()
 class AdminSubscriptionSettingPage extends StatefulWidget {
   const AdminSubscriptionSettingPage({super.key});
 
@@ -52,7 +50,7 @@ class _AdminSubscriptionSettingPageState extends State<AdminSubscriptionSettingP
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     BackButtonApp(onPressed: () {
-                      context.popRoute(const AdminSubscriptionSettingPage());
+                      Navigator.pop(context);
                     }),
                     const SizedBox(height: 60),
                     Column(

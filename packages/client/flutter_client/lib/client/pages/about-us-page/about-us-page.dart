@@ -1,9 +1,9 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:cvworld/client/pages/home-page/components/footer.dart';
 import 'package:cvworld/client/utils.dart';
+import 'package:cvworld/routes/router.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-@RoutePage()
 class AboutUsPage extends StatelessWidget {
   const AboutUsPage({super.key});
 
@@ -51,7 +51,7 @@ class AboutUsPageDesktopBody extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             BackButtonApp(onPressed: () {
-              context.navigateBack();
+              Navigator.pop(context);
             }),
             const SizedBox(height: 32),
             const Text(
@@ -96,8 +96,7 @@ class AboutUsPageDesktopBody extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                // Navigate to the CV World website
-                // You can use the launch URL package or any navigation method of your choice
+                context.pushNamed(RouteNames.contactUs);
               },
               child: const Text('Visit us at www.cvworld.me'),
             ),

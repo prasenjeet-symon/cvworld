@@ -1,21 +1,20 @@
 // ignore: file_names
 import 'dart:async';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:cvworld/client/datasource.dart';
 import 'package:cvworld/client/pages/dashboard/view-resume/view-resume-desktop.dart';
 import 'package:cvworld/client/pages/dashboard/view-resume/view-resume-mobile.dart';
 import 'package:cvworld/client/utils.dart';
-import 'package:cvworld/routes/router.gr.dart';
+import 'package:cvworld/routes/router.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:go_router/go_router.dart';
 
-@RoutePage()
 class ViewResume extends StatefulWidget {
   final int resumeID;
 
-  const ViewResume({super.key, @PathParam() required this.resumeID});
+  const ViewResume({super.key, required this.resumeID});
 
   @override
   State<ViewResume> createState() => _ViewResumeState();
@@ -161,7 +160,7 @@ class ResumeViewerLogic {
 
     var url = await DatabaseService().buyTemplate(templateName);
 
-    timer = Timer.periodic(const Duration(seconds: 2), (timer) async {
+    timer = Timer.periodic(const Duration(seconds: Constants.refreshSeconds), (timer) async {
       canDownload = await checkIsBought(resume!);
       setStateCallback();
       // If bought then show thanks popup
@@ -278,7 +277,7 @@ class _ResumeViewerState extends State<ResumeViewer> {
                     margin: const EdgeInsets.fromLTRB(0, 25, 0, 0),
                     child: BackButtonApp(onPressed: () {
                       _logic.dispose();
-                      context.popRoute(ViewResume(resumeID: widget.resumeID));
+                      Navigator.pop(context);
                     }),
                   ),
                 Container(
@@ -298,7 +297,7 @@ class _ResumeViewerState extends State<ResumeViewer> {
                       child: ViewResumeButton(
                         onPressed: () {
                           _logic.dispose();
-                          context.pushRoute(CvMakerRoute(resumeID: widget.resumeID, templateName: 'Edit'));
+                          context.pushNamed(RouteNames.cvMaker, pathParameters: {"resumeID": widget.resumeID.toString(), "templateName": "Edit"});
                         },
                         buttonText: 'Edit',
                         backgroundColor: Colors.white,

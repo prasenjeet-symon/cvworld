@@ -1,10 +1,8 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/dashboard/datasource_dashboard.dart';
+import 'package:cvworld/routes/router.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../../routes/router.gr.dart';
-
-@RoutePage()
 class AdminHomePage extends StatefulWidget {
   const AdminHomePage({super.key});
 
@@ -26,7 +24,6 @@ class _AdminHomePageState extends State<AdminHomePage> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                // Close the dialog and return false (cancel)
                 Navigator.of(context).pop(false);
               },
               child: const Text('Cancel'),
@@ -44,10 +41,10 @@ class _AdminHomePageState extends State<AdminHomePage> {
     );
 
     // If the user confirms, proceed with logout
-    if (confirm == true) {
+    if (confirm) {
       await logoutAdmin();
       // ignore: use_build_context_synchronously
-      ctx.pushRoute(const SignInDashboardPage());
+      ctx.pushNamed(RouteNames.adminSignin);
     }
   }
 
@@ -77,17 +74,17 @@ class _AdminHomePageState extends State<AdminHomePage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        HoverCard(title: 'All Users', icon: Icons.people, onTap: () => context.pushRoute(const AdminAllUsersPage())),
-                        HoverCard(title: 'All Templates', icon: Icons.format_list_bulleted, onTap: () => {context.pushRoute(const AllTemplatesPage())}),
-                        HoverCard(title: 'Subscription Settings', icon: Icons.settings, onTap: () => context.pushRoute(const AdminSubscriptionSettingPage())),
+                        HoverCard(title: 'All Users', icon: Icons.people, onTap: () => context.pushNamed(RouteNames.adminAllUsers)),
+                        HoverCard(title: 'All Templates', icon: Icons.format_list_bulleted, onTap: () => {context.pushNamed(RouteNames.adminAllTemplates)}),
+                        HoverCard(title: 'Subscription Settings', icon: Icons.settings, onTap: () => context.pushNamed(RouteNames.adminSubscriptionSetting)),
                       ],
                     ),
                     const SizedBox(height: 50),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        HoverCard(title: 'Update Password', icon: Icons.password, onTap: () => context.pushRoute(const AdminChangePasswordPage())),
-                        HoverCard(title: 'Contact Us Messages', icon: Icons.message, onTap: () => context.pushRoute(const AdminContactUsPage())),
+                        HoverCard(title: 'Update Password', icon: Icons.password, onTap: () => context.pushNamed(RouteNames.adminChangePassword)),
+                        HoverCard(title: 'Contact Us Messages', icon: Icons.message, onTap: () => context.pushNamed(RouteNames.adminContactUs)),
                         HoverCard(title: 'Sign Out', icon: Icons.logout, onTap: () => confirmLogout(context)),
                       ],
                     )

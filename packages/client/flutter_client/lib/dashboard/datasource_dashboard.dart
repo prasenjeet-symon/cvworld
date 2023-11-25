@@ -1,11 +1,12 @@
 import 'dart:convert';
 
+import 'package:cvworld/client/datasource.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:cvworld/client/datasource.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+
+import '../config.dart';
 
 class TokenModel {
   final String token;
@@ -31,8 +32,8 @@ class TemplateModel {
 
   factory TemplateModel.fromJson(Map<String, dynamic> json) {
     return TemplateModel(
-      json['imageUrl'] as String,
-      json['price'] as int,
+      DatabaseService().publicResource(json['imageUrl']),
+      int.parse(json['price'].toString()),
     );
   }
 
@@ -63,7 +64,7 @@ class UpdatePasswordResponse {
 class BoughtTemplate {
   final int id;
   final String name;
-  final int price; // in paisa
+  final double price; // in paisa
   final int userId;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -81,10 +82,10 @@ class BoughtTemplate {
 
   factory BoughtTemplate.fromJson(Map<String, dynamic> json) {
     return BoughtTemplate(
-      id: json['id'] as int,
+      id: int.parse(json['id'].toString()),
       name: json['name'] as String,
-      price: json['price'] as int,
-      userId: json['userId'] as int,
+      price: double.parse(json['price'].toString()),
+      userId: int.parse(json['userId'].toString()),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       eventId: json['eventID'] as String,
@@ -101,8 +102,8 @@ class Subscription {
   final DateTime expireOn;
   final DateTime activatedOn;
   final String cycle;
-  final int discount; // in paisa
-  final int basePrice; // In paisa
+  final double discount; // in paisa
+  final double basePrice; // In paisa
   final int userId;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -125,17 +126,17 @@ class Subscription {
 
   factory Subscription.fromJson(Map<String, dynamic> json) {
     return Subscription(
-      id: json['id'] as int,
+      id: int.parse(json['id'].toString()),
       subscriptionId: json['subscriptionID'] as String,
       subscriptionLink: json['subscriptionLink'] as String,
       planName: json['planName'] as String,
-      isActive: json['isActive'] as bool,
+      isActive: bool.parse(json['isActive'].toString()),
       expireOn: DateTime.parse(json['expireOn'] as String),
       activatedOn: DateTime.parse(json['activatedOn'] as String),
       cycle: json['cycle'] as String,
-      discount: json['discount'] as int,
-      basePrice: json['basePrice'] as int,
-      userId: json['userId'] as int,
+      discount: double.parse(json['discount'].toString()),
+      basePrice: double.parse(json['basePrice'].toString()),
+      userId: int.parse(json['userId'].toString()),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
@@ -146,39 +147,42 @@ class User {
   final int id;
   final String email;
   final String fullName;
+  final String timeZone;
   final String profilePicture;
   final String password;
   final String reference;
   final DateTime createdAt;
   final DateTime updatedAt;
   final Subscription? subscription;
-  final List<BoughtTemplate> boughtTemplate; // Using the BoughtTemplate class
+  final List<BoughtTemplate>? boughtTemplate; // Using the BoughtTemplate class
 
   User({
     required this.id,
     required this.email,
     required this.fullName,
+    required this.timeZone,
     required this.profilePicture,
     required this.password,
     required this.reference,
     required this.createdAt,
     required this.updatedAt,
     this.subscription,
-    this.boughtTemplate = const [],
+    this.boughtTemplate,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'] as int,
+      id: int.parse(json['id'].toString()),
       email: json['email'] as String,
       fullName: json['fullName'] as String,
+      timeZone: json['timeZone'] as String,
       profilePicture: DatabaseService().publicResource(json['profilePicture'] as String),
-      password: json['password'] as String,
+      password: json['password'],
       reference: json['reference'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       subscription: json['subscription'] != null ? Subscription.fromJson(json['subscription']) : null,
-      boughtTemplate: (json['boughtTemplate'] as List).map((item) => BoughtTemplate.fromJson(item)).toList(),
+      boughtTemplate: json['boughtTemplate'] != null ? (List.from(json['boughtTemplate'])).map((item) => BoughtTemplate.fromJson(item)).toList() : [],
     );
   }
 }
@@ -206,12 +210,12 @@ class ContactUsMessage {
 
   factory ContactUsMessage.fromJson(Map<String, dynamic> json) {
     return ContactUsMessage(
-      id: json['id'] as int,
+      id: int.parse(json['id'].toString()),
       name: json['name'] as String,
       email: json['email'] as String,
       phone: json['phone'] as String,
       message: json['message'] as String,
-      isResolved: json['isResolved'] as bool,
+      isResolved: bool.parse(json['isResolved'].toString()),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
@@ -229,8 +233,8 @@ class ContactUsMessageUpdate {
 
   factory ContactUsMessageUpdate.fromJson(Map<String, dynamic> json) {
     return ContactUsMessageUpdate(
-      isResolved: json['isResolved'] as bool,
-      id: json['id'] as int,
+      isResolved: bool.parse(json['isResolved'].toString()),
+      id: int.parse(json['id'].toString()),
     );
   }
 
@@ -273,15 +277,15 @@ class TemplateTransaction {
 
   factory TemplateTransaction.fromJson(Map<String, dynamic> json) {
     return TemplateTransaction(
-      id: json['id'] as int,
-      templateId: json['templateId'] as int,
+      id: int.parse(json['id'].toString()),
+      templateId: int.parse(json['templateId'].toString()),
       orderId: json['orderId'] as String,
-      amount: json['amount'] as int,
-      amountPaid: json['amountPaid'] as int, // in paisa
-      amountDue: json['amountDue'] as int, // in paisa
+      amount: int.parse(json['amount'].toString()),
+      amountPaid: int.parse(json['amountPaid'].toString()), // in paisa
+      amountDue: int.parse(json['amountDue'].toString()), // in paisa
       currency: json['currency'] as String, // INR
       status: json['status'] as String,
-      isInternational: json['isInternational'] as bool,
+      isInternational: bool.parse(json['isInternational'].toString()),
       method: json['method'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
@@ -339,13 +343,13 @@ class CardPaymentSubscription {
 
   factory CardPaymentSubscription.fromJson(Map<String, dynamic> json) {
     return CardPaymentSubscription(
-      id: json['id'] as int,
+      id: int.parse(json['id'].toString()),
       last4: json['last4'] as String,
       name: json['name'] as String,
       network: json['network'] as String,
       type: cardTypeFromString(json['type'] as String),
-      isInternational: json['isInternational'] as bool,
-      transactionId: json['transactionId'] as int,
+      isInternational: bool.parse(json['isInternational'].toString()),
+      transactionId: int.parse(json['transactionId'].toString()),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
@@ -425,8 +429,8 @@ class UPIPaymentSubscription {
 
   factory UPIPaymentSubscription.fromJson(Map<String, dynamic> json) {
     return UPIPaymentSubscription(
-      id: json['id'] as int,
-      transactionId: json['transactionId'] as int,
+      id: int.parse(json['id'].toString()),
+      transactionId: int.parse(json['transactionId'].toString()),
       vpa: json['vpa'] as String,
       email: json['email'] as String,
       mobile: json['mobile'] as String,
@@ -469,13 +473,13 @@ class SubscriptionTransaction {
 
   factory SubscriptionTransaction.fromJson(Map<String, dynamic> json) {
     return SubscriptionTransaction(
-      id: json['id'] as int,
-      amount: json['amount'] as double,
+      id: int.parse(json['id'].toString()),
+      amount: double.parse(json['amount'].toString()),
       method: paymentMethodFromString(json['method'] as String),
       eventID: json['eventID'] as String,
       card: json['card'] != null ? CardPaymentSubscription.fromJson(json['card'] as Map<String, dynamic>) : null,
       upi: json['upi'] != null ? UPIPaymentSubscription.fromJson(json['upi'] as Map<String, dynamic>) : null,
-      subscriptionId: json['subscriptionId'] as int,
+      subscriptionId: int.parse(json['subscriptionId'].toString()),
     );
   }
 
@@ -549,7 +553,7 @@ class MarketplaceTemplate {
 
   factory MarketplaceTemplate.fromJson(Map<String, dynamic> json) {
     return MarketplaceTemplate(
-      id: json['id'],
+      id: int.parse(json['id'].toString()),
       name: json['name'],
       displayName: json['displayName'],
       displayDescription: json['displayDescription'],
@@ -597,7 +601,7 @@ class Admin {
 
   factory Admin.fromJson(Map<String, dynamic> json) {
     return Admin(
-      id: json['id'] as int,
+      id: int.parse(json['id'].toString()),
       email: json['email'] as String,
       fullName: json['fullName'] as String,
       profilePicture: json['profilePicture'] as String?,
@@ -661,10 +665,10 @@ class SubscriptionPlan {
 
   factory SubscriptionPlan.fromJson(Map<String, dynamic> json) {
     return SubscriptionPlan(
-      id: json['id'] as int,
+      id: int.parse(json['id'].toString()),
       planID: json['planID'] as String,
       name: json['name'] as String,
-      price: json['price'] as int,
+      price: int.parse(json['price'].toString()),
       period: json['period'] as String,
       interval: json['interval'] as int,
       currency: json['currency'] as String,
@@ -759,8 +763,7 @@ class DashboardDataService {
   late Uri adminDetailsRoute;
 
   DashboardDataService() {
-    origin = 'https://cvworld.me';
-    //origin = 'http://localhost:8081';
+    origin = ApplicationConfiguration.API_URL;
 
     signInRoute = Uri.parse('$origin/server/auth/sign_in_as_admin');
     resetPasswordRoute = Uri.parse('$origin/server/api_admin/reset_password');
@@ -793,26 +796,30 @@ class DashboardDataService {
         const SnackBar(
           backgroundColor: Colors.red,
           content: Center(
-            child: Text(
-              'Wrong password. Please try again.',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            child: Text('Wrong password. Please try again.', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
           duration: Duration(seconds: 5), // Set a longer duration (e.g., 5 seconds)
         ),
       );
+
+      return;
     }
 
     if (response.statusCode == 200) {
       var responseData = TokenModel.fromJson(json.decode(response.body));
       const storage = FlutterSecureStorage();
       await storage.write(key: 'JWT_ADMIN', value: responseData.token);
-      // write the mail also admin
-      const storage2 = FlutterSecureStorage();
-      await storage2.write(key: 'EMAIL_ADMIN', value: email);
+      await storage.write(key: 'EMAIL_ADMIN', value: email);
+
+      ScaffoldMessenger.of(ctx).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.green, // Use a green color for success
+          content: Center(
+            child: Text('Login successful! Welcome!', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+          duration: Duration(seconds: 5), // Set a longer duration (e.g., 5 seconds)
+        ),
+      );
     } else {
       if (kDebugMode) {
         print('POST request failed with status code: ${response.statusCode}');
@@ -864,7 +871,8 @@ class DashboardDataService {
     final response = await client.get(usersRoute);
 
     if (response.statusCode == 200) {
-      var responseData = (json.decode(response.body) as List).map((item) => User.fromJson(item)).toList();
+      var jsonData = json.decode(response.body);
+      var responseData = List<Map<String, dynamic>>.from(jsonData).map((item) => User.fromJson(item)).toList();
       return responseData;
     } else {
       if (kDebugMode) {
@@ -881,7 +889,9 @@ class DashboardDataService {
     final response = await client.get(contactUsRoute);
 
     if (response.statusCode == 200) {
-      var responseData = (json.decode(response.body) as List).map((item) => ContactUsMessage.fromJson(item)).toList();
+      var jsonData = json.decode(response.body);
+      var listData = List<Map<String, dynamic>>.from(jsonData);
+      var responseData = listData.map((item) => ContactUsMessage.fromJson(item)).toList();
       return responseData;
     } else {
       if (kDebugMode) {
@@ -915,7 +925,9 @@ class DashboardDataService {
     final response = await client.get(getPremiumPlanRoute);
 
     if (response.statusCode == 200) {
-      var responseData = (json.decode(response.body) as List).map((item) => SubscriptionPlan.fromJson(item)).toList();
+      var jsonData = json.decode(response.body);
+      var listData = List<Map<String, dynamic>>.from(jsonData);
+      var responseData = listData.map((item) => SubscriptionPlan.fromJson(item)).toList();
       return responseData;
     } else {
       if (kDebugMode) {
@@ -951,7 +963,9 @@ class DashboardDataService {
 
     final response = await client.post(getTemplateRoute, body: json.encode(body));
     if (response.statusCode == 200) {
-      var responseData = (json.decode(response.body) as List).map((item) => BoughtTemplate.fromJson(item)).toList();
+      var jsonData = json.decode(response.body);
+      var listData = List<Map<String, dynamic>>.from(jsonData);
+      var responseData = listData.map((item) => BoughtTemplate.fromJson(item)).toList();
       return responseData;
     } else {
       if (kDebugMode) {
@@ -969,7 +983,9 @@ class DashboardDataService {
 
     final response = await client.post(generateOrderRoute, body: json.encode(body));
     if (response.statusCode == 200) {
-      var responseData = (json.decode(response.body) as List).map((item) => GeneratedResume.fromJson(item)).toList();
+      var jsonData = json.decode(response.body);
+      var listData = List<Map<String, dynamic>>.from(jsonData);
+      var responseData = listData.map((item) => GeneratedResume.fromJson(item)).toList();
       return responseData;
     } else {
       if (kDebugMode) {
@@ -987,7 +1003,9 @@ class DashboardDataService {
 
     final response = await client.post(getTransactionRoute, body: json.encode(body));
     if (response.statusCode == 200) {
-      var responseData = (json.decode(response.body) as List).map((item) => TemplateTransaction.fromJson(item)).toList();
+      var jsonData = json.decode(response.body);
+      var listData = List<Map<String, dynamic>>.from(jsonData);
+      var responseData = listData.map((item) => TemplateTransaction.fromJson(item)).toList();
       return responseData;
     } else {
       if (kDebugMode) {
@@ -1005,7 +1023,9 @@ class DashboardDataService {
 
     final response = await client.post(subscriptionTransactionRoute, body: json.encode(body));
     if (response.statusCode == 200) {
-      var responseData = (json.decode(response.body) as List).map((item) => SubscriptionTransaction.fromJson(item)).toList();
+      var jsonData = json.decode(response.body);
+      var listData = List<Map<String, dynamic>>.from(jsonData);
+      var responseData = listData.map((item) => SubscriptionTransaction.fromJson(item)).toList();
       return responseData;
     } else {
       if (kDebugMode) {
@@ -1040,7 +1060,9 @@ class DashboardDataService {
     final response = await client.get(marketplaceTemplateRoute);
 
     if (response.statusCode == 200) {
-      var responseData = (json.decode(response.body) as List).map((item) => MarketplaceTemplate.fromJson(item)).toList();
+      var jsonData = json.decode(response.body);
+      var listData = List<Map<String, dynamic>>.from(jsonData);
+      var responseData = listData.map((item) => MarketplaceTemplate.fromJson(item)).toList();
       return responseData;
     } else {
       if (kDebugMode) {

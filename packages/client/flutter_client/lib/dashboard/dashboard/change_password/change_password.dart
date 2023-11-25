@@ -1,11 +1,9 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/utils.dart';
 import 'package:cvworld/dashboard/datasource_dashboard.dart';
-import 'package:cvworld/routes/router.gr.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:cvworld/routes/router.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-@RoutePage()
 class AdminChangePasswordPage extends StatefulWidget {
   const AdminChangePasswordPage({super.key});
 
@@ -29,7 +27,7 @@ class _AdminChangePasswordPageState extends State<AdminChangePasswordPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             BackButtonApp(onPressed: () {
-              context.popRoute(const AdminChangePasswordPage());
+              Navigator.pop(context);
             }),
             const SizedBox(height: 60),
             Column(
@@ -102,6 +100,11 @@ class AdminChangePasswordLogic {
         ),
       ),
     );
+
+    // Logout
+    await logoutAdmin();
+    // ignore: use_build_context_synchronously
+    context.pushNamed(RouteNames.adminSignin);
     return;
   }
 }
@@ -194,12 +197,7 @@ class AdminChangePasswordForm extends StatefulWidget {
   final TextEditingController confirmPasswordController;
   final void Function() onPasswordChange;
 
-  const AdminChangePasswordForm({
-    Key? key,
-    required this.newPasswordController,
-    required this.confirmPasswordController,
-    required this.onPasswordChange,
-  }) : super(key: key);
+  const AdminChangePasswordForm({Key? key, required this.newPasswordController, required this.confirmPasswordController, required this.onPasswordChange}) : super(key: key);
 
   @override
   _AdminChangePasswordFormState createState() => _AdminChangePasswordFormState();

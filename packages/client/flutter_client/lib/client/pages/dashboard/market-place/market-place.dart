@@ -1,10 +1,10 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/datasource.dart';
 import 'package:cvworld/client/pages/dashboard/market-place/market-place-desktop.dart';
 import 'package:cvworld/client/pages/dashboard/market-place/market-place-mobile.dart';
 import 'package:cvworld/client/utils.dart';
-import 'package:cvworld/routes/router.gr.dart';
+import 'package:cvworld/routes/router.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 String formatAsIndianRupee(double amount) {
@@ -12,7 +12,6 @@ String formatAsIndianRupee(double amount) {
   return format.format(amount);
 }
 
-@RoutePage()
 class MarketPlacePage extends StatelessWidget {
   const MarketPlacePage({super.key});
 
@@ -97,9 +96,7 @@ class HeaderSection extends StatelessWidget {
         children: [
           if (canShowBackButton)
             BackButtonApp(
-              onPressed: () {
-                context.popRoute(const MarketPlacePage());
-              },
+              onPressed: () => {Navigator.pop(context)},
             ),
           Expanded(
             child: Row(
@@ -348,7 +345,7 @@ class MarketPlaceTemplateItem extends StatelessWidget {
   }) : super(key: key);
 
   void createNewCV(BuildContext context) {
-    context.router.push(CvMakerRoute(resumeID: 0, templateName: templateName));
+    context.pushNamed(RouteNames.cvMaker, pathParameters: {"templateName": templateName, "resumeID": "0"});
   }
 
   @override

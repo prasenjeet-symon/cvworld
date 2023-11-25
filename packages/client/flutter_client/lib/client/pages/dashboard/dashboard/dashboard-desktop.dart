@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/pages/dashboard/components/header.dart';
 import 'package:cvworld/client/pages/dashboard/dashboard/dashboard-body.dart';
+import 'package:flutter/material.dart';
 
 class DashboardDesktop extends StatefulWidget {
   const DashboardDesktop({super.key});
@@ -12,17 +12,16 @@ class DashboardDesktop extends StatefulWidget {
 class _DashboardDesktopState extends State<DashboardDesktop> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Dashboard header for desktop only
             DashboardHeader(),
-            const Padding(
+            Padding(
               padding: EdgeInsets.fromLTRB(100, 10, 100, 10),
               child: DashboardHeaderSecondary(),
             ),
-            const DashboardBodyContent(resumeWidth: 200)
+            DashboardBodyContent(resumeWidth: 200)
           ],
         ),
       ),

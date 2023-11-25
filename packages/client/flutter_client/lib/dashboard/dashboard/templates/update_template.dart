@@ -1,13 +1,11 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/utils.dart';
 import 'package:cvworld/dashboard/dashboard/templates/all_templates_page.dart';
+import 'package:flutter/material.dart';
 
-@RoutePage()
 class AdminUpdateTemplatePage extends StatefulWidget {
   final String templateId;
 
-  const AdminUpdateTemplatePage({super.key, @PathParam() required this.templateId});
+  const AdminUpdateTemplatePage({super.key, required this.templateId});
 
   @override
   State<AdminUpdateTemplatePage> createState() => _AdminUpdateTemplatePageState();
@@ -37,7 +35,7 @@ class _AdminUpdateTemplatePageState extends State<AdminUpdateTemplatePage> {
               children: [
                 // Back button
                 BackButtonApp(onPressed: () {
-                  context.popRoute(const AllTemplatesPage());
+                  Navigator.pop(context);
                 }),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,

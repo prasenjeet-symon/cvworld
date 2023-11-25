@@ -1,10 +1,12 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'dart:async';
+
 import 'package:cvworld/client/datasource.dart';
 import 'package:cvworld/client/pages/dashboard/dashboard/dashboard-body.dart';
-import 'package:cvworld/routes/router.gr.dart';
+import 'package:cvworld/routes/router.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:go_router/go_router.dart';
 
 class DashboardMobile extends StatefulWidget {
   const DashboardMobile({super.key});
@@ -48,7 +50,7 @@ class _DashboardMobileState extends State<DashboardMobile> {
         onPressed: () {
           // Add your action here
           // Nav to the marketplace page
-          context.pushRoute(const MarketPlacePage());
+          context.pushNamed(RouteNames.chooseTemplate);
         },
         child: const Icon(Icons.add),
       ),
@@ -85,8 +87,7 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
                 DatabaseService().logout().then((value) {
                   // Close the dialog
                   Navigator.of(context).pop();
-                  // Navigate to the SignInRoute after logout
-                  context.pushRoute(const SignInRoute());
+                  context.pushNamed(RouteNames.signin);
                 });
               },
               child: const Text('Yes'),
@@ -127,14 +128,14 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
                   icon: Icons.home,
                   title: 'Dashboard',
                   onTap: () {
-                    context.pushRoute(const Dashboard());
+                    context.pushNamed(RouteNames.dashboard);
                   },
                 ),
                 DrawerMenuItem(
                   icon: Icons.settings,
                   title: 'Account Settings',
                   onTap: () {
-                    context.pushRoute(const AccountSettingPage());
+                    context.pushNamed(RouteNames.dashboardAccountSetting);
                   },
                 ),
                 const Divider(), // Add a divider between menu items and app info
@@ -143,7 +144,7 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
                   title: 'Contact Us',
                   onTap: () {
                     // Handle menu item tap here
-                    context.pushRoute(const ContactUsPage());
+                    context.pushNamed(RouteNames.contactUs);
                   },
                 ),
                 DrawerMenuItem(
@@ -228,7 +229,7 @@ class ProfileWidget extends StatelessWidget {
               )
             : GestureDetector(
                 onTap: () {
-                  context.pushRoute(const AccountSettingPage());
+                  context.pushNamed(RouteNames.dashboardAccountSetting);
                 },
                 child: Container(
                   margin: const EdgeInsets.only(top: 10),

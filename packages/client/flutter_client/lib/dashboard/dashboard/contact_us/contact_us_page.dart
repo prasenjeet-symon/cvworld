@@ -1,12 +1,12 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/utils.dart';
 import 'package:cvworld/dashboard/dashboard/users/user_profile_page.dart';
 import 'package:cvworld/dashboard/datasource_dashboard.dart';
-import 'package:cvworld/routes/router.gr.dart';
+import 'package:cvworld/routes/router.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'dart:async';
 
-@RoutePage()
 class AdminContactUsPage extends StatefulWidget {
   const AdminContactUsPage({super.key});
 
@@ -16,11 +16,22 @@ class AdminContactUsPage extends StatefulWidget {
 
 class _AdminContactUsPageState extends State<AdminContactUsPage> {
   ContactUsLogic contactUsLogic = ContactUsLogic();
+  Timer? timer;
 
   @override
   void initState() {
     super.initState();
     contactUsLogic.fetchMessages(setState);
+
+    timer = Timer.periodic(const Duration(seconds: Constants.refreshSeconds), (timer) async {
+      await contactUsLogic.fetchMessages(setState, canShowLoading: false);
+    });
+  }
+
+  @override
+  void dispose() {
+    timer!.cancel();
+    super.dispose();
   }
 
   @override
@@ -44,7 +55,7 @@ class _AdminContactUsPageState extends State<AdminContactUsPage> {
                   children: [
                     // Back button
                     BackButtonApp(onPressed: () {
-                      context.popRoute();
+                      Navigator.pop(context);
                     }),
                     const SizedBox(height: 50),
                     // Heading "Customer Inquiry"
@@ -85,9 +96,7 @@ class CustomerIssueCard extends StatelessWidget {
       margin: const EdgeInsets.all(10),
       child: canCutText
           ? ListTile(
-              onTap: () => context.pushRoute(
-                AdminContactUsFullPage(messageId: issue.id.toString()),
-              ),
+              onTap: () => context.pushNamed(RouteNames.adminContactUsMessage, pathParameters: {"messageId": issue.id.toString()}),
               title: Text(
                 issue.message,
                 maxLines: 2,
@@ -142,12 +151,12 @@ class ResolvedBadge extends StatelessWidget {
 /// Contact Us Logic
 class ContactUsLogic {
   List<ContactUsMessage>? messages;
-  bool isLoading = true;
   ContactUsMessage? singleMessage;
+  bool isLoading = true;
 
   // Fetch all messages
-  Future<void> fetchMessages(void Function(void Function()) setState) async {
-    setState(() => isLoading = true);
+  Future<void> fetchMessages(void Function(void Function()) setState, {bool canShowLoading = true}) async {
+    setState(() => isLoading = canShowLoading);
     messages = await DashboardDataService().getContactUsMessages();
     setState(() => isLoading = false);
   }
@@ -157,6 +166,7 @@ class ContactUsLogic {
     setState(() => isLoading = true);
     singleMessage = await DashboardDataService().getSingleContactUsMessage(id);
     setState(() => isLoading = false);
+    return null;
   }
 
   // mark as resolved
@@ -165,6 +175,6 @@ class ContactUsLogic {
     await fetchMessages(setState);
     // redirect back
     // ignore: use_build_context_synchronously
-    context.popRoute(const ContactUsPage());
+    Navigator.pop(context);
   }
 }

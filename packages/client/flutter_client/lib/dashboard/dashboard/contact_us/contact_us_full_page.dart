@@ -1,13 +1,11 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/utils.dart';
 import 'package:cvworld/dashboard/dashboard/contact_us/contact_us_page.dart';
+import 'package:flutter/material.dart';
 
-@RoutePage()
 class AdminContactUsFullPage extends StatefulWidget {
-  String messageId;
+  final String messageId;
 
-  AdminContactUsFullPage({super.key, @PathParam() required this.messageId});
+  const AdminContactUsFullPage({super.key, required this.messageId});
 
   @override
   State<AdminContactUsFullPage> createState() => _AdminContactUsPageFullState();
@@ -43,9 +41,7 @@ class _AdminContactUsPageFullState extends State<AdminContactUsFullPage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       BackButtonApp(onPressed: () {
-                        context.popRoute(AdminContactUsFullPage(
-                          messageId: widget.messageId,
-                        ));
+                        Navigator.pop(context);
                       }),
                       const SizedBox(height: 50),
                       // Heading "Customer Inquiry"

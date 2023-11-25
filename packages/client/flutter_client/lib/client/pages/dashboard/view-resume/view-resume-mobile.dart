@@ -1,6 +1,5 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/pages/dashboard/view-resume/view-resume.dart';
+import 'package:flutter/material.dart';
 
 class ViewResumeMobile extends StatefulWidget {
   final int resumeID;
@@ -17,18 +16,18 @@ class _ViewResumeMobileState extends State<ViewResumeMobile> {
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
-            // Add your action here
-            context.popRoute(ViewResume(resumeID: widget.resumeID));
+            Navigator.pop(context);
           },
           icon: const Icon(Icons.arrow_back),
         ),
         title: const Text("View Resume"),
       ),
       body: Padding(
-          padding: const EdgeInsets.all(10),
-          child: SingleChildScrollView(
-            child: ResumeViewer(resumeID: widget.resumeID),
-          )),
+        padding: const EdgeInsets.all(10),
+        child: SingleChildScrollView(
+          child: ResumeViewer(resumeID: widget.resumeID),
+        ),
+      ),
     );
   }
 }

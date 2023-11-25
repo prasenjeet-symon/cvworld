@@ -794,6 +794,8 @@ export namespace DatabaseType {
 /** Sign in/ Sign up with google */
 export async function signInOrSignUpWithGoogle(req: Request, res: Response): Promise<void> {
   const token = req.body.google_token as string;
+  const timeZone = req.body.timeZone as string;
+
   if (!token) {
     res.status(400).json({ error: "Missing google_token" });
     return;
@@ -811,6 +813,7 @@ export async function signInOrSignUpWithGoogle(req: Request, res: Response): Pro
     const prisma = PrismaClientSingleton.prisma;
     const newUser = await prisma.user.create({
       data: {
+        timeZone: timeZone,
         email: verifiedToken.email,
         fullName: verifiedToken.name,
         profilePicture: verifiedToken.profile || "",
@@ -931,8 +934,9 @@ export async function signUpWithEmailAndPassword(req: Request, res: Response) {
     const email = req.body.email;
     const password = req.body.password;
     const userId = v4();
+    const timeZone = req.body.timeZone;
 
-    if (!("name" in req.body && "email" in req.body && "password" in req.body)) {
+    if (!("name" in req.body && "email" in req.body && "password" in req.body && "timeZone" in req.body)) {
       res.status(400).json({ message: "All input is required" });
       return;
     }
@@ -956,6 +960,7 @@ export async function signUpWithEmailAndPassword(req: Request, res: Response) {
     const prisma = PrismaClientSingleton.prisma;
     await prisma.user.create({
       data: {
+        timeZone: timeZone,
         email: email,
         fullName: name,
         profilePicture: profilePicture,
@@ -1100,8 +1105,6 @@ export class PrismaClientSingleton {
  * Create the server
  */
 export function createServer() {
-  
-
   const cors = require("cors");
   const app = express();
 
@@ -1202,9 +1205,9 @@ import axios from "axios";
 // Generate dummy data for the Resume interface
 export function generateDummyResume(): Resume {
   const resume: Resume = {
-    profilePicture: 'https://picsum.photos/200/200',
-    name: faker.name.fullName(),
-    profession: faker.name.jobTitle(),
+    profilePicture: "https://picsum.photos/200/200",
+    name: faker.person.fullName(),
+    profession: faker.person.jobTitle(),
     profile: faker.lorem.paragraph(),
     employmentHistory: [],
     education: [],
@@ -1231,7 +1234,7 @@ export function generateDummyResume(): Resume {
   // Generate dummy employment history
   for (let i = 0; i < 3; i++) {
     const employment = {
-      job: faker.name.jobTitle(),
+      job: faker.person.jobTitle(),
       employer: faker.company.name(),
       startDate: faker.date.past(),
       endDate: faker.date.recent(),
@@ -1309,18 +1312,22 @@ export function generateDummyResume(): Resume {
 }
 
 /** Format date */
-export function formatDate(date: Date) {
-  const finalDate = new Date(date);
-  // format : day/month/year
-  return finalDate.toLocaleDateString("en-GB", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+export function formatDate(utcTimestamp: Date, timeZone: string) {
+  const utcDate = new Date(utcTimestamp);
+
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone:timeZone,
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
   });
-}
+
+  const convertedDateStr = formatter.format(utcDate);
+  return convertedDateStr;
+} 
 
 /** Generate the resume HTML */
-export function generateResumeHTML(resume: Resume) {
+export function generateResumeHTML(resume: Resume, timeZone: string) {
   return `
       <!DOCTYPE html>
     <html lang="en">
@@ -1581,7 +1588,7 @@ export function generateResumeHTML(resume: Resume) {
                           return `
                         <div class="employmentHistoryItem">
                         <div>${p.job} at ${p.employer} , ${p.city}</div>
-                        <div>${formatDate(p.startDate)} -- ${formatDate(p.endDate)}</div>
+                        <div>${formatDate(p.startDate, timeZone)} -- ${formatDate(p.endDate, timeZone)}</div>
                         <div>${p.description}</div>
                         </div>
                         `;
@@ -1607,7 +1614,7 @@ export function generateResumeHTML(resume: Resume) {
                       return `
                     <div class="educationSectionItem">
                     <div>${p.degree}, ${p.school}, ${p.city}</div>
-                    <div>${formatDate(p.startDate)} -- ${formatDate(p.endDate)}</div>
+                    <div>${formatDate(p.startDate, timeZone)} -- ${formatDate(p.endDate, timeZone)}</div>
                     <div></div>
                     </div>
                     `;
@@ -1635,7 +1642,7 @@ export function generateResumeHTML(resume: Resume) {
                       return `
                     <div class="internshipSectionItem">
                     <div>${p.job}, ${p.employer}, ${p.city}</div>
-                    <div>${formatDate(p.startDate)} -- ${formatDate(p.endDate)}</div>
+                    <div>${formatDate(p.startDate, timeZone)} -- ${formatDate(p.endDate, timeZone)}</div>
                     <div>${p.description}</div>
                     </div>
                     `;
@@ -1663,7 +1670,7 @@ export function generateResumeHTML(resume: Resume) {
                       return `
                     <div class="coursesSectionItem">
                     <div>${p.course}, ${p.institution}</div>
-                    <div>${formatDate(p.startDate)} -- ${formatDate(p.endDate)}</div>
+                    <div>${formatDate(p.startDate, timeZone)} -- ${formatDate(p.endDate, timeZone)}</div>
                     <div></div>
                     </div>
                     `;
@@ -1690,7 +1697,7 @@ export function generateResumeHTML(resume: Resume) {
                 <div>
                   <div>Date/Place of birth</div>
                   <div>
-                    ${formatDate(resume.details.dateOfBirth)} <br />
+                    ${formatDate(resume.details.dateOfBirth, timeZone)} <br />
                     ${resume.details.placeOfBirth}
                   </div>
                 </div>
@@ -1786,10 +1793,10 @@ export function generateResumeHTML(resume: Resume) {
 }
 
 /** Generate the PDF */
-export async function generatePDF(resume: Resume, resumeMaker: null | ((resume: Resume) => string) = null, resumeUUID?: string) {
+export async function generatePDF(timeZone: string, resume: Resume, resumeMaker: null | ((resume: Resume, timeZone: string) => string) = null, resumeUUID?: string) {
   const browser = (await BrowserPuppeteer.browser()).browserInstance;
   const page = await browser.newPage();
-  const resumeHTML = resumeMaker ? resumeMaker(resume) : generateResumeHTML(resume);
+  const resumeHTML = resumeMaker ? resumeMaker(resume, timeZone) : generateResumeHTML(resume, timeZone);
   await page.setContent(resumeHTML);
   await page.waitForNetworkIdle({ idleTime: 1000 });
 
@@ -1803,10 +1810,10 @@ export async function generatePDF(resume: Resume, resumeMaker: null | ((resume: 
 }
 
 /** Generate the Image of the resume */
-export async function generateImage(resume: Resume, resumeMaker: null | ((resume: Resume) => string) = null, resumeUUID?: string) {
+export async function generateImage(timeZone: string, resume: Resume, resumeMaker: null | ((resume: Resume, timeZone: string) => string) = null, resumeUUID?: string) {
   const browser = (await BrowserPuppeteer.browser()).browserInstance;
   const page = await browser.newPage();
-  const resumeHTML = resumeMaker ? resumeMaker(resume) : generateResumeHTML(resume);
+  const resumeHTML = resumeMaker ? resumeMaker(resume, timeZone) : generateResumeHTML(resume, timeZone);
   await page.setContent(resumeHTML);
   await page.waitForSelector(".resume");
   await page.waitForNetworkIdle({ idleTime: 1000 });
@@ -1919,17 +1926,14 @@ export async function createPremiumTemplatePlan() {
   const adminEmail = process.env.ADMIN_EMAIL;
   const instance = new Razorpay({ key_id: razorpayKeyID, key_secret: razorpayKeySecret });
   const prisma = PrismaClientSingleton.prisma;
+
   // check if the plan already created in the database
   const oldPlan = await prisma.admin.findUnique({
     where: {
       email: adminEmail,
     },
     select: {
-      premiumTemplatePlans: {
-        where: {
-          name: nameOfPlan,
-        },
-      },
+      premiumTemplatePlans:true
     },
   });
 
@@ -1939,7 +1943,7 @@ export async function createPremiumTemplatePlan() {
 
   // Is already created on razorpay
   const allCreatedPlans = (await instance.plans.all()) as templatePlans;
-  const marsPlan = allCreatedPlans.items.find((p) => p.item.name === nameOfPlan);
+  const marsPlan = allCreatedPlans.items.find((p) => p.item.name.toLowerCase() === nameOfPlan.toLowerCase());
 
   let createdPlanID = marsPlan ? marsPlan.id : "";
 
@@ -1955,37 +1959,24 @@ export async function createPremiumTemplatePlan() {
       },
     })) as PremiumTemplatePlan;
 
-    createdPlanID = createdPlan.id; 
+    createdPlanID = createdPlan.id;
   }
 
+  // this means not created in database yet , create new one
   await prisma.admin.update({
     where: {
       email: adminEmail,
     },
     data: {
       premiumTemplatePlans: {
-        upsert: {
-          where: {
-            name: nameOfPlan,
-          },
-          create: {
-            currency: "INR",
-            description: "Access all the premium templates",
-            interval: 1,
-            name: nameOfPlan,
-            period: "MONTHLY",
-            planID: createdPlanID,
-            price: price,
-          },
-          update: {
-            currency: "INR",
-            description: "Access all the premium templates",
-            interval: 1,
-            name: nameOfPlan,
-            period: "MONTHLY",
-            planID: createdPlanID,
-            price: price,
-          }
+        create: {
+          currency: "INR",
+          description: "Access all the premium templates",
+          interval: 1,
+          name: nameOfPlan,
+          period: "MONTHLY",
+          planID: createdPlanID,
+          price: price,
         },
       },
     },
@@ -2034,9 +2025,12 @@ export async function addTemplate(name: string, price: number) {
 
   const template = await loadTemplate();
 
+  const moment = require("moment-timezone");
+  const timeZone: string = "Asia/Kolkata";
+
   // generate the dummy template for the preview
   const dummyResume = generateDummyResume();
-  const imageUrl = await generateImage(dummyResume, template.default);
+  const imageUrl = await generateImage(timeZone, dummyResume, template.default);
 
   // add to the database template marketplace
   const prisma = PrismaClientSingleton.prisma;

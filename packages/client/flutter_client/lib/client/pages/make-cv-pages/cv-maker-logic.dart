@@ -1,6 +1,3 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/datasource.dart';
 import 'package:cvworld/client/pages/make-cv-pages/courses-section.dart';
 import 'package:cvworld/client/pages/make-cv-pages/education-section.dart';
@@ -12,7 +9,10 @@ import 'package:cvworld/client/pages/make-cv-pages/personal-details-section.dart
 import 'package:cvworld/client/pages/make-cv-pages/professional-summry-section.dart';
 import 'package:cvworld/client/pages/make-cv-pages/skills-section.dart';
 import 'package:cvworld/client/pages/make-cv-pages/website-links-section.dart';
-import 'package:cvworld/routes/router.gr.dart';
+import 'package:cvworld/routes/router.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class CVMakerLogic {
   final String educationSectionTitle = 'Education';
@@ -133,7 +133,7 @@ class CVMakerLogic {
     setStateCallback();
 
     try {
-      if (resumeID != null) {
+      if (resumeID != null && resumeID != 0) {
         var oldResumeFetched = await DatabaseService().fetchSingleResume(resumeID!);
 
         if (oldResumeFetched != null) {
@@ -246,7 +246,10 @@ class CVMakerLogic {
       // ignore: use_build_context_synchronously
       hideLoadingDialog(ctx);
       // ignore: use_build_context_synchronously
-      ctx.pushRoute(ViewResume(resumeID: resumeID));
+      ctx.pushNamed(
+        RouteNames.dashboardViewResume,
+        pathParameters: {"resumeID": resumeID.toString()},
+      );
     } catch (err) {
       // Handle any errors
       if (kDebugMode) {

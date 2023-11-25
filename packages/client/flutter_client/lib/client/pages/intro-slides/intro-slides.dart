@@ -1,10 +1,9 @@
-import 'package:auto_route/auto_route.dart';
+import 'package:cvworld/routes/router.dart';
 import 'package:flutter/material.dart';
 import 'package:cvworld/client/datasource.dart';
-import 'package:cvworld/routes/router.gr.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intro_slider/intro_slider.dart';
 
-@RoutePage()
 class IntroSliderPage extends StatefulWidget {
   const IntroSliderPage({super.key});
 
@@ -28,7 +27,7 @@ class _IntroSliderState extends State<IntroSliderPage> {
         key: UniqueKey(),
         listContentConfig: _introSlideLogic.slides,
         onDonePress: () {
-          DatabaseService().setTutorialCompleted().then((value) => {context.pushRoute(const Dashboard())});
+          DatabaseService().setTutorialCompleted().then((value) => {context.pushNamed(RouteNames.dashboard)});
         },
       ),
     );

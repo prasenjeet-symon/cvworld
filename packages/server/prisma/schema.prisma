@@ -28,7 +28,7 @@ model Admin {
 model PremiumTemplatePlans {
   id          Int               @id @default(autoincrement())
   planID      String            @unique
-  name        String            @unique
+  name        String            
   price       Float
   period      SubscriptionCycle
   interval    Int
@@ -47,6 +47,7 @@ model User {
   fullName       String
   profilePicture String?
   password       String?
+  timeZone       String @default("IST")
   reference      String  @unique
 
   subscription        Subscription?

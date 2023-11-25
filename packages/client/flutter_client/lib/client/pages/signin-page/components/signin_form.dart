@@ -1,13 +1,14 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/datasource.dart';
 import 'package:cvworld/client/pages/home-page/components/footer.dart';
 import 'package:cvworld/client/pages/signin-page/components/signin_form_mobile.dart';
 import 'package:cvworld/client/utils.dart';
-import 'package:cvworld/routes/router.gr.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:cvworld/routes/router.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
+import '../../../../config.dart';
 
 class SignInFormDesktop extends StatefulWidget {
   const SignInFormDesktop({super.key});
@@ -37,12 +38,7 @@ class _SignInFormDesktopState extends State<SignInFormDesktop> {
                         top: 40,
                         left: 40,
                         child: TextButton.icon(
-                          onPressed: () {
-                            context.router.pushAndPopUntil(
-                              const HomeRoute(),
-                              predicate: (_) => false, // Clear the stack
-                            );
-                          },
+                          onPressed: () => {context.pushNamed(RouteNames.home)},
                           icon: const Icon(Icons.arrow_back),
                           label: const Text('Back'),
                         ),
@@ -116,10 +112,7 @@ class SignInLogic {
             content: Center(
               child: Text(
                 'No user found. Please check your email and try again.',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
             duration: Duration(seconds: 5),
@@ -167,19 +160,19 @@ class SignInLogic {
     );
 
     // ignore: use_build_context_synchronously
-    ctx.navigateNamedTo('/dashboard');
+    ctx.pushNamed(RouteNames.dashboard);
   }
 
   // Sign in with google
   void signInWithGoogle(BuildContext ctx) async {
-    final GoogleSignIn googleSignIn = GoogleSignIn(clientId: kIsWeb ? Constants.googleClientId : Constants.googleClientIdAndroid);
+    final GoogleSignIn googleSignIn = GoogleSignIn(clientId: kIsWeb ? ApplicationConfiguration.GOOGLE_WEB_CLIENT_ID : Constants.googleClientIdAndroid);
     final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
     if (googleUser != null) {
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       var accessToken = googleAuth.accessToken!;
       await DatabaseService().continueWithGoogle(accessToken);
       // ignore: use_build_context_synchronously
-      ctx.navigateNamedTo('/dashboard');
+      ctx.pushNamed(RouteNames.dashboard);
     }
   }
 }

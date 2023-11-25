@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:cvworld/client/datasource.dart';
 import 'package:cvworld/client/pages/dashboard/account-setting/account-setting-mobile.dart';
 import 'package:cvworld/client/pages/make-cv-pages/courses-section.dart';
@@ -16,11 +15,11 @@ import 'package:cvworld/client/pages/make-cv-pages/website-links-section.dart' s
 import 'package:cvworld/client/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:rxdart/subjects.dart';
 
 import 'account-setting-desktop.dart';
 
-@RoutePage()
 class AccountSettingPage extends StatelessWidget {
   const AccountSettingPage({super.key});
 
@@ -53,24 +52,22 @@ class PricingPlanCardLogic {
   PricingPlanCardLogic({required this.setStateCallback});
 
   Future<void> fetchUser({bool enableLoading = true}) async {
-    if (enableLoading) {
-      isLoading = true;
-      setStateCallback();
-    }
+    isLoading = enableLoading;
+    setStateCallback();
 
     user = await DatabaseService().fetchUser();
 
-    if (enableLoading) {
-      isLoading = false;
-      setStateCallback();
-    }
+    isLoading = false;
+    setStateCallback();
   }
 
   Future<void> fetchAllPlans() async {
     isLoading = true;
     setStateCallback();
+
     var subsPlan = await DatabaseService().getPremiumPlan();
     subscriptionPlan = subsPlan;
+
     isLoading = false;
     setStateCallback();
     return;
@@ -79,14 +76,16 @@ class PricingPlanCardLogic {
   Future<String?> subscribeToPremium(SubscriptionPlan plan) async {
     isLoading = true;
     setStateCallback();
+
     var link = await DatabaseService().createSubscription(plan.name);
+
     isLoading = false;
     setStateCallback();
     return link;
   }
 
   Future<void> startTick(Function callback) async {
-    timer = Timer.periodic(const Duration(seconds: 2), (Timer timer) {
+    timer = Timer.periodic(const Duration(seconds: Constants.refreshSeconds), (Timer timer) {
       _fetchUserAndSetState(callback);
     });
   }
@@ -205,26 +204,25 @@ class PlanCardWidget extends StatelessWidget {
 ///
 ///
 class PricingPlanCard extends StatefulWidget {
-  BehaviorSubject? canRefresh;
-
-  PricingPlanCard({super.key, this.canRefresh});
+  const PricingPlanCard({super.key});
 
   @override
   State<PricingPlanCard> createState() => _PricingPlanCardState();
 }
 
 class _PricingPlanCardState extends State<PricingPlanCard> {
-  late PricingPlanCardLogic logic;
+  late final PricingPlanCardLogic logic;
+
+  stateCallback() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    logic = PricingPlanCardLogic(setStateCallback: () {
-      if (mounted) {
-        setState(() {});
-      }
-    });
-
+    logic = PricingPlanCardLogic(setStateCallback: stateCallback);
     logic.fetchUser().then((value) => logic.fetchAllPlans());
   }
 
@@ -239,17 +237,11 @@ class _PricingPlanCardState extends State<PricingPlanCard> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(
-            'Cancel Subscription',
-            textAlign: TextAlign.center,
-          ),
+          title: const Text('Cancel Subscription', textAlign: TextAlign.center),
           content: const Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                'Are you sure you want to cancel your subscription?',
-                textAlign: TextAlign.center,
-              ),
+              Text('Are you sure you want to cancel your subscription?', textAlign: TextAlign.center),
             ],
           ),
           actions: [
@@ -274,25 +266,17 @@ class _PricingPlanCardState extends State<PricingPlanCard> {
   }
 
   Future<void> _showGreetingPopup(BuildContext context) async {
-    if (widget.canRefresh != null) {
-      widget.canRefresh!.add(true);
-    }
+    MySubjectSingleton.instance.dashboardHeaderSubject.add(true);
 
     return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(
-            'Congratulations!',
-            textAlign: TextAlign.center,
-          ),
+          title: const Text('Congratulations!', textAlign: TextAlign.center),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                'Thank you for becoming a Premium Member.',
-                textAlign: TextAlign.center,
-              ),
+              const Text('Thank you for becoming a Premium Member.', textAlign: TextAlign.center),
               const SizedBox(height: 20.0),
               Image.asset(
                 'assets/premium_member_image.png', // Replace with your premium member image asset
@@ -400,9 +384,7 @@ class _AccountCardState extends State<AccountCard> {
 ///
 ///
 class AccountSettingBody extends StatelessWidget {
-  BehaviorSubject<bool>? canRefresh;
-
-  AccountSettingBody({super.key, this.canRefresh});
+  const AccountSettingBody({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -426,15 +408,15 @@ class AccountSettingBody extends StatelessWidget {
                       children: [
                         BackButtonApp(
                           onPressed: () {
-                            context.popRoute(const AccountSettingPage());
+                            Navigator.pop(context);
                           },
                         ),
                         const Expanded(child: SizedBox()),
                       ],
                     ),
                   ),
-                PricingPlanCard(canRefresh: canRefresh),
-                ImageCard(canRefresh: canRefresh),
+                const PricingPlanCard(),
+                ImageCard(),
                 const AccountCard(),
               ],
             ),

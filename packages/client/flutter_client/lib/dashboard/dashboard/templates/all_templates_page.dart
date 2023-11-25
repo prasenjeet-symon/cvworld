@@ -1,14 +1,14 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/utils.dart';
 import 'package:cvworld/dashboard/datasource_dashboard.dart';
-import 'package:cvworld/routes/router.gr.dart';
+import 'package:cvworld/routes/router.dart';
+import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'dart:async';
 
 import '../users/user_profile_page.dart';
 
-@RoutePage()
 class AllTemplatesPage extends StatefulWidget {
   const AllTemplatesPage({super.key});
 
@@ -18,11 +18,28 @@ class AllTemplatesPage extends StatefulWidget {
 
 class _AllTemplatesPageState extends State<AllTemplatesPage> {
   final AllTemplatesPageLogic allTemplatesPageLogic = AllTemplatesPageLogic();
+  Timer? timer;
 
   @override
   void initState() {
     super.initState();
     allTemplatesPageLogic.getMarketplaceTemplates(setState);
+
+    timer = Timer.periodic(const Duration(seconds: Constants.refreshSeconds), (timer) async {
+      allTemplatesPageLogic.getMarketplaceTemplates(setState, canShowLoading: false);
+    });
+  }
+
+  @override
+  void dispose() {
+    timer!.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    allTemplatesPageLogic.getMarketplaceTemplates(setState, canShowLoading: false);
   }
 
   @override
@@ -44,7 +61,7 @@ class _AllTemplatesPageState extends State<AllTemplatesPage> {
                     children: [
                       // Back button
                       BackButtonApp(onPressed: () {
-                        context.popRoute(const AllTemplatesPage());
+                        Navigator.pop(context);
                       }),
                       const SizedBox(height: 50),
                       // // Text heading "Marketplace Templates"
@@ -162,7 +179,7 @@ class TemplateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.pushRoute(AdminUpdateTemplatePage(templateId: template.id.toString())),
+      onTap: () => context.pushNamed(RouteNames.adminUpdateTemplate, pathParameters: {"templateId": template.id.toString()}),
       child: Container(
         width: 200,
         margin: const EdgeInsets.only(bottom: 20),
@@ -171,12 +188,7 @@ class TemplateCard extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 1,
-              blurRadius: 2,
-              offset: const Offset(0, 3), // changes position of shadow
-            ),
+            BoxShadow(color: Colors.grey.withOpacity(0.5), spreadRadius: 1, blurRadius: 2, offset: const Offset(0, 3)),
           ],
         ),
         child: Column(
@@ -227,8 +239,8 @@ class AllTemplatesPageLogic {
   // price controller
   final TextEditingController priceController = TextEditingController();
 
-  Future<List<MarketplaceTemplate>?> getMarketplaceTemplates(void Function(void Function()) setState) async {
-    setState(() => isLoading = true);
+  Future<List<MarketplaceTemplate>?> getMarketplaceTemplates(void Function(void Function()) setState, {bool canShowLoading = true}) async {
+    setState(() => isLoading = canShowLoading);
     templates = await DashboardDataService().getMarketplaceTemplates();
     setState(() => isLoading = false);
     return null;
@@ -265,7 +277,8 @@ class AllTemplatesPageLogic {
     );
 
     // navigate back
-    context.navigateBack();
+    // ignore: use_build_context_synchronously
+    Navigator.pop(context);
   }
 
   // Fetch single marketplace template
@@ -275,5 +288,6 @@ class AllTemplatesPageLogic {
     nameController.text = data!.displayName;
     priceController.text = data.price.toString();
     setState(() => isLoading = false);
+    return null;
   }
 }

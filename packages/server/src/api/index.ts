@@ -26,6 +26,7 @@ router.post("/update_resume", async (req, res) => {
     },
     select: {
       profilePicture: true,
+      timeZone: true,
       resumes: {
         where: {
           id: resumeID,
@@ -54,6 +55,8 @@ router.post("/update_resume", async (req, res) => {
   rmSync(oldPdfFilePath);
 
   const templateName = oldResume.resumes[0].templateName;
+  const timeZone = oldResume.timeZone;
+
   const loadTemplate = async () => {
     const template = await import(`../templates/${templateName}`);
     return template as unknown as { default: (resume: Resume) => string };
@@ -61,7 +64,7 @@ router.post("/update_resume", async (req, res) => {
 
   const template = await loadTemplate();
 
-  const [imageUrl, pdfUrl] = await Promise.all([generateImage(resume, template.default), generatePDF(resume, template.default)]);
+  const [imageUrl, pdfUrl] = await Promise.all([generateImage(timeZone, resume, template.default), generatePDF(timeZone, resume, template.default)]);
 
   if (!imageUrl || !pdfUrl) {
     res.status(500).send("Something went wrong");
@@ -123,14 +126,31 @@ router.post("/generate", async (req, res) => {
     return;
   }
 
+  const oldUser = await PrismaClientSingleton.prisma.user.findUnique({
+    where: {
+      email: res.locals.email,
+    },
+    select: {
+      timeZone: true,
+    }
+  });
+
+  if(!oldUser) {
+    res.status(500).send("Something went wrong");
+    return;
+  }
+
+  const timeZone = oldUser.timeZone;
+
+
   const loadTemplate = async () => {
     const template = await import(`../templates/${templateName}`);
-    return template as unknown as { default: (resume: Resume) => string };
+    return template as unknown as { default: (resume: Resume, timeZone: string) => string };
   };
 
   const template = await loadTemplate();
 
-  const [imageUrl, pdfUrl] = await Promise.all([generateImage(resume, template.default), generatePDF(resume, template.default)]);
+  const [imageUrl, pdfUrl] = await Promise.all([generateImage(timeZone, resume, template.default), generatePDF(timeZone,resume, template.default)]);
 
   if (!imageUrl || !pdfUrl) {
     res.status(500).send("Something went wrong");
@@ -1454,6 +1474,7 @@ router.post("/get_user", async (req, res) => {
       email: email,
     },
     select: {
+      timeZone: true,
       courses: false,
       educations: false,
       employmentHistories: false,
@@ -1762,7 +1783,7 @@ router.post("/cancel_subscription", async (req, res) => {
 // For the buy template get req with auth token and template name
 router.get("/template/:name", async (req, res) => {
   const templateName = req.params.name;
-  const hostName = req.query.hostName as string;
+  const hostName = process.env.BASE_URL || "http://localhost:8081";
   const email = res.locals.email;
 
   const Razorpay = require("razorpay");

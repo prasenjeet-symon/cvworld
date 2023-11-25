@@ -1,14 +1,13 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/datasource.dart';
 import 'package:cvworld/client/pages/dashboard/dashboard/dashboard-desktop.dart';
 import 'package:cvworld/client/pages/dashboard/dashboard/dashboard-mobile.dart';
 import 'package:cvworld/client/utils.dart';
-import 'package:cvworld/routes/router.gr.dart';
+import 'package:cvworld/routes/router.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 
-@RoutePage()
 class Dashboard extends StatelessWidget {
   const Dashboard({super.key});
 
@@ -38,9 +37,9 @@ class DashboardContentLogic {
   DashboardContentLogic({required this.setStateCallback});
 
   // Fetch all created resumes for the current user from the database
-  Future<List<GeneratedResume>> fetchAllCreatedResume() async {
+  Future<List<GeneratedResume>> fetchAllCreatedResume({bool canShowLoading = true}) async {
     try {
-      isLoading = true;
+      isLoading = canShowLoading;
       setStateCallback();
       var resumesFetched = await DatabaseService().fetchAllGeneratedResumeOfUser();
       resumes = resumesFetched ?? [];
@@ -90,7 +89,7 @@ class DashboardContentLogic {
   // Edit the resume with the given ID by navigating to the CvMakerRoute
   void editResume(BuildContext ctx, int id) {
     // ignore: use_build_context_synchronously
-    ctx.pushRoute(CvMakerRoute(resumeID: id, templateName: 'Edit'));
+    ctx.pushNamed(RouteNames.cvMaker, pathParameters: {"resumeID": "$id", "templateName": "Edit"});
   }
 }
 
@@ -148,7 +147,7 @@ class CreatedResumeItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final resumeImage = GestureDetector(
-      onTap: () => context.pushRoute(ViewResume(resumeID: resume.id)),
+      onTap: () => context.pushNamed(RouteNames.dashboardViewResume, pathParameters: {'resumeID': resume.id.toString()}),
       child: Container(
         padding: const EdgeInsets.all(1),
         child: Image.network(resume.resumeLink.imageUrl, width: width, fit: BoxFit.cover),
@@ -168,7 +167,7 @@ class CreatedResumeItem extends StatelessWidget {
           ),
           const SizedBox(height: 5),
           ResumeActionButton(
-            onPressed: () => context.pushRoute(ViewResume(resumeID: resume.id)),
+            onPressed: () => context.pushNamed(RouteNames.dashboardViewResume, pathParameters: {'resumeID': resume.id.toString()}),
             icon: Icons.remove_red_eye_sharp,
             label: 'View Resume',
           ),
@@ -326,7 +325,7 @@ class ShiningImageCreateButton extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(padding: const EdgeInsets.fromLTRB(35, 12, 35, 12)),
-        onPressed: () => context.pushRoute(const MarketPlacePage()),
+        onPressed: () => context.pushNamed(RouteNames.chooseTemplate),
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -334,10 +333,7 @@ class ShiningImageCreateButton extends StatelessWidget {
           children: [
             Icon(Icons.add),
             SizedBox(width: 8),
-            Text(
-              'Create',
-              style: TextStyle(fontSize: 16),
-            ),
+            Text('Create', style: TextStyle(fontSize: 16)),
           ],
         ),
       ),

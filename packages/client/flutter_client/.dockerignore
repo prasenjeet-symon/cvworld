@@ -1,0 +1,61 @@
+# Ignore common files and directories
+build/
+android/build/
+ios/Pods/
+ios/.symlinks/
+macos/Flutter/ephemeral/
+web/build/
+
+# Ignore Flutter tools and configuration
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter-plugins-dependencies.lock
+.flutter-plugins-version
+.flutter-version
+
+# Ignore Dart analysis files
+.dart_tool/
+.dart_dev/
+.dart_tool/
+.pub/
+.pub-cache/
+*.dart.snapshot
+
+# Ignore IDE-specific files
+.idea/
+.vscode/
+*.iml
+
+# Ignore test and temporary files
+test/
+temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Ignore CI/CD files
+.flutter-intellij.log
+.flutter-plugins.log
+
+# Ignore Android Studio/IntelliJ project files
+*.iml
+*.iws
+*.ipr
+*.bak
+.idea/
+
+# Ignore system and hidden files
+Thumbs.db
+.DS_Store
+Desktop.ini
+
+# Ignore package manager files
+*.lock
+pubspec.lock
+
+# Ignore logs and cache files
+logs/
+*.log
+*.logs/
+*.cache/

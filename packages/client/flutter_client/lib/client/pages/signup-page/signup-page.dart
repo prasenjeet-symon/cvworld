@@ -1,12 +1,9 @@
-// ignore: file_names
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/pages/signup-page/components/signup_form_mobile.dart';
 import 'package:cvworld/client/utils.dart';
+import 'package:flutter/material.dart';
 
 import 'components/signup_form.dart';
 
-@RoutePage()
 class SignUpScreen extends StatelessWidget {
   const SignUpScreen({super.key});
 

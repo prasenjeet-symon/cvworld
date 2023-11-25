@@ -46,7 +46,7 @@ export function paymentSuccess(price: number, order_id: string, paymentID: strin
           <p>Payment Status: Success</p>
           <p>
             Thank you for your purchase! If you have any questions or concerns,
-            please contact our customer support.
+            please contact our customer support. To download your resume goto Dashboard.
           </p>
         </div>
       </body>

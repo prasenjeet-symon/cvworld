@@ -1,6 +1,5 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/pages/dashboard/account-setting/account-setting.dart';
+import 'package:flutter/material.dart';
 
 class AccountSettingMobile extends StatefulWidget {
   const AccountSettingMobile({super.key});
@@ -16,14 +15,13 @@ class _AccountSettingMobileState extends State<AccountSettingMobile> {
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
-            // Add your action here
-            context.popRoute(const AccountSettingPage());
+            Navigator.pop(context);
           },
           icon: const Icon(Icons.arrow_back),
         ),
         title: const Text('Account Settings'),
       ),
-      body: Padding(
+      body: const Padding(
         padding: EdgeInsets.all(10),
         child: SingleChildScrollView(
           child: AccountSettingBody(),

@@ -1,7 +1,7 @@
-// ignore: file_names
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/pages/dashboard/market-place/market-place.dart';
+import 'package:cvworld/routes/router.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class MarketPlaceMobile extends StatefulWidget {
   const MarketPlaceMobile({super.key});
@@ -33,7 +33,7 @@ class _MarketPlaceMobileState extends State<MarketPlaceMobile> {
         leading: IconButton(
           onPressed: () {
             // Add your action here
-            context.popRoute(const MarketPlacePage());
+            context.pushNamed(RouteNames.chooseTemplate);
           },
           icon: const Icon(Icons.arrow_back),
         ),

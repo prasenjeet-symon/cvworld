@@ -1,7 +1,7 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/utils.dart';
-import 'package:cvworld/routes/router.gr.dart';
+import 'package:cvworld/routes/router.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 // ignore: must_be_immutable
 class HeaderSection extends StatelessWidget {
@@ -38,14 +38,14 @@ class HeaderMenus extends StatelessWidget {
                 Container(
                   margin: const EdgeInsets.fromLTRB(0, 0, 40, 0),
                   child: TextButton(
-                    onPressed: () => {context.navigateNamedTo('/contact-us')},
+                    onPressed: () => {context.pushNamed(RouteNames.contactUs)},
                     child: const Text('Contact Us', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500)),
                   ),
                 ),
                 Container(
                   margin: const EdgeInsets.fromLTRB(0, 0, 40, 0),
                   child: TextButton(
-                    onPressed: () => {context.navigateNamedTo('/about-us')},
+                    onPressed: () => {context.pushNamed(RouteNames.aboutUs)},
                     child: const Text('About Us', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500)),
                   ),
                 ),
@@ -69,13 +69,13 @@ class HeaderActions extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           TextButton(
-            onPressed: () => {context.pushRoute(const SignInRoute())},
+            onPressed: () => {context.pushNamed(RouteNames.signin)},
             child: const Text('Log In', style: TextStyle(fontSize: 16, color: Colors.white)),
           ),
           Container(
             margin: const EdgeInsets.fromLTRB(15, 0, 0, 0),
             child: ElevatedButton(
-              onPressed: () => {context.pushRoute(const SignUpRoute())},
+              onPressed: () => {context.pushNamed(RouteNames.signup)},
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.fromLTRB(25, 20, 25, 20),
                 backgroundColor: Colors.white,
@@ -97,7 +97,7 @@ class HeaderLogo extends StatelessWidget {
   void _handleLogoTap(BuildContext context) {
     // Implement the action you want when the logo is clicked
     // For example, you can navigate to a different screen.
-    context.pushRoute(const HomeRoute());
+    context.pushNamed(RouteNames.home);
   }
 
   @override

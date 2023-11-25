@@ -1,23 +1,20 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
-
 import 'package:cvworld/client/pages/make-cv-pages/cv-maker-logic.dart';
 import 'package:cvworld/client/pages/make-cv-pages/education-section.dart';
 import 'package:cvworld/client/pages/make-cv-pages/employment-history-section.dart';
-
 import 'package:cvworld/client/pages/make-cv-pages/personal-details-section.dart';
 import 'package:cvworld/client/pages/make-cv-pages/professional-summry-section.dart';
 import 'package:cvworld/client/pages/make-cv-pages/skills-section.dart';
 import 'package:cvworld/client/pages/make-cv-pages/website-links-section.dart';
 import 'package:cvworld/client/utils.dart';
-import 'package:cvworld/routes/router.gr.dart';
+import 'package:cvworld/routes/router.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-@RoutePage()
 class CvMakerScreen extends StatelessWidget {
   final int? resumeID;
   final String? templateName;
 
-  const CvMakerScreen({super.key, @PathParam() required this.resumeID, @PathParam() required this.templateName});
+  const CvMakerScreen({super.key, required this.resumeID, required this.templateName});
 
   @override
   Widget build(BuildContext context) {
@@ -63,16 +60,12 @@ class CvMakerMobile extends StatelessWidget {
         leading: IconButton(
           onPressed: () {
             // Add your action here
-            context.popRoute(CvMakerRoute(resumeID: resumeID, templateName: templateName));
+            context.pushNamed(RouteNames.cvMaker, pathParameters: {"resumeID": "$resumeID", "templateName": "$templateName"});
           },
           icon: const Icon(Icons.arrow_back),
         ),
       ),
-      body: Padding(
-          padding: const EdgeInsets.all(10),
-          child: SingleChildScrollView(
-            child: CvMakerBody(resumeID: resumeID, templateName: templateName),
-          )),
+      body: Padding(padding: const EdgeInsets.all(10), child: SingleChildScrollView(child: CvMakerBody(resumeID: resumeID, templateName: templateName))),
     );
   }
 }
@@ -118,7 +111,7 @@ class _CvMakerBodyState extends State<CvMakerBody> {
             top: 10,
             left: 10,
             child: BackButtonApp(onPressed: () {
-              context.popRoute(CvMakerRoute(resumeID: widget.resumeID, templateName: widget.templateName));
+              Navigator.pop(context);
             }),
           ),
         if (!isMobile) Positioned(bottom: 30, left: 1, width: 450, child: Image.asset('assets/add-name-image.png', fit: BoxFit.cover)),

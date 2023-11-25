@@ -1,7 +1,8 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/utils.dart';
+import 'package:cvworld/routes/router.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 
 class SectionOne extends StatelessWidget {
   const SectionOne({super.key});
@@ -155,7 +156,7 @@ class SectionOneRight extends StatelessWidget {
           ),
         ),
         ElevatedButton(
-          onPressed: () => context.navigateNamedTo('/dashboard'),
+          onPressed: () => context.pushNamed(RouteNames.dashboard),
           style: ElevatedButton.styleFrom(foregroundColor: Colors.white, backgroundColor: Colors.blue, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)), padding: const EdgeInsets.fromLTRB(20, 15, 20, 15)),
           child: const Row(
             mainAxisSize: MainAxisSize.min,

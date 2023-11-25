@@ -1,10 +1,9 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:cvworld/client/pages/signin-page/components/signin_form_mobile.dart';
 import 'package:cvworld/dashboard/datasource_dashboard.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:cvworld/routes/router.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-@RoutePage()
 class SignInDashboardPage extends StatefulWidget {
   const SignInDashboardPage({super.key});
 
@@ -49,11 +48,7 @@ class SignInForm extends StatelessWidget {
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  SignInForm({
-    required this.emailController,
-    required this.passwordController,
-    required this.onSignInPressed,
-  });
+  SignInForm({super.key, required this.emailController, required this.passwordController, required this.onSignInPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -105,22 +100,6 @@ class SignInPageLogic {
     await DashboardDataService().signInAsAdmin(email, password, context);
 
     // ignore: use_build_context_synchronously
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        backgroundColor: Colors.green, // Use a green color for success
-        content: Center(
-          child: Text(
-            'Login successful! Welcome!',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
-    );
-
-    // ignore: use_build_context_synchronously
-    context.navigateNamedTo('/admin/dashboard');
+    context.pushNamed(RouteNames.adminSignin);
   }
 }

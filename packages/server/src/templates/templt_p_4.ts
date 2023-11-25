@@ -1,6 +1,6 @@
 import { Resume, formatDate } from "../utils";
 
-export default function generateResumeHTML(resume:Resume ){
+export default function generateResumeHTML(resume:Resume , timeZone: string){
     return `
     <!DOCTYPE html>
     <html lang="en">
@@ -14,8 +14,8 @@ export default function generateResumeHTML(resume:Resume ){
         </style>
       </head>
       <body>
-        <section id="resume" class="resume" style="font-family: 'Rubik', sans-serif; width: 210mm; min-height: 297mm; margin: 0 auto; background-color: white; border: 1px solid gainsboro">
-          <div style="padding: 15px; background-color: #303846; color: white">
+        <section id="resume" class="resume" style="font-family: 'Rubik', sans-serif; width: 210mm; min-height: 297mm; margin: 0 auto; background-color: white;">
+          <div style="padding: 15px; background-color: #303846; color: white;height: 70px;">
             <div style="font-size: 1.5rem; font-weight: 600; display: ${resume.name ? 'block': 'none'}">${resume.name}</div>
             <div style="display: flex; align-items: center; margin-top: 10px">
               <div style="display: ${resume.details.email ? 'flex' : 'none'}; align-items: flex-start; font-size: 0.8rem; padding: 5px 5px 5px 0px; margin-right: 20px">
@@ -53,7 +53,7 @@ export default function generateResumeHTML(resume:Resume ){
                         return `
                         <div style="margin: 0px 0px 20px 0px">
                             <div style="font-size: 0.85rem; font-weight: 500">${p.job} at ${p.employer} , ${p.city}</div>
-                            <div style="font-size: 0.85rem; font-weight: 400; margin: 10px 0px; color: rgb(70, 70, 70)">${formatDate(p.startDate)} -- ${formatDate(p.endDate)}</div>
+                            <div style="font-size: 0.85rem; font-weight: 400; margin: 10px 0px; color: rgb(70, 70, 70)">${formatDate(p.startDate, timeZone)} -- ${formatDate(p.endDate, timeZone)}</div>
                             <div style="font-size: 0.8rem">${p.description}</div>
                         </div>
                         `
@@ -73,7 +73,7 @@ export default function generateResumeHTML(resume:Resume ){
                         return `
                         <div style="margin: 0px 0px 20px 0px">
                             <div style="font-size: 0.85rem; font-weight: 500">${p.degree} at ${p.school} , ${p.city}</div>
-                            <div style="font-size: 0.85rem; font-weight: 400; margin: 10px 0px; color: rgb(70, 70, 70)">${formatDate(p.startDate)} -- ${formatDate(p.endDate)}</div>
+                            <div style="font-size: 0.85rem; font-weight: 400; margin: 10px 0px; color: rgb(70, 70, 70)">${formatDate(p.startDate, timeZone)} -- ${formatDate(p.endDate, timeZone)}</div>
                         </div>
                         `
                     }).join(" ")
@@ -92,7 +92,7 @@ export default function generateResumeHTML(resume:Resume ){
                         return `
                         <div style="margin: 0px 0px 20px 0px">
                             <div style="font-size: 0.85rem; font-weight: 500">${p.job} at ${p.employer} , ${p.city}</div>
-                            <div style="font-size: 0.85rem; font-weight: 400; margin: 10px 0px; color: rgb(70, 70, 70)">${formatDate(p.startDate)} -- ${formatDate(p.endDate)}</div>
+                            <div style="font-size: 0.85rem; font-weight: 400; margin: 10px 0px; color: rgb(70, 70, 70)">${formatDate(p.startDate, timeZone)} -- ${formatDate(p.endDate, timeZone)}</div>
                             <div style="font-size: 0.8rem">${p.description}</div>
                         </div>
                         `
@@ -112,7 +112,7 @@ export default function generateResumeHTML(resume:Resume ){
                         return `
                         <div style="margin: 0px 0px 20px 0px">
                             <div style="font-size: 0.85rem; font-weight: 500">${p.course}, ${p.institution}</div>
-                            <div style="font-size: 0.85rem; font-weight: 400; margin: 10px 0px; color: rgb(70, 70, 70)">${formatDate(p.startDate)} -- ${formatDate(p.endDate)}</div>
+                            <div style="font-size: 0.85rem; font-weight: 400; margin: 10px 0px; color: rgb(70, 70, 70)">${formatDate(p.startDate, timeZone)} -- ${formatDate(p.endDate, timeZone)}</div>
                         </div>
                         `
                     }).join(" ")
@@ -120,11 +120,11 @@ export default function generateResumeHTML(resume:Resume ){
                 </div>
               </div>
             </div>
-            <div style="flex: 2.45; height: 100%; border-left: 1px solid gainsboro">
+            <div style="flex: 2.45; min-height: calc(297mm - 70px); border-left: 1px solid gainsboro">
               <!-- place of birth -->
               <div style="padding: 10px; margin-bottom: 15px; display: ${resume.details.placeOfBirth || resume.details.dateOfBirth ? 'block' : 'none'}">
                 <div style="border-bottom: 1px solid gainsboro; font-size: 1rem; padding: 5px; margin-bottom: 10px">Date/place of birth</div>
-                <div style="display: flex; align-items: flex-start; font-size: 0.8rem; padding: 5px 5px 0px 5px; margin-bottom: 0px">${formatDate(resume.details.dateOfBirth)}</div>
+                <div style="display: flex; align-items: flex-start; font-size: 0.8rem; padding: 5px 5px 0px 5px; margin-bottom: 0px">${formatDate(resume.details.dateOfBirth, timeZone)}</div>
                 <div style="display: flex; align-items: flex-start; font-size: 0.8rem; padding: 5px; margin-bottom: 0px">${resume.details.placeOfBirth}</div>
               </div>
     
