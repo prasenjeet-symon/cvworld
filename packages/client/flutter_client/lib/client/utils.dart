@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rxdart/subjects.dart';
-import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // SOME APPLICATION CONSTANTS
@@ -280,7 +280,7 @@ class _ImageCardState extends State<ImageCard> {
 
 // Get timezone
 Future<String> getCurrentTimeZone() async {
-  return await FlutterNativeTimezone.getLocalTimezone();
+  return await FlutterTimezone.getLocalTimezone();
 }
 
 class MySubjectSingleton {

@@ -8,7 +8,6 @@ import 'package:cvworld/client/utils.dart';
 import 'package:cvworld/routes/router.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 
 class ViewResume extends StatefulWidget {
@@ -124,13 +123,9 @@ class ResumeViewerLogic {
       var resumeFetched = await DatabaseService().fetchSingleResume(resumeID);
       resume = resumeFetched;
     } catch (e) {
-      await Fluttertoast.showToast(
-        msg: 'Something went wrong...',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.8),
-        textColor: Colors.white,
-      );
+      if (kDebugMode) {
+        print(e);
+      }
     }
 
     isLoading = false;
@@ -314,7 +309,7 @@ class _ResumeViewerState extends State<ResumeViewer> {
                                 if (kIsWeb) {
                                   downloadFile(_logic.resume!.resumeLink.pdfUrl, _logic.resume!.resumeLink.pdfUrl);
                                 } else {
-                                  DatabaseService().downloadAndSavePdf(_logic.resume!.resumeLink.pdfUrl);
+                                  DatabaseService().downloadAndSavePdf(_logic.resume!.resumeLink.pdfUrl, context);
                                 }
                               },
                               buttonText: 'Download',
@@ -329,7 +324,7 @@ class _ResumeViewerState extends State<ResumeViewer> {
                                     if (kIsWeb) {
                                       downloadFile(_logic.resume!.resumeLink.pdfUrl, _logic.resume!.resumeLink.pdfUrl);
                                     } else {
-                                      DatabaseService().downloadAndSavePdf(_logic.resume!.resumeLink.pdfUrl);
+                                      DatabaseService().downloadAndSavePdf(_logic.resume!.resumeLink.pdfUrl, context);
                                     }
                                   });
                                 });

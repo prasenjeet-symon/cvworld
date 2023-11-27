@@ -160,19 +160,19 @@ class SignInLogic {
     );
 
     // ignore: use_build_context_synchronously
-    ctx.pushNamed(RouteNames.dashboard);
+    ctx.goNamed(RouteNames.dashboard);
   }
 
   // Sign in with google
   void signInWithGoogle(BuildContext ctx) async {
-    final GoogleSignIn googleSignIn = GoogleSignIn(clientId: kIsWeb ? ApplicationConfiguration.GOOGLE_WEB_CLIENT_ID : Constants.googleClientIdAndroid);
+    final GoogleSignIn googleSignIn = kIsWeb ? GoogleSignIn(clientId: ApplicationConfiguration.GOOGLE_WEB_CLIENT_ID) : GoogleSignIn(serverClientId: Constants.googleClientIdAndroid);
     final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
     if (googleUser != null) {
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       var accessToken = googleAuth.accessToken!;
       await DatabaseService().continueWithGoogle(accessToken);
       // ignore: use_build_context_synchronously
-      ctx.pushNamed(RouteNames.dashboard);
+      ctx.goNamed(RouteNames.dashboard);
     }
   }
 }

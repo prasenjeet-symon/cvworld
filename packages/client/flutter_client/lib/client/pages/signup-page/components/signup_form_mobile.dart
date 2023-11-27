@@ -82,7 +82,7 @@ class _SignUpFormState extends State<SignUpForm> {
           icon: FontAwesomeIcons.google,
         ),
         const SizedBox(height: 50),
-        AlreadyHaveAccount(mainText: 'Already have an account?', linkedText: ' Sign In', onTap: () => context.pushNamed(RouteNames.signin))
+        AlreadyHaveAccount(mainText: 'Already have an account?', linkedText: ' Sign In', onTap: () => context.goNamed(RouteNames.signin))
       ],
     );
   }

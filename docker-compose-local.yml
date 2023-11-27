@@ -5,11 +5,8 @@ services:
     restart: always
     ports:
       - 3306:3306
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: cvworld
-      MYSQL_USER: cvworld
-      MYSQL_PASSWORD: cvworld
+    env_file:
+      - ./packages/server/.env
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
@@ -24,17 +21,8 @@ services:
       - 8081:8081
     depends_on:
       - mysql
-    environment:
-      - DATABASE_URL=mysql://root:root@mysql:3306/cvworld
-      - ADMIN_EMAIL=iampawanbhatia@gmail.com
-      - ADMIN_PASSWORD=IamPawanbhatia@134
-      - ADMIN_NAME=Pawan
-      - JWT_SECRET=secret
-      - RAZORPAY_KEY_ID=rzp_test_8kEpnyXnaJIirx
-      - RAZORPAY_KEY_SECRET=2V20fgeMf2lUDhkOlKiOSodB
-      - RAZORPAY_WEBHOOK_SECRET=cvworld
-      - IS_SERVERLESS=true
-      - BASE_URL=http://localhost:8081
+    env_file:
+      - ./packages/server/.env
     command: sh -c "npx prisma migrate deploy && npm run start"
     volumes:
       - ./public:/app/public

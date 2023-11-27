@@ -98,7 +98,6 @@ class _SigninFormState extends State<SigninForm> {
 
   // Sign in using the email and password
   void signInEmailAndPassword(BuildContext context) {
-    print('Hello');
     SignInLogic(email: _emailController.text, password: _passwordController.text).signInNow(context);
   }
 
@@ -199,7 +198,7 @@ class SignUpText extends StatelessWidget {
               TextSpan(
                 text: 'Sign Up',
                 style: const TextStyle(color: Colors.blue),
-                recognizer: TapGestureRecognizer()..onTap = () => context.pushNamed(RouteNames.signup),
+                recognizer: TapGestureRecognizer()..onTap = () => context.goNamed(RouteNames.signup),
               ),
             ],
           ),

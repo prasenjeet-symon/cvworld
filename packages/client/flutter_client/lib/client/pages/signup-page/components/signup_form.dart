@@ -7,7 +7,6 @@ import 'package:cvworld/config.dart';
 import 'package:cvworld/routes/router.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -101,33 +100,42 @@ class SignUpLogic {
 
   Future<void> signUp(BuildContext ctx) async {
     if (!(name.isNotEmpty && email.isNotEmpty && password.isNotEmpty)) {
-      Fluttertoast.showToast(msg: 'Please fill all fields', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.red.withOpacity(0.8), textColor: Colors.white);
       return;
     }
 
     try {
       await DatabaseService().signUpUserWithEmailAndPassword(email, password, name);
     } catch (e) {
-      if (e is RequiredFieldException) {
-        await Fluttertoast.showToast(msg: e.message, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.red.withOpacity(0.8), textColor: Colors.white);
-      }
-
       if (e is UserAlreadyExistsException) {
-        await Fluttertoast.showToast(msg: e.message, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.red.withOpacity(0.8), textColor: Colors.white);
         // ignore: use_build_context_synchronously
-        ctx.pushNamed(RouteNames.signin);
-      }
+        // Flutter toast
+        ScaffoldMessenger.of(ctx).showSnackBar(
+          SnackBar(
+            content: const Text('User already exists. Please signin'),
+            action: SnackBarAction(
+              label: 'Signin',
+              onPressed: () {
+                ctx.pushNamed(RouteNames.signin);
+              },
+            ),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(20),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            duration: const Duration(seconds: 5),
+            backgroundColor: Theme.of(ctx).colorScheme.primary,
+          ),
+        );
 
-      if (e is WeekPasswordException) {
-        await Fluttertoast.showToast(msg: e.message, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.red.withOpacity(0.8), textColor: Colors.white);
+        ctx.pushNamed(RouteNames.signin);
       }
 
       return;
     }
 
-    await Fluttertoast.showToast(msg: 'Welcome $name', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.red.withOpacity(0.8), textColor: Colors.white);
     // ignore: use_build_context_synchronously
-    ctx.pushNamed(RouteNames.dashboard);
+    ctx.goNamed(RouteNames.dashboard);
   }
 
   void signInWithGoogle(BuildContext ctx) async {
@@ -138,7 +146,7 @@ class SignUpLogic {
       var accessToken = googleAuth.accessToken!;
       await DatabaseService().continueWithGoogle(accessToken);
       // ignore: use_build_context_synchronously
-      ctx.pushNamed(RouteNames.dashboard);
+      ctx.goNamed(RouteNames.dashboard);
     }
   }
 }

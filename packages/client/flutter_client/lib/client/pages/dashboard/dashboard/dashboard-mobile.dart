@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:cvworld/client/datasource.dart';
 import 'package:cvworld/client/pages/dashboard/dashboard/dashboard-body.dart';
+import 'package:cvworld/client/utils.dart';
 import 'package:cvworld/routes/router.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 
 class DashboardMobile extends StatefulWidget {
@@ -18,16 +18,28 @@ class DashboardMobile extends StatefulWidget {
 class _DashboardMobileState extends State<DashboardMobile> {
   late AppDrawerLogic logic;
 
+  setStateCallback() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   @override
   initState() {
     super.initState();
-    logic = AppDrawerLogic(() {
+    logic = AppDrawerLogic(setStateCallback);
+    logic.init();
+
+    MySubjectSingleton.instance.dashboardHeaderSubject.listen((value) {
       if (mounted) {
-        setState(() {});
+        logic.init(canShowLoading: false);
       }
     });
+  }
 
-    logic.init();
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -73,8 +85,8 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
     super.initState();
   }
 
-  void showLogoutConfirmationDialog(BuildContext context) {
-    showDialog(
+  void showLogoutConfirmationDialog(BuildContext context) async {
+    final result = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -83,19 +95,13 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
           actions: [
             TextButton(
               onPressed: () {
-                // Perform the logout action
-                DatabaseService().logout().then((value) {
-                  // Close the dialog
-                  Navigator.of(context).pop();
-                  context.pushNamed(RouteNames.signin);
-                });
+                Navigator.of(context).pop(true);
               },
               child: const Text('Yes'),
             ),
             TextButton(
               onPressed: () {
-                // Close the dialog
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(false);
               },
               child: const Text('No'),
             ),
@@ -103,17 +109,19 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
         );
       },
     );
+
+    if (result != null && result) {
+      // Perform the logout action
+      DatabaseService().logout().then((value) {
+        context.goNamed(RouteNames.signin);
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    bool isSubscriber = false;
-    if (widget.logic.user != null && widget.logic.user!.subscription != null && widget.logic.user!.subscription!.isActive) {
-      isSubscriber = true;
-    } else {
-      isSubscriber = false;
-    }
-
+    // Check if the user is a subscriber
+    bool isSubscriber = widget.logic.user?.subscription?.isActive ?? false;
     return Drawer(
       child: widget.logic.isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -128,7 +136,7 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
                   icon: Icons.home,
                   title: 'Dashboard',
                   onTap: () {
-                    context.pushNamed(RouteNames.dashboard);
+                    context.goNamed(RouteNames.dashboard);
                   },
                 ),
                 DrawerMenuItem(
@@ -267,22 +275,20 @@ class AppDrawerLogic {
     appVersion = '1.0.0';
   }
 
-  Future<void> init() async {
+  Future<void> init({bool canShowLoading = true}) async {
     getAppVersion();
-    await getUser();
+    await getUser(canShowLoading: canShowLoading);
   }
 
-  Future<void> getUser() async {
+  Future<void> getUser({bool canShowLoading = true}) async {
     try {
-      isLoading = true;
+      isLoading = canShowLoading;
       updateState();
       user = await DatabaseService().fetchUser();
     } catch (e) {
       if (kDebugMode) {
         print(e);
       }
-
-      Fluttertoast.showToast(msg: 'Failed to fetch user', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white, fontSize: 16.0);
     } finally {
       isLoading = false;
       updateState();

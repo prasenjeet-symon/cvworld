@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart' show FlutterSecureStorage;
-import 'package:fluttertoast/fluttertoast.dart';
+
 import 'package:http/http.dart' as http;
 
 import '../config.dart';
@@ -1671,17 +1671,37 @@ class DatabaseService {
     }
   }
 
-  void downloadAndSavePdf(String pdfUrl) async {
+  void downloadAndSavePdf(String pdfUrl, BuildContext context) async {
     try {
       // Add the downloaded file to the device's media gallery (Android only)
       if (Platform.isAndroid) {
         await FileDownloader.downloadFile(
           url: pdfUrl,
           onDownloadCompleted: (String path) {
-            Fluttertoast.showToast(msg: 'PDF file saved to gallery', toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white);
+            // Show a success message
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('PDF file saved to gallery'),
+                backgroundColor: Colors.green,
+                behavior: SnackBarBehavior.floating,
+                duration: Duration(seconds: 5),
+                margin: EdgeInsets.all(10),
+                dismissDirection: DismissDirection.horizontal,
+              ),
+            );
           },
           onDownloadError: (errorMessage) {
-            Fluttertoast.showToast(msg: errorMessage, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white);
+            // Show an error message
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(errorMessage),
+                backgroundColor: Colors.red,
+                behavior: SnackBarBehavior.floating,
+                duration: const Duration(seconds: 5),
+                margin: const EdgeInsets.all(10),
+                dismissDirection: DismissDirection.horizontal,
+              ),
+            );
           },
         );
       }

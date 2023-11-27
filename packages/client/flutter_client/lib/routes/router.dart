@@ -22,6 +22,7 @@ import 'package:cvworld/dashboard/dashboard/users/user_profile_page.dart';
 import 'package:cvworld/dashboard/sign_in_page/sign_in_page.dart';
 import 'package:go_router/go_router.dart';
 
+import '../client/utils.dart';
 import '../dashboard/utils.dart';
 
 class RouteNames {
@@ -73,20 +74,51 @@ final goRouter = GoRouter(
           return null;
         }
       } else {
+        // Client routes
         bool isClientAuthenticated = await DatabaseService().isAuthenticated();
+        bool isTutorialCompleted = await DatabaseService().isTutorialCompleted();
+        PlatformType platform = detectPlatformType();
 
-        if (state.fullPath!.startsWith('/signin') || state.fullPath!.startsWith('/signup') || state.fullPath == '/' || state.fullPath!.startsWith('/contact-us') || state.fullPath!.startsWith('/about-us')) {
-          if (isClientAuthenticated) {
-            return '/dashboard';
+        if (platform == PlatformType.mobile) {
+          if (state.fullPath!.startsWith('/signin') || state.fullPath!.startsWith('/signup') || state.fullPath == '/' || state.fullPath!.startsWith('/about-us') || state.fullPath!.startsWith('/intro-slider')) {
+            if (isClientAuthenticated) {
+              return '/dashboard';
+            } else if (!isTutorialCompleted) {
+              return '/intro-slider';
+            } else if (state.fullPath == '/' || state.fullPath!.startsWith('/about-us')) {
+              // nav to signin
+              return '/signin';
+            } else {
+              return null;
+            }
+          } else if (!isClientAuthenticated) {
+            // dashboard routes
+            return '/signin';
           } else {
+            // authenticated and dashboard routes
             return null;
           }
-        }
-
-        if (!isClientAuthenticated) {
-          return '/signin';
         } else {
-          return null;
+          // On the web
+          if (state.fullPath!.startsWith('/signin') ||
+              state.fullPath!.startsWith('/signup') ||
+              state.fullPath == '/' ||
+              state.fullPath!.startsWith('/contact-us') ||
+              state.fullPath!.startsWith('/about-us') ||
+              state.fullPath!.startsWith('/intro-slider')) {
+            if (isClientAuthenticated) {
+              return '/dashboard';
+            } else {
+              return null;
+            }
+          } else {
+            // dashboard routes
+            if (isClientAuthenticated) {
+              return null;
+            } else {
+              return '/signin';
+            }
+          }
         }
       }
     },

@@ -1,11 +1,11 @@
+import 'dart:async';
+
 import 'package:cvworld/client/utils.dart';
 import 'package:cvworld/dashboard/datasource_dashboard.dart';
 import 'package:cvworld/routes/router.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'dart:async';
 
 import '../users/user_profile_page.dart';
 
@@ -207,7 +207,7 @@ class TemplateCard extends StatelessWidget {
             const SizedBox(height: 10),
             // Title
             Text(
-              template.displayName ?? '',
+              template.displayName,
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -250,7 +250,6 @@ class AllTemplatesPageLogic {
   Future<void> addTemplate(String name, int price, void Function(void Function()) setState) async {
     await DashboardDataService().addTemplate(name, price);
     await getMarketplaceTemplates(setState);
-    Fluttertoast.showToast(msg: "Template added", toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 16.0);
   }
 
   // update template
