@@ -588,3 +588,80 @@ ngrok http --domain=native-humorous-mule.ngrok-free.app 8081
 [Download Version 1.0.4](https://drive.google.com/file/d/1nV2Cw4C35BiIOYUdq5FlZujbNTwTbB9C/view?usp=sharing)
 
 [Download Version 1.0.5](https://drive.google.com/file/d/1a9bnCWEPue9Ezpl-NYU_p-noAXu_qTWM/view?usp=sharing) - This is the release version for testing
+
+
+# Setup production server
+
+Deploying Your Application to Production: A Step-by-Step Guide
+
+---
+
+## Introduction
+
+Congratulations on successfully testing your application locally! Now it's time to take it to the production environment. This tutorial will guide you through the necessary steps to deploy your application and ensure a smooth transition to the live server.
+
+### Prerequisites
+
+Before we begin, ensure that you have:
+
+- Docker installed on your server.
+
+## Deployment Steps
+
+1. **Cleanup Previous Deployment:**
+
+    ```bash
+    cd ~
+    rm -rf cvworld
+    git clone git@github.com:iAmPawanBhatia/cvworld.me.git cvworld
+    cd cvworld
+    docker-compose down --rmi all --volumes
+    ```
+
+2. **Configure Environment Variables:**
+
+    Navigate to `packages/server` and create a new `.env` file by copying the content from `.env.example`. Replace the placeholder values with your desired configuration. Make sure the "BASE_URL" key in the `.env` file holds your domain, like 'https://cvword.me'.
+
+3. **Update Client Configuration:**
+
+    In the `packages/client/flutter_client/lib` folder, locate `config.dart`. Replace the keys with your values. Ensure that "API_URL" is replaced with your domain to enable communication with the correct server.
+
+4. **Configure Google Login:**
+
+    Obtain the SHA1 fingerprint for the release mode by following [this link](https://www.geeksforgeeks.org/how-to-generate-sha-1-fingerprint-of-keystore-certificate-in-android-studio/). 
+
+    In the Google Cloud Console, create two new auth clients:
+
+    - For Android:
+        - Package name: me.cvworld
+        - SHA1: (your SHA1)
+        - Name: CV-WORLD
+
+    - For the web:
+        - Domain: (your domain with https)
+        - Redirect: (your domain with https)
+
+    Save and obtain Google Client IDs for both web and Android.
+
+    Insert the client IDs:
+    - For the web version, insert it in `config.dart`.
+    - For Android, insert it in 'lib/client/utils.dart' in the Constants Class with 'googleClientIdAndroid' property.
+
+5. **Build and Start the Application:**
+
+    Run the following commands:
+
+    ```bash
+    cd ~
+    cd cvworld
+    docker-compose build --no-cache
+    docker-compose up -d
+    ```
+
+6. **Verification:**
+
+    Your application is now running! Visit your domain to confirm the successful deployment.
+
+---
+
+Congratulations! You have successfully deployed your application to the production environment. If you encounter any issues, refer to the logs and the configuration to ensure a smooth deployment process. Happy coding!
