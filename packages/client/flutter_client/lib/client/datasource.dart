@@ -2563,10 +2563,7 @@ class DatabaseService {
     }
   }
 
-  Future<User?> updateUserProfilePicture(
-    String fileName,
-    Uint8List? imageBytes,
-  ) async {
+  Future<User?> updateUserProfilePicture(String fileName, Uint8List? imageBytes, String? path) async {
     try {
       if (imageBytes == null) {
         throw Exception('Image bytes are missing');
@@ -2576,11 +2573,17 @@ class DatabaseService {
       var request = http.MultipartRequest('POST', updateUserProfilePictureRoute);
 
       // Create a multipart file from the bytes
-      var multipartFile = http.MultipartFile.fromBytes(
-        'profilePicture',
-        imageBytes,
-        filename: fileName,
-      );
+      var multipartFile = kIsWeb
+          ? http.MultipartFile.fromBytes(
+              'profilePicture',
+              imageBytes,
+              filename: fileName,
+            )
+          : await http.MultipartFile.fromPath(
+              'profilePicture',
+              File(path!).path,
+              filename: fileName,
+            );
 
       // Add the multipart file to the request
       request.files.add(multipartFile);
@@ -2591,26 +2594,17 @@ class DatabaseService {
 
       // Set the 'Authorization' header with the bearer token
       request.headers['Authorization'] = 'Bearer $bearerToken';
-
-      print('Sending the request...');
-
       // Send the request and get the response
       var streamedResponse = await request.send();
       var response = await http.Response.fromStream(streamedResponse);
-
-      print('Received response with status code: ${response.statusCode}');
-      print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         var user = await fetchUser(); // Implement fetchUser to get the updated user
         return user;
       } else {
-        print('Failed to update user profile picture. Status Code: ${response.statusCode}');
-        print('Response: ${response.body}');
         return null;
       }
     } catch (e) {
-      print('Error during updating user profile picture: $e');
       return null;
     }
   }

@@ -15,7 +15,7 @@ class Constants {
   static const String appName = 'CV World';
   static const String appVersion = '1.0';
   static const int debounceTime = 1000;
-  static const googleClientIdAndroid = '599994784077-kq6slt22l90qfk6kjl81jti233o1e050.apps.googleusercontent.com';
+  static const googleClientIdAndroid = '526173453078-5bt1icrr45ub28erv39j62qkpnd5473m.apps.googleusercontent.com';
   static const int breakPoint = 600;
   static const refreshSeconds = 5;
 }
@@ -207,7 +207,7 @@ class _ImageCardState extends State<ImageCard> {
       isLoading = true;
     });
 
-    var user = await DatabaseService().updateUserProfilePicture(_pickedImage.first.name, _pickedImage.first.bytes!);
+    var user = await DatabaseService().updateUserProfilePicture(_pickedImage.first.name, _pickedImage.first.bytes!, _pickedImage.first.path);
     user = user;
 
     setState(() {
