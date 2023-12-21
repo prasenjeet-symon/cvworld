@@ -144,8 +144,8 @@ class ClickableLinks extends StatelessWidget {
           _buildLinkText('Privacy Policy', 'https://merchant.razorpay.com/policy/MUCeXANyEQNJAn/privacy'),
           _buildLinkText('Terms & Condition', 'https://merchant.razorpay.com/policy/MUCeXANyEQNJAn/terms'),
           _buildLinkText('Refund Policy', 'https://merchant.razorpay.com/policy/MUCeXANyEQNJAn/refund'),
-          _buildLinkText('About Us', 'https://cvworld.me/#/about-us'),
-          _buildLinkText('Contact Us', 'https://cvworld.me/#/contact-us'),
+          _buildLinkText('About Us', 'https://www.cvworld.me/#/about-us'),
+          _buildLinkText('Contact Us', 'https://www.cvworld.me/#/contact-us'),
         ],
       ),
     );
