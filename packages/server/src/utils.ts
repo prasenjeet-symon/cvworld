@@ -1918,8 +1918,8 @@ export function razorpayPrice(price: number) {
  * Create new premium resume template
  */
 export async function createPremiumTemplatePlan() {
-  const nameOfPlan = "Jupiter";
-  const price = razorpayPrice(820.84); // 10 Dollar
+  const nameOfPlan = "Premium";
+  const price = razorpayPrice(499.00); // 10 Dollar
   const Razorpay = require("razorpay");
   const razorpayKeyID = process.env.RAZORPAY_KEY_ID;
   const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET;
