@@ -15,15 +15,15 @@ signUpAdmin()
     return new Promise<boolean>((resolve, reject) => {
       setTimeout(async () => {
         await addTemplate("templt_1", 0); // Free
-        await addTemplate("templt_p_1", 0000);
-        await addTemplate("templt_p_2", 0000);
-        await addTemplate("templt_p_3", 0000);
-        await addTemplate("templt_p_4", 0000);
-        await addTemplate("templt_p_5", 0000);
-        await addTemplate("templt_p_6", 0000);
-        await addTemplate("templt_p_7", 0000);
-        await addTemplate("templt_p_8", 0000);
-        await addTemplate("templt_p_9", 0000);
+        await addTemplate("templt_p_1", 0);
+        await addTemplate("templt_p_2", 0);
+        await addTemplate("templt_p_3", 0);
+        await addTemplate("templt_p_4", 0);
+        await addTemplate("templt_p_5", 0);
+        await addTemplate("templt_p_6", 0);
+        await addTemplate("templt_p_7", 0);
+        await addTemplate("templt_p_8", 0);
+        await addTemplate("templt_p_9", 0);
         resolve(true);
       }, 5000);
     });
