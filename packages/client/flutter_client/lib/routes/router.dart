@@ -29,6 +29,7 @@ class RouteNames {
   static const String home = '/';
   static const String introSlider = '/intro-slider';
   static const String contactUs = '/contact-us';
+  static const String dashboardContactUs = '/dashboard/contact-us';
   static const String aboutUs = '/about-us';
   static const String signup = '/signup';
   static const String signin = '/signin';
@@ -198,6 +199,13 @@ final goRouter = GoRouter(
       path: '/choose-template',
       builder: (context, state) => const MarketPlacePage(),
       name: RouteNames.chooseTemplate,
+    ),
+
+    // Dashboard contact us
+    GoRoute(
+      path: '/dashboard/contact-us',
+      builder: (context, state) => const ContactUsPage(),
+      name: RouteNames.dashboardContactUs,
     ),
 
     ///

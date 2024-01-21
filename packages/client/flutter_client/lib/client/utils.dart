@@ -224,7 +224,7 @@ class _ImageCardState extends State<ImageCard> {
 
     setState(() => isLoading = true);
 
-    User? latestUser = await DatabaseService().updateUserProfilePicture(pickedFiles.first.name, pickedFiles.first.bytes, pickedFiles.first.path);
+    User? latestUser = await DatabaseService().updateUserProfilePicture(pickedFiles.first.name, pickedFiles.first.bytes, kIsWeb ? null : pickedFiles.first.path);
 
     setState(() {
       user = latestUser;

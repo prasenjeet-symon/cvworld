@@ -223,7 +223,17 @@ class TransactionCard extends StatelessWidget {
   void _copyToClipboard(BuildContext context) {
     Clipboard.setData(ClipboardData(text: transaction.orderId));
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Order ID copied to clipboard')),
+      const SnackBar(
+        backgroundColor: Colors.black87,
+        margin: EdgeInsets.all(10),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+        ),
+        duration: Duration(seconds: 5),
+        dismissDirection: DismissDirection.horizontal,
+        content: Text('Order ID copied to clipboard', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      ),
     );
   }
 

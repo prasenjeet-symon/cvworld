@@ -1,6 +1,6 @@
+// ignore: file_names
 import 'package:cvworld/client/datasource.dart';
 import 'package:cvworld/client/pages/signin-page/components/signin_form_mobile.dart';
-import 'package:cvworld/routes/router.dart';
 // ignore: file_names
 
 import 'package:flutter/material.dart';
@@ -14,7 +14,7 @@ class ContactUsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (MediaQuery.of(context).size.width < 600) {
+    if (MediaQuery.of(context).size.width < Constants.breakPoint) {
       return const ContactUsPageMobile();
     } else {
       return const ContactUsPageDesktop();
@@ -200,13 +200,17 @@ class _ContactUsFormState extends State<ContactUsForm> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: Colors.red,
+          duration: Duration(seconds: 5),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+          ),
+          margin: EdgeInsets.all(20),
+          dismissDirection: DismissDirection.horizontal,
           content: Center(
             child: Text(
               'Please fill all the required fields',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
           ),
         ),

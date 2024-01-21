@@ -98,13 +98,17 @@ class AdminSubscriptionSettingsLogic {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         backgroundColor: Colors.green,
+        margin: EdgeInsets.all(10),
+        behavior: SnackBarBehavior.floating,
+        duration: Duration(seconds: 5),
+        dismissDirection: DismissDirection.horizontal,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+        ),
         content: Center(
           child: Text(
             'Subscription updated successfully!',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
       ),

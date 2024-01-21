@@ -145,8 +145,7 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
                   icon: Icons.mail,
                   title: 'Contact Us',
                   onTap: () {
-                    // Handle menu item tap here
-                    context.pushNamed(RouteNames.contactUs);
+                    kIsWeb ? context.pushNamed(RouteNames.dashboardContactUs) : context.pushNamed(RouteNames.contactUs);
                   },
                 ),
                 DrawerMenuItem(

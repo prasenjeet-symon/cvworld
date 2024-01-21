@@ -111,7 +111,7 @@ class SignUpLogic {
         // Flutter toast
         ScaffoldMessenger.of(ctx).showSnackBar(
           SnackBar(
-            content: const Text('User already exists. Please signin'),
+            content: const Text('User already exists. Please signin', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             action: SnackBarAction(
               label: 'Signin',
               onPressed: () {
@@ -124,7 +124,7 @@ class SignUpLogic {
               borderRadius: BorderRadius.circular(20),
             ),
             duration: const Duration(seconds: 5),
-            backgroundColor: Theme.of(ctx).colorScheme.primary,
+            backgroundColor: Colors.red,
           ),
         );
 

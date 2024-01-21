@@ -109,13 +109,19 @@ class SignInLogic {
         ScaffoldMessenger.of(ctx).showSnackBar(
           const SnackBar(
             backgroundColor: Colors.red,
+            dismissDirection: DismissDirection.horizontal,
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 5),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+            ),
+            margin: EdgeInsets.all(20),
             content: Center(
               child: Text(
                 'No user found. Please check your email and try again.',
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
-            duration: Duration(seconds: 5),
           ),
         );
       }
@@ -124,16 +130,19 @@ class SignInLogic {
         ScaffoldMessenger.of(ctx).showSnackBar(
           const SnackBar(
             backgroundColor: Colors.red,
+            dismissDirection: DismissDirection.horizontal,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+            ),
+            margin: EdgeInsets.all(20),
+            duration: Duration(seconds: 5),
             content: Center(
               child: Text(
                 'Wrong password. Please try again.',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
-            duration: Duration(seconds: 5),
           ),
         );
       }
@@ -146,16 +155,18 @@ class SignInLogic {
       const SnackBar(
         dismissDirection: DismissDirection.horizontal,
         backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+        ),
+        margin: EdgeInsets.all(20),
+        duration: Duration(seconds: 5),
         content: Center(
           child: Text(
             'Welcome back!',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
-        duration: Duration(seconds: 5),
       ),
     );
 
