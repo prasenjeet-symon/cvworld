@@ -53,220 +53,225 @@ class RouteNames {
 }
 
 final goRouter = GoRouter(
-    initialLocation: '/',
-    debugLogDiagnostics: true,
-    redirect: (context, state) async {
-      if (state.fullPath!.startsWith('/admin')) {
-        bool isAuthenticated = await isAdminAuthenticated();
+  initialLocation: '/',
+  debugLogDiagnostics: true,
+  redirect: (context, state) async {
+    if (state.fullPath!.startsWith('/admin')) {
+      bool isAuthenticated = await isAdminAuthenticated();
 
-        // check if login route
-        if (state.fullPath!.startsWith('/admin/signin')) {
-          if (isAuthenticated) {
-            return '/admin/dashboard';
-          } else {
-            return null;
-          }
-        }
-
-        if (!isAuthenticated) {
-          return '/admin/signin';
+      // check if login route
+      if (state.fullPath!.startsWith('/admin/signin')) {
+        if (isAuthenticated) {
+          return '/admin/dashboard';
         } else {
           return null;
         }
-      } else {
-        // Client routes
-        bool isClientAuthenticated = await DatabaseService().isAuthenticated();
-        bool isTutorialCompleted = await DatabaseService().isTutorialCompleted();
-        PlatformType platform = detectPlatformType();
+      }
 
-        if (platform == PlatformType.mobile) {
-          if (state.fullPath!.startsWith('/signin') || state.fullPath!.startsWith('/signup') || state.fullPath == '/' || state.fullPath!.startsWith('/about-us') || state.fullPath!.startsWith('/intro-slider')) {
-            if (isClientAuthenticated) {
-              return '/dashboard';
-            } else if (!isTutorialCompleted) {
-              return '/intro-slider';
-            } else if (state.fullPath == '/' || state.fullPath!.startsWith('/about-us')) {
-              // nav to signin
-              return '/signin';
-            } else {
-              return null;
-            }
-          } else if (!isClientAuthenticated) {
-            // dashboard routes
+      if (!isAuthenticated) {
+        return '/admin/signin';
+      } else {
+        return null;
+      }
+    } else {
+      // Client routes
+      bool isClientAuthenticated = await DatabaseService().isAuthenticated();
+      bool isTutorialCompleted = await DatabaseService().isTutorialCompleted();
+      PlatformType platform = detectPlatformType();
+
+      if (platform == PlatformType.mobile) {
+        if (state.fullPath!.startsWith('/signin') || state.fullPath!.startsWith('/signup') || state.fullPath == '/' || state.fullPath!.startsWith('/about-us') || state.fullPath!.startsWith('/intro-slider')) {
+          if (isClientAuthenticated) {
+            return '/dashboard';
+          } else if (!isTutorialCompleted) {
+            return '/intro-slider';
+          } else if (state.fullPath == '/' || state.fullPath!.startsWith('/about-us')) {
+            // nav to signin
             return '/signin';
           } else {
-            // authenticated and dashboard routes
+            return null;
+          }
+        } else if (!isClientAuthenticated) {
+          // dashboard routes
+          return '/signin';
+        } else {
+          // authenticated and dashboard routes
+          return null;
+        }
+      } else {
+        // On the web
+        if (state.fullPath!.startsWith('/signin') ||
+            state.fullPath!.startsWith('/signup') ||
+            state.fullPath == '/' ||
+            state.fullPath!.startsWith('/contact-us') ||
+            state.fullPath!.startsWith('/about-us') ||
+            state.fullPath!.startsWith('/intro-slider')) {
+          if (isClientAuthenticated) {
+            return '/dashboard';
+          } else {
             return null;
           }
         } else {
-          // On the web
-          if (state.fullPath!.startsWith('/signin') ||
-              state.fullPath!.startsWith('/signup') ||
-              state.fullPath == '/' ||
-              state.fullPath!.startsWith('/contact-us') ||
-              state.fullPath!.startsWith('/about-us') ||
-              state.fullPath!.startsWith('/intro-slider')) {
-            if (isClientAuthenticated) {
-              return '/dashboard';
-            } else {
-              return null;
-            }
+          // dashboard routes
+          if (isClientAuthenticated) {
+            return null;
           } else {
-            // dashboard routes
-            if (isClientAuthenticated) {
-              return null;
-            } else {
-              return '/signin';
-            }
+            return '/signin';
           }
         }
       }
-    },
-    routes: [
-      // Home route
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const HomeScreen(),
-        name: RouteNames.home,
-      ),
+    }
+  },
+  routes: [
+    // Home route
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const HomeScreen(),
+      name: RouteNames.home,
+    ),
 
-      // Intro Slider
-      GoRoute(
-        path: '/intro-slider',
-        builder: (context, state) => const IntroSliderPage(),
-        name: RouteNames.introSlider,
-      ),
+    // Intro Slider
+    GoRoute(
+      path: '/intro-slider',
+      builder: (context, state) => const IntroSliderPage(),
+      name: RouteNames.introSlider,
+    ),
 
-      // Contact Us
-      GoRoute(
-        path: '/contact-us',
-        builder: (context, state) => const ContactUsPage(),
-        name: RouteNames.contactUs,
-      ),
+    // Contact Us
+    GoRoute(
+      path: '/contact-us',
+      builder: (context, state) => const ContactUsPage(),
+      name: RouteNames.contactUs,
+    ),
 
-      // About US
-      GoRoute(
-        path: '/about-us',
-        builder: (context, state) => const AboutUsPage(),
-        name: RouteNames.aboutUs,
-      ),
+    // About US
+    GoRoute(
+      path: '/about-us',
+      builder: (context, state) => const AboutUsPage(),
+      name: RouteNames.aboutUs,
+    ),
 
-      // Signup
-      GoRoute(
-        path: '/signup',
-        builder: (context, state) => const SignUpScreen(),
-        name: RouteNames.signup,
-      ),
+    // Signup
+    GoRoute(
+      path: '/signup',
+      builder: (context, state) => const SignUpScreen(),
+      name: RouteNames.signup,
+    ),
 
-      // Signin
-      GoRoute(
-        path: '/signin',
-        builder: (context, state) => const SignInScreen(),
-        name: RouteNames.signin,
-      ),
+    // Signin
+    GoRoute(
+      path: '/signin',
+      builder: (context, state) => const SignInScreen(),
+      name: RouteNames.signin,
+    ),
 
-      // dashboard/account-setting
-      GoRoute(
-        path: '/dashboard/account-setting',
-        builder: (context, state) => const AccountSettingPage(),
-        name: RouteNames.dashboardAccountSetting,
-      ),
+    // dashboard/account-setting
+    GoRoute(
+      path: '/dashboard/account-setting',
+      builder: (context, state) => const AccountSettingPage(),
+      name: RouteNames.dashboardAccountSetting,
+    ),
 
-      // dashboard
-      GoRoute(
-        path: '/dashboard',
-        builder: (context, state) => const Dashboard(),
-        name: RouteNames.dashboard,
-      ),
+    // dashboard
+    GoRoute(
+      path: '/dashboard',
+      builder: (context, state) => const Dashboard(),
+      name: RouteNames.dashboard,
+    ),
 
-      // dashboard/view-resume/:resumeID
-      GoRoute(
-        path: '/dashboard/view-resume/:resumeID',
-        builder: (context, state) => ViewResume(resumeID: int.parse(state.pathParameters['resumeID']!)),
-        name: RouteNames.dashboardViewResume,
-      ),
+    // dashboard/view-resume/:resumeID
+    GoRoute(
+      path: '/dashboard/view-resume/:resumeID',
+      builder: (context, state) => ViewResume(resumeID: int.parse(state.pathParameters['resumeID']!)),
+      name: RouteNames.dashboardViewResume,
+    ),
 
-      // cv-maker/:resumeID/:templateName
-      GoRoute(
-        path: '/cv-maker/:resumeID/:templateName',
-        builder: (context, state) => CvMakerScreen(resumeID: int.parse(state.pathParameters['resumeID']!), templateName: state.pathParameters['templateName']!),
-        name: RouteNames.cvMaker,
-      ),
+    // cv-maker/:resumeID/:templateName
+    GoRoute(
+      path: '/cv-maker/:resumeID/:templateName',
+      builder: (context, state) => CvMakerScreen(resumeID: int.parse(state.pathParameters['resumeID']!), templateName: state.pathParameters['templateName']!),
+      name: RouteNames.cvMaker,
+    ),
 
-      // choose-template
-      GoRoute(
-        path: '/choose-template',
-        builder: (context, state) => const MarketPlacePage(),
-        name: RouteNames.chooseTemplate,
-      ),
+    // choose-template
+    GoRoute(
+      path: '/choose-template',
+      builder: (context, state) => const MarketPlacePage(),
+      name: RouteNames.chooseTemplate,
+    ),
 
-      // admin/signin
-      GoRoute(
-        path: '/admin/signin',
-        builder: (context, state) => const SignInDashboardPage(),
-        name: RouteNames.adminSignin,
-      ),
+    ///
+    ///
+    ///
+    ///
+    /// For the admin panel
+    GoRoute(
+      path: '/admin/signin',
+      builder: (context, state) => const SignInDashboardPage(),
+      name: RouteNames.adminSignin,
+    ),
 
-      // admin/dashboard
-      GoRoute(
-        path: '/admin/dashboard',
-        builder: (context, state) => const AdminHomePage(),
-        name: RouteNames.adminDashboard,
-      ),
+    // admin/dashboard
+    GoRoute(
+      path: '/admin/dashboard',
+      builder: (context, state) => const AdminHomePage(),
+      name: RouteNames.adminDashboard,
+    ),
 
-      // admin/changePassword
-      GoRoute(
-        path: '/admin/changePassword',
-        builder: (context, state) => const AdminChangePasswordPage(),
-        name: RouteNames.adminChangePassword,
-      ),
+    // admin/changePassword
+    GoRoute(
+      path: '/admin/changePassword',
+      builder: (context, state) => const AdminChangePasswordPage(),
+      name: RouteNames.adminChangePassword,
+    ),
 
-      // admin/subscriptionSetting
-      GoRoute(
-        path: '/admin/subscriptionSetting',
-        builder: (context, state) => const AdminSubscriptionSettingPage(),
-        name: RouteNames.adminSubscriptionSetting,
-      ),
+    // admin/subscriptionSetting
+    GoRoute(
+      path: '/admin/subscriptionSetting',
+      builder: (context, state) => const AdminSubscriptionSettingPage(),
+      name: RouteNames.adminSubscriptionSetting,
+    ),
 
-      // admin/allUsers
-      GoRoute(
-        path: '/admin/allUsers',
-        builder: (context, state) => const AdminAllUsersPage(),
-        name: RouteNames.adminAllUsers,
-      ),
+    // admin/allUsers
+    GoRoute(
+      path: '/admin/allUsers',
+      builder: (context, state) => const AdminAllUsersPage(),
+      name: RouteNames.adminAllUsers,
+    ),
 
-      // admin/userProfile/:userId
-      GoRoute(
-        path: '/admin/userProfile/:userId',
-        builder: (context, state) => UserProfilePage(userId: state.pathParameters['userId']!),
-        name: RouteNames.adminUserProfile,
-      ),
+    // admin/userProfile/:userId
+    GoRoute(
+      path: '/admin/userProfile/:userId',
+      builder: (context, state) => UserProfilePage(userId: state.pathParameters['userId']!),
+      name: RouteNames.adminUserProfile,
+    ),
 
-      // admin/allTemplates
-      GoRoute(
-        path: '/admin/allTemplates',
-        builder: (context, state) => const AllTemplatesPage(),
-        name: RouteNames.adminAllTemplates,
-      ),
+    // admin/allTemplates
+    GoRoute(
+      path: '/admin/allTemplates',
+      builder: (context, state) => const AllTemplatesPage(),
+      name: RouteNames.adminAllTemplates,
+    ),
 
-      // admin/updateTemplate/:templateId
-      GoRoute(
-        path: '/admin/updateTemplate/:templateId',
-        builder: (context, state) => AdminUpdateTemplatePage(templateId: state.pathParameters['templateId']!),
-        name: RouteNames.adminUpdateTemplate,
-      ),
+    // admin/updateTemplate/:templateId
+    GoRoute(
+      path: '/admin/updateTemplate/:templateId',
+      builder: (context, state) => AdminUpdateTemplatePage(templateId: state.pathParameters['templateId']!),
+      name: RouteNames.adminUpdateTemplate,
+    ),
 
-      // admin/contactUs
-      GoRoute(
-        path: '/admin/contactUs',
-        builder: (context, state) => const AdminContactUsPage(),
-        name: RouteNames.adminContactUs,
-      ),
+    // admin/contactUs
+    GoRoute(
+      path: '/admin/contactUs',
+      builder: (context, state) => const AdminContactUsPage(),
+      name: RouteNames.adminContactUs,
+    ),
 
-      // admin/contactUs/:messageId
-      GoRoute(
-        path: '/admin/contactUs/:messageId',
-        builder: (context, state) => AdminContactUsFullPage(messageId: state.pathParameters['messageId']!),
-        name: RouteNames.adminContactUsMessage,
-      )
-    ]);
+    // admin/contactUs/:messageId
+    GoRoute(
+      path: '/admin/contactUs/:messageId',
+      builder: (context, state) => AdminContactUsFullPage(messageId: state.pathParameters['messageId']!),
+      name: RouteNames.adminContactUsMessage,
+    )
+  ],
+);

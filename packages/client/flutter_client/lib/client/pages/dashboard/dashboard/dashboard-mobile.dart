@@ -110,7 +110,7 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
       },
     );
 
-    if (result != null && result) {
+    if (result != null && result == true) {
       // Perform the logout action
       DatabaseService().logout().then((value) {
         context.goNamed(RouteNames.signin);
@@ -122,6 +122,7 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
   Widget build(BuildContext context) {
     // Check if the user is a subscriber
     bool isSubscriber = widget.logic.user?.subscription?.isActive ?? false;
+
     return Drawer(
       child: widget.logic.isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -130,14 +131,7 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
               children: <Widget>[
                 DrawerHeader(
                   decoration: const BoxDecoration(color: Colors.blue),
-                  child: ProfileWidget(fullName: widget.logic.user!.fullName, imageUrl: widget.logic.user!.profilePicture, isPremium: isSubscriber),
-                ),
-                DrawerMenuItem(
-                  icon: Icons.home,
-                  title: 'Dashboard',
-                  onTap: () {
-                    context.goNamed(RouteNames.dashboard);
-                  },
+                  child: ProfileWidget(fullName: widget.logic.user?.fullName ?? '', imageUrl: widget.logic.user?.profilePicture ?? Constants.dummyProfilePic, isPremium: isSubscriber),
                 ),
                 DrawerMenuItem(
                   icon: Icons.settings,
@@ -164,7 +158,6 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
                 ),
                 const SizedBox(height: 20),
                 const Divider(),
-
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text('App Version: ${widget.logic.appVersion}', textAlign: TextAlign.center, style: const TextStyle(color: Colors.grey)),
@@ -208,30 +201,17 @@ class ProfileWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        CircleAvatar(
-          backgroundImage: NetworkImage(imageUrl),
-          radius: 25,
-        ),
+        CircleAvatar(backgroundImage: NetworkImage(imageUrl), radius: 25),
         const SizedBox(height: 5),
-        Text(
-          fullName,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
-        ),
+        Text(fullName, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
         isPremium
             ? Container(
                 margin: const EdgeInsets.only(top: 10),
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                decoration: BoxDecoration(
-                  color: Colors.deepOrange,
-                  borderRadius: BorderRadius.circular(15),
-                ),
+                decoration: BoxDecoration(color: Colors.deepOrange, borderRadius: BorderRadius.circular(15)),
                 child: const Text(
                   'Premium',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
                   textAlign: TextAlign.center,
                 ),
               )
@@ -248,11 +228,7 @@ class ProfileWidget extends StatelessWidget {
                   ),
                   child: const Text(
                     'Upgrade',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
-                    ),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.blue),
                     textAlign: TextAlign.center,
                   ),
                 ),

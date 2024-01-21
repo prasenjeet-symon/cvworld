@@ -2524,6 +2524,11 @@ class DatabaseService {
     }
   }
 
+  ///
+  ///
+  ///
+  ///
+  ///
   // delete_user_subscription
   Future<DeleteDocuments?> deleteUserSubscription(DeleteDocuments delete) async {
     var payload = delete.toJson();
@@ -2544,6 +2549,11 @@ class DatabaseService {
     }
   }
 
+  ///
+  ///
+  ///
+  ///
+
   // get_user
   Future<User?> fetchUser() async {
     var client = JwtClient();
@@ -2563,6 +2573,11 @@ class DatabaseService {
     }
   }
 
+  ///
+  ///
+  ///
+  ///
+  ///
   Future<User?> updateUserProfilePicture(String fileName, Uint8List? imageBytes, String? path) async {
     try {
       if (imageBytes == null) {
@@ -2579,11 +2594,13 @@ class DatabaseService {
               imageBytes,
               filename: fileName,
             )
-          : await http.MultipartFile.fromPath(
-              'profilePicture',
-              File(path!).path,
-              filename: fileName,
-            );
+          : path != null
+              ? await http.MultipartFile.fromPath(
+                  'profilePicture',
+                  File(path).path,
+                  filename: fileName,
+                )
+              : throw Exception('File path is null');
 
       // Add the multipart file to the request
       request.files.add(multipartFile);
@@ -2594,21 +2611,35 @@ class DatabaseService {
 
       // Set the 'Authorization' header with the bearer token
       request.headers['Authorization'] = 'Bearer $bearerToken';
+
       // Send the request and get the response
       var streamedResponse = await request.send();
       var response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode == 200) {
-        var user = await fetchUser(); // Implement fetchUser to get the updated user
+        var user = await fetchUser(); // Assuming fetchUser() is correctly implemented
         return user;
       } else {
+        if (kDebugMode) {
+          print('Failed to update user profile picture. Status code: ${response.statusCode}');
+        }
+        // Handle error based on status code
+        // Return appropriate error information or throw an exception
         return null;
       }
     } catch (e) {
+      if (kDebugMode) {
+        print('Error updating user profile picture: $e');
+      }
       return null;
     }
   }
 
+  ///
+  ///
+  ///
+  ///
+  ///
   // update_resume
   Future<GeneratedResume?> updateResume(Resume resume, int id) async {
     var payload = resume.toJson();

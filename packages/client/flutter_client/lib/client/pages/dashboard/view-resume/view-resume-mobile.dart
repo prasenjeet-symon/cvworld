@@ -1,3 +1,4 @@
+// ignore: file_names
 import 'package:cvworld/client/pages/dashboard/view-resume/view-resume.dart';
 import 'package:flutter/material.dart';
 

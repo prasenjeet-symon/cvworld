@@ -15,8 +15,6 @@ import 'package:cvworld/client/pages/make-cv-pages/website-links-section.dart' s
 import 'package:cvworld/client/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:rxdart/rxdart.dart';
-import 'package:rxdart/subjects.dart';
 
 import 'account-setting-desktop.dart';
 
@@ -159,17 +157,16 @@ class PlanCardWidget extends StatelessWidget {
       color: Colors.black.withOpacity(0.03),
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
         children: [
-          SizedBox(
-            width: 50,
-            height: 50,
-            child: Image.asset(isPremium ? 'assets/tasks.png' : 'assets/renew.png'),
-          ),
+          SizedBox(width: 50, height: 50, child: Image.asset(isPremium ? 'assets/tasks.png' : 'assets/renew.png')),
           Expanded(
             child: Container(
               margin: const EdgeInsets.fromLTRB(15, 0, 15, 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     planName,
@@ -177,20 +174,32 @@ class PlanCardWidget extends StatelessWidget {
                   ),
                   Container(
                     margin: const EdgeInsets.fromLTRB(0, 5, 0, 0),
-                    child: Text(
-                      description,
-                      style: const TextStyle(color: Colors.black54),
-                    ),
+                    child: Text(description, style: const TextStyle(color: Colors.black54)),
                   ),
+                  const SizedBox(height: 10),
+                  isPremium
+                      ? TextButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
+                          ),
+                          onPressed: onPressed,
+                          child: const Text('Cancel'),
+                        )
+                      : TextButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).primaryColor,
+                            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                            elevation: 0,
+                            padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
+                          ),
+                          onPressed: onPressed,
+                          child: const Text('Upgrade'),
+                        )
                 ],
               ),
-            ),
-          ),
-          TextButton(
-            onPressed: onPressed,
-            child: Text(
-              isPremium ? 'Cancel' : 'Upgrade',
-              style: const TextStyle(fontSize: 16),
             ),
           ),
         ],
@@ -301,22 +310,21 @@ class _PricingPlanCardState extends State<PricingPlanCard> {
   @override
   Widget build(BuildContext context) {
     if (logic.isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      // Shrink
+      return const SizedBox.shrink();
     }
 
     return Container(
       margin: const EdgeInsets.fromLTRB(0, 25, 0, 25),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             margin: const EdgeInsets.fromLTRB(20, 10, 0, 10),
-            child: Text(
-              'YOUR PLAN',
-              style: TextStyle(fontSize: 15, color: Colors.black.withOpacity(0.6), fontWeight: FontWeight.w500),
-            ),
+            child: Text('YOUR PLAN', style: TextStyle(fontSize: 15, color: Colors.black.withOpacity(0.6), fontWeight: FontWeight.w500)),
           ),
-          logic.user != null && logic.user!.subscription != null && logic.user!.subscription!.isActive
+          logic.user?.subscription?.isActive ?? false
               ? PlanCardWidget(
                   planName: logic.user!.subscription!.planName,
                   description: 'You are on premium plan. You can use any resume template',
@@ -416,7 +424,7 @@ class AccountSettingBody extends StatelessWidget {
                     ),
                   ),
                 const PricingPlanCard(),
-                ImageCard(),
+                const ImageCard(),
                 const AccountCard(),
               ],
             ),

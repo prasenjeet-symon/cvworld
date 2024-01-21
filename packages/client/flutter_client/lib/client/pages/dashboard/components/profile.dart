@@ -42,8 +42,7 @@ class _ProfileOptionsState extends State<ProfileOptions> {
         profileOptionsLogic.logOutUser(context);
         break;
       case 'dashboard':
-        // Handle Dashboard option tap
-        context.pushNamed(RouteNames.dashboard);
+        context.goNamed(RouteNames.dashboard);
         break;
     }
   }

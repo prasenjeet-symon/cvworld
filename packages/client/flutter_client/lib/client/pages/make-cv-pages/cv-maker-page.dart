@@ -59,8 +59,7 @@ class CvMakerMobile extends StatelessWidget {
         title: const Text('CV Maker'),
         leading: IconButton(
           onPressed: () {
-            // Add your action here
-            context.pushNamed(RouteNames.cvMaker, pathParameters: {"resumeID": "$resumeID", "templateName": "$templateName"});
+            GoRouter.of(context).pop();
           },
           icon: const Icon(Icons.arrow_back),
         ),

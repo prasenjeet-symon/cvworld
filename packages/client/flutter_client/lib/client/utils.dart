@@ -5,9 +5,9 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rxdart/subjects.dart';
-import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // SOME APPLICATION CONSTANTS
@@ -18,6 +18,7 @@ class Constants {
   static const googleClientIdAndroid = '526173453078-5bt1icrr45ub28erv39j62qkpnd5473m.apps.googleusercontent.com';
   static const int breakPoint = 600;
   static const refreshSeconds = 5;
+  static const String dummyProfilePic = 'https://th.bing.com/th/id/OIP.9B2RxsHDB_s7FZT0mljnhQHaHa?rs=1&pid=ImgDetMain';
 }
 
 double pageWidth(BuildContext context) {
@@ -161,7 +162,7 @@ PlatformType detectPlatformType() {
 class ImagePickerWidget extends StatefulWidget {
   final Function(List<PlatformFile>) onImageSelected;
 
-  const ImagePickerWidget({super.key, required this.onImageSelected});
+  const ImagePickerWidget({Key? key, required this.onImageSelected}) : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
@@ -170,7 +171,12 @@ class ImagePickerWidget extends StatefulWidget {
 
 class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   Future<void> _pickImage() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      withData: true,
+      allowMultiple: false,
+      allowCompression: true,
+    );
 
     if (result != null) {
       widget.onImageSelected(result.files);
@@ -182,14 +188,24 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
     return Column(
       children: [
         ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).primaryColor,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            elevation: 0,
+            padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
+          ),
           onPressed: _pickImage,
-          child: const Text('Choose Image'),
+          child: const Text('Upload profile picture'),
         ),
       ],
     );
   }
 }
 
+///
+///
+///
+///
 class ImageCard extends StatefulWidget {
   const ImageCard({super.key});
 
@@ -198,19 +214,20 @@ class ImageCard extends StatefulWidget {
 }
 
 class _ImageCardState extends State<ImageCard> {
-  List<PlatformFile> _pickedImage = [];
   User? user;
   bool isLoading = true;
 
-  Future<void> _uploadProfile() async {
-    setState(() {
-      isLoading = true;
-    });
+  Future<void> _uploadProfile(List<PlatformFile> pickedFiles) async {
+    if (pickedFiles.isEmpty) {
+      return;
+    }
 
-    var user = await DatabaseService().updateUserProfilePicture(_pickedImage.first.name, _pickedImage.first.bytes!, _pickedImage.first.path);
-    user = user;
+    setState(() => isLoading = true);
+
+    User? latestUser = await DatabaseService().updateUserProfilePicture(pickedFiles.first.name, pickedFiles.first.bytes, pickedFiles.first.path);
 
     setState(() {
+      user = latestUser;
       isLoading = false;
     });
 
@@ -225,6 +242,10 @@ class _ImageCardState extends State<ImageCard> {
 
   @override
   Widget build(BuildContext context) {
+    if (user == null) {
+      return const SizedBox.shrink();
+    }
+
     return Container(
       color: Colors.black.withOpacity(0.03),
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
@@ -232,18 +253,8 @@ class _ImageCardState extends State<ImageCard> {
       child: Row(
         children: [
           SizedBox(
-            width: 100, // Adjust the width as needed
-            child: isLoading
-                ? const CircularProgressIndicator()
-                : _pickedImage.isNotEmpty
-                    ? CircleAvatar(
-                        backgroundImage: MemoryImage(_pickedImage.first.bytes!),
-                        radius: 50, // Adjust the radius as needed
-                      )
-                    : CircleAvatar(
-                        backgroundImage: NetworkImage(user!.profilePicture!),
-                        radius: 50,
-                      ),
+            width: 80,
+            child: isLoading ? const CircularProgressIndicator(strokeWidth: 2.0, color: Colors.black, backgroundColor: Colors.white) : CircleAvatar(backgroundImage: NetworkImage(user!.profilePicture), radius: 50),
           ),
           Expanded(
             child: Padding(
@@ -251,21 +262,11 @@ class _ImageCardState extends State<ImageCard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Upload a Profile Picture',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  const Text('Change your profile picture', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 16),
                   ImagePickerWidget(
                     onImageSelected: (List<PlatformFile> files) {
-                      // Handle the selected image here
-                      _pickedImage = files;
-                      setState(() {
-                        _uploadProfile();
-                      });
+                      _uploadProfile(files);
                     },
                   ),
                 ],

@@ -107,18 +107,17 @@ class ResumeViewerLogic {
 
     if (isSubscriber) {
       canDownload = true;
+      isLoading = false;
       setStateCallback();
     } else {
       canDownload = await checkIsBought(resume!);
+      isLoading = false;
       setStateCallback();
     }
   }
 
   // Fetch a single resume with the given resume ID
   Future<void> fetchSingleResume(int resumeID) async {
-    isLoading = true;
-    setStateCallback();
-
     try {
       var resumeFetched = await DatabaseService().fetchSingleResume(resumeID);
       resume = resumeFetched;
@@ -127,9 +126,6 @@ class ResumeViewerLogic {
         print(e);
       }
     }
-
-    isLoading = false;
-    setStateCallback();
   }
 
   // Check if the template is bought for the given resume
@@ -190,6 +186,7 @@ class _ResumeViewerState extends State<ResumeViewer> {
   @override
   void initState() {
     super.initState();
+
     _logic = ResumeViewerLogic(setStateCallback: () {
       if (mounted) {
         setState(() {});

@@ -32,8 +32,7 @@ class _MarketPlaceMobileState extends State<MarketPlaceMobile> {
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
-            // Add your action here
-            context.pushNamed(RouteNames.chooseTemplate);
+            GoRouter.of(context).pop();
           },
           icon: const Icon(Icons.arrow_back),
         ),
