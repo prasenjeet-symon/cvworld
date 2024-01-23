@@ -1484,6 +1484,7 @@ class DatabaseService {
   late Uri allResumeRoute;
   late Uri singleResumeRoute;
   late Uri isLoggedInRoute;
+  late Uri isTokenActiveRoute;
   late Uri generateResumeRoute;
   // add_update_user_details
   late Uri addUpdateUserDetailsRoute;
@@ -1580,7 +1581,7 @@ class DatabaseService {
     // const apiBaseUrl = 'https://native-humorous-mule.ngrok-free.app';
     // const localBaseUrl = 'http://localhost:8081';
     //origin = 'https://www.cvworld.me';
-    origin = ApplicationConfiguration.API_URL;
+    origin = ApplicationConfiguration.apiUrl;
 
     authRoute = Uri.parse('$origin/server/auth');
     apiRoute = Uri.parse('$origin/server/api');
@@ -1589,6 +1590,7 @@ class DatabaseService {
     allResumeRoute = Uri.parse('$origin/server/api/generated_resumes');
     singleResumeRoute = Uri.parse('$origin/server/api/generated_resume');
     isLoggedInRoute = Uri.parse('$origin/server/auth/session');
+    isTokenActiveRoute = Uri.parse('$origin/server/auth/is_token_active');
     generateResumeRoute = Uri.parse('$origin/server/api/generate');
     addUpdateUserDetailsRoute = Uri.parse('$origin/server/api/add_update_user_details');
     userDetailsRoute = Uri.parse('$origin/server/api/user_details');
@@ -1634,6 +1636,7 @@ class DatabaseService {
     createSubscriptionRoute = Uri.parse('$origin/server/api/create_subscription');
     cancelSubscriptionRoute = Uri.parse('$origin/server/api/cancel_subscription');
     getPremiumPlanRoute = Uri.parse('$origin/server/api/get_premium_plan');
+    // isTokenActiveRoute
   }
 
   publicResource(String path) {
@@ -1731,6 +1734,7 @@ class DatabaseService {
       // set the JWT
       const storage = FlutterSecureStorage();
       await storage.write(key: 'JWT', value: responseData.token);
+      await Authentication().bootUp();
       return responseData;
     } else {
       // POST request failed
@@ -1766,6 +1770,7 @@ class DatabaseService {
       var responseData = SignUpSignInWithEmailAndPassword.fromJson(json.decode(response.body));
       const storage = FlutterSecureStorage();
       await storage.write(key: 'JWT', value: responseData.token);
+      await Authentication().bootUp();
       return responseData;
     } else {
       // POST request failed
@@ -1799,6 +1804,7 @@ class DatabaseService {
       var responseData = SignUpSignInWithEmailAndPassword.fromJson(json.decode(response.body));
       const storage = FlutterSecureStorage();
       await storage.write(key: 'JWT', value: responseData.token);
+      await Authentication().bootUp();
       return responseData;
     } else {
       return null;
@@ -1873,6 +1879,21 @@ class DatabaseService {
         print('Something went wrong while fetching is logged in');
       }
       return null;
+    }
+  }
+
+  /// Is token active
+  Future<bool> fetchIsTokenActive(String token) async {
+    var payload = {'token': token};
+    var response = await http.post(isTokenActiveRoute, body: payload);
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      if (kDebugMode) {
+        print('Something went wrong while fetching is token active');
+      }
+
+      return false;
     }
   }
 

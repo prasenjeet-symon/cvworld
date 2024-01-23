@@ -203,7 +203,7 @@ class CVMakerLogic {
     var details = detailsData!; // Replace 'PersonalDetails()' with the default constructor of your 'PersonalDetails' class
 
     var user = await DatabaseService().fetchUser();
-    var profilePicture = DatabaseService().publicResource(user!.profilePicture!) as String;
+    var profilePicture = DatabaseService().publicResource(user!.profilePicture) as String;
 
     // Create and return the Resume object
     return Resume(

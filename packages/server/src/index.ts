@@ -14,7 +14,7 @@ signUpAdmin()
   .then((browser) => {
     return new Promise<boolean>((resolve, reject) => {
       setTimeout(async () => {
-        await addTemplate("templt_1", 0); // Free
+        await addTemplate("templt_1", 0); // 0 means free
         await addTemplate("templt_p_1", 0);
         await addTemplate("templt_p_2", 0);
         await addTemplate("templt_p_3", 0);

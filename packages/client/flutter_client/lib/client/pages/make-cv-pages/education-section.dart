@@ -404,7 +404,7 @@ class CustomEducationSection {
 
     var educationFetched = await DatabaseService().fetchUserEducations();
     if (educationFetched == null) return;
-    education = educationFetched!;
+    education = educationFetched;
 
     for (var element in education) {
       var schoolController = _addController();

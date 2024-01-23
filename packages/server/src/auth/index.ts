@@ -1,10 +1,27 @@
 import express from "express";
-import { authenticateUser, signInAdmin, signInOrSignUpWithGoogle, signInWithEmailAndPassword, signUpWithEmailAndPassword } from "../utils";
+import { authenticateUser, isTokenExpired, signInAdmin, signInOrSignUpWithGoogle, signInWithEmailAndPassword, signUpWithEmailAndPassword } from "../utils";
 
 const router = express.Router();
 
 router.get("/", (req, res) => {
   res.send({ message: "Authentication working..." });
+});
+
+/** Is token active */
+router.post("/is_token_active", (req, res) => {
+  const token = req.body.token;
+
+  if (!token) {
+    res.status(400).json({ error: "Missing token" });
+    return;
+  }
+
+  if (isTokenExpired(token)) {
+    res.status(401).json({ error: "Token expired" });
+    return;
+  }
+
+  res.status(200).json({ message: "Token is active" });
 });
 
 /** Sign in with Google */

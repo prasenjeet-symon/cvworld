@@ -1,7 +1,11 @@
 class ApplicationConfiguration {
-  static const String GOOGLE_WEB_CLIENT_ID = "526173453078-5bt1icrr45ub28erv39j62qkpnd5473m.apps.googleusercontent.com";
-  static const bool IS_LOCAL = false;
-  static const bool IS_SERVERLESS = true;
+  static const googleWebClientId = "526173453078-5bt1icrr45ub28erv39j62qkpnd5473m.apps.googleusercontent.com";
+  static const googleAndroidClientId = "526173453078-5bt1icrr45ub28erv39j62qkpnd5473m.apps.googleusercontent.com";
+  static const isLocal = false;
+  static const isServerLess = true;
+  static const String appName = 'CV World';
+  static const String appVersion = '1.0';
   // http://localhost:8081
-  static const String API_URL = "https://www.cvworld.me";
+  // https://www.cvworld.me
+  static const String apiUrl = "https://www.cvworld.me";
 }

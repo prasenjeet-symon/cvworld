@@ -46,7 +46,7 @@ class HobbiesSectionState extends State<HobbiesSection> {
     hobby = fetchedHobby;
 
     // patch the hobby
-    _controller.text = fetchedHobby!.hobby;
+    _controller.text = fetchedHobby.hobby;
   }
 
   // update the hobby

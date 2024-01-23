@@ -310,7 +310,7 @@ class CustomSkillSection {
 
     var fetchedUserSkills = await DatabaseService().fetchUserSkills();
     if (fetchedUserSkills == null) return;
-    _userSkills = fetchedUserSkills!;
+    _userSkills = fetchedUserSkills;
 
     for (var element in _userSkills) {
       var skillController = _addController();

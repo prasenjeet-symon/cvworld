@@ -826,6 +826,32 @@ export async function signInOrSignUpWithGoogle(req: Request, res: Response): Pro
   }
 }
 
+/**  Detect if the JWT is expired or not */
+
+export function isTokenExpired(token: string): boolean {
+  try {
+    const jwt = require("jsonwebtoken");
+    const decodedToken: any = jwt.decode(token);
+
+    if (!decodedToken || !decodedToken.exp) {
+      // Token or expiration claim is missing
+      return true;
+    }
+
+    // Convert expiration time from seconds to milliseconds (assuming it's already in UTC)
+    const expirationTimeUTC = decodedToken.exp * 1000;
+
+    // Get the current time in UTC
+    const currentTimeUTC = new Date().getTime();
+
+    // Check if the token has expired
+    return currentTimeUTC > expirationTimeUTC;
+  } catch (error) {
+    // An error occurred while decoding the token
+    return true;
+  }
+}
+
 /** Verify the Google Auth Token */
 export async function verifyGoogleAuthToken(token: string): Promise<IGoogleAuthTokenResponse> {
   const response = await axios.get("https://oauth2.googleapis.com/tokeninfo", {
@@ -854,11 +880,12 @@ export async function verifyGoogleAuthToken(token: string): Promise<IGoogleAuthT
 export async function createJwt(userId: string, email: string, isAdmin: boolean = false): Promise<string> {
   const jwt = require("jsonwebtoken");
   const JWT_SECRET = process.env.JWT_SECRET;
+  const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1d";
   if (!JWT_SECRET) {
     throw new Error("JWT_SECRET not set");
   }
 
-  return jwt.sign({ userId, email, isAdmin: isAdmin }, JWT_SECRET, { expiresIn: "20h" });
+  return jwt.sign({ userId, email, isAdmin: isAdmin }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 }
 
 /** Verify the JSON WEB TOKEN */

@@ -322,7 +322,7 @@ class CustomLanguageSection {
 
     var fetchedLanguages = await DatabaseService().fetchUserLanguages();
     if (fetchedLanguages == null) return;
-    _userLanguages = fetchedLanguages!;
+    _userLanguages = fetchedLanguages;
 
     for (var language in _userLanguages) {
       // language controller and patch the value

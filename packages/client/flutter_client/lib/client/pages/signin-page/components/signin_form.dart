@@ -176,7 +176,7 @@ class SignInLogic {
 
   // Sign in with google
   void signInWithGoogle(BuildContext ctx) async {
-    final GoogleSignIn googleSignIn = kIsWeb ? GoogleSignIn(clientId: ApplicationConfiguration.GOOGLE_WEB_CLIENT_ID) : GoogleSignIn(serverClientId: Constants.googleClientIdAndroid);
+    final GoogleSignIn googleSignIn = kIsWeb ? GoogleSignIn(clientId: ApplicationConfiguration.googleWebClientId) : GoogleSignIn(serverClientId: ApplicationConfiguration.googleAndroidClientId);
     final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
     if (googleUser != null) {
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;

@@ -1,4 +1,3 @@
-import 'package:cvworld/client/datasource.dart';
 import 'package:cvworld/client/pages/about-us-page/about-us-page.dart';
 import 'package:cvworld/client/pages/contact-us-page/contact-us-page.dart';
 import 'package:cvworld/client/pages/dashboard/account-setting/account-setting.dart';
@@ -76,23 +75,30 @@ final goRouter = GoRouter(
       }
     } else {
       // Client routes
-      bool isClientAuthenticated = await DatabaseService().isAuthenticated();
-      bool isTutorialCompleted = await DatabaseService().isTutorialCompleted();
+      bool isClientAuthenticated = Authentication().isAuthenticatedValue;
+      bool isTutorialCompleted = TutorialStatus().isTutorialCompletedValue;
       PlatformType platform = detectPlatformType();
 
       if (platform == PlatformType.mobile) {
         if (state.fullPath!.startsWith('/signin') || state.fullPath!.startsWith('/signup') || state.fullPath == '/' || state.fullPath!.startsWith('/about-us') || state.fullPath!.startsWith('/intro-slider')) {
+          // Under public route
+          // Check if authenticated
           if (isClientAuthenticated) {
+            // Public route cannot be accessed because the user is authenticated
             return '/dashboard';
           } else if (!isTutorialCompleted) {
+            // Tutorial not completed
+            // nav to intro
             return '/intro-slider';
           } else if (state.fullPath == '/' || state.fullPath!.startsWith('/about-us')) {
             // nav to signin
             return '/signin';
           } else {
+            // Let them go to public route
             return null;
           }
         } else if (!isClientAuthenticated) {
+          // Not authenticated
           // dashboard routes
           return '/signin';
         } else {
@@ -107,16 +113,22 @@ final goRouter = GoRouter(
             state.fullPath!.startsWith('/contact-us') ||
             state.fullPath!.startsWith('/about-us') ||
             state.fullPath!.startsWith('/intro-slider')) {
+          // Under public route
           if (isClientAuthenticated) {
+            // Public route cannot be accessed because the user is authenticated
             return '/dashboard';
           } else {
+            // Let them go to public route
             return null;
           }
         } else {
-          // dashboard routes
+          // Dashboard routes
           if (isClientAuthenticated) {
+            // If authenticated then let them go to dashboard
             return null;
           } else {
+            // Not authenticated
+            // Redirect to signin
             return '/signin';
           }
         }

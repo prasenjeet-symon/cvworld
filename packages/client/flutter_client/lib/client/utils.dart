@@ -12,10 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 // SOME APPLICATION CONSTANTS
 class Constants {
-  static const String appName = 'CV World';
-  static const String appVersion = '1.0';
   static const int debounceTime = 1000;
-  static const googleClientIdAndroid = '526173453078-5bt1icrr45ub28erv39j62qkpnd5473m.apps.googleusercontent.com';
   static const int breakPoint = 600;
   static const refreshSeconds = 5;
   static const String dummyProfilePic = 'https://th.bing.com/th/id/OIP.9B2RxsHDB_s7FZT0mljnhQHaHa?rs=1&pid=ImgDetMain';
@@ -303,5 +300,69 @@ class MySubjectSingleton {
   // Dispose method to close the subject when it's no longer needed
   void dispose() {
     _dashboardHeaderSubject.close();
+  }
+}
+
+///
+///
+///
+///
+/// Is authenticated
+class Authentication {
+  bool isAuthenticated = true;
+
+  Authentication._();
+
+  static final Authentication _instance = Authentication._();
+
+  factory Authentication() {
+    return _instance;
+  }
+
+  // Is authenticated getter
+  bool get isAuthenticatedValue => isAuthenticated;
+
+  // Boot up
+  Future<void> bootUp() async {
+    // Check if the token is active or not
+    // If not active then redirect to login
+
+    String? token = await DatabaseService().getToken();
+    if (token == null) {
+      isAuthenticated = false;
+      return;
+    }
+
+    // There is token
+    // Check if active or not
+    bool session = await DatabaseService().fetchIsTokenActive(token);
+    if (session) {
+      isAuthenticated = true;
+    } else {
+      isAuthenticated = false;
+    }
+  }
+}
+
+///
+///
+///
+/// Is tutorial completed
+class TutorialStatus {
+  bool isTutorialCompleted = false;
+
+  TutorialStatus._();
+
+  static final TutorialStatus _instance = TutorialStatus._();
+
+  factory TutorialStatus() {
+    return _instance;
+  }
+
+  // getter
+  bool get isTutorialCompletedValue => isTutorialCompleted;
+
+  Future<void> bootUp() async {
+    isTutorialCompleted = await DatabaseService().isTutorialCompleted();
   }
 }

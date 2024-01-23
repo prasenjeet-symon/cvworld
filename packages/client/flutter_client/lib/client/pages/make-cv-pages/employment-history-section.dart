@@ -373,7 +373,7 @@ class CustomEmploymentHistory {
     if (!(resume == null)) return;
     var fetchedEmploymentHistory = await DatabaseService().fetchUserEmploymentHistories();
     if (fetchedEmploymentHistory == null) return;
-    employment = fetchedEmploymentHistory!;
+    employment = fetchedEmploymentHistory;
 
     for (var element in employment) {
       var jobController = _addController();

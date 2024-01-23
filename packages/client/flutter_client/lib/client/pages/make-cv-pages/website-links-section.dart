@@ -303,7 +303,7 @@ class CustomWebsiteLinkSection {
     if (resume == null) {
       var fetchedLinks = await DatabaseService().fetchUserLinks();
       if (fetchedLinks == null) return;
-      _userLinks = fetchedLinks!;
+      _userLinks = fetchedLinks;
 
       for (var element in _userLinks) {
         var linkController = _addController();

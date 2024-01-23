@@ -763,7 +763,7 @@ class DashboardDataService {
   late Uri adminDetailsRoute;
 
   DashboardDataService() {
-    origin = ApplicationConfiguration.API_URL;
+    origin = ApplicationConfiguration.apiUrl;
 
     signInRoute = Uri.parse('$origin/server/auth/sign_in_as_admin');
     resetPasswordRoute = Uri.parse('$origin/server/api_admin/reset_password');

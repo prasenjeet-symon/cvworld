@@ -6,7 +6,6 @@ import 'package:cvworld/client/pages/make-cv-pages/professional-summry-section.d
 import 'package:cvworld/client/pages/make-cv-pages/skills-section.dart';
 import 'package:cvworld/client/pages/make-cv-pages/website-links-section.dart';
 import 'package:cvworld/client/utils.dart';
-import 'package:cvworld/routes/router.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cvworld/client/datasource.dart';
 import 'package:cvworld/client/pages/dashboard/dashboard/dashboard-body.dart';
 import 'package:cvworld/client/utils.dart';
+import 'package:cvworld/config.dart';
 import 'package:cvworld/routes/router.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -238,7 +239,7 @@ class ProfileWidget extends StatelessWidget {
 }
 
 class AppDrawerLogic {
-  String appVersion = '1.0.0';
+  String appVersion = ApplicationConfiguration.appVersion;
   User? user;
   bool isLoading = false;
   final Function updateState;
@@ -247,7 +248,7 @@ class AppDrawerLogic {
 
   // get application version
   Future<void> getAppVersion() async {
-    appVersion = '1.0.0';
+    appVersion = ApplicationConfiguration.appVersion;
   }
 
   Future<void> init({bool canShowLoading = true}) async {

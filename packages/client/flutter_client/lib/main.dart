@@ -1,7 +1,10 @@
+import 'package:cvworld/client/utils.dart';
 import 'package:cvworld/routes/router.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
+  await Authentication().bootUp();
+  await TutorialStatus().bootUp();
   runApp(const MyApp());
 }
 
