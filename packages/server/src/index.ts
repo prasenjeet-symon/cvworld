@@ -23,7 +23,7 @@ signUpAdmin()
         await addTemplate("templt_p_6", 0);
         await addTemplate("templt_p_7", 0);
         await addTemplate("templt_p_8", 0);
-        await addTemplate("templt_p_9", 0);
+        await addTemplate("templt_p_9", 4900);
         resolve(true);
       }, 5000);
     });
