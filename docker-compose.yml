@@ -1,6 +1,7 @@
 version: '3'
 services:
   mysql:
+    container_name: cvworld-mysql
     image: mysql:8.0
     restart: always
     ports:
@@ -13,6 +14,7 @@ services:
       - mynetwork
 
   server:
+    container_name: cvworld-server
     build:
       context: ./packages/server
       dockerfile: Dockerfile
@@ -30,6 +32,7 @@ services:
       - mynetwork
 
   client:
+    container_name: cvworld-client
     build:
       context: ./packages/client/flutter_client
       dockerfile: Dockerfile
@@ -40,6 +43,7 @@ services:
       - mynetwork
 
   nginx:
+    container_name: cvworld-nginx-server
     image: nginx
     ports:
       - 80:80
@@ -53,21 +57,34 @@ services:
     depends_on:
       - server
       - client
+      - phpmyadmin
     networks:
       - mynetwork
 
   adminer:
+    container_name: cvworld-adminer
     image: adminer:latest
-    container_name: adminer
     environment:
       ADMINER_DEFAULT_SERVER: mysql
     depends_on:
       - mysql
     restart: always
     ports:
-      - 7777:8080
+      - 7777:80
+
+  phpmyadmin:
+    container_name: cvworld-phpmyadmin
+    depends_on:
+      - mysql
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - 8088:80
+    env_file:
+      - ./packages/server/.env
 
   certbot:
+    container_name: cvworld-certbot
     image: certbot/certbot
     volumes:
       - ./certbot/conf:/etc/letsencrypt
@@ -75,7 +92,7 @@ services:
       - ./certbot/var:/var/lib/letsencrypt
     networks:
       - mynetwork
-    command: certonly --webroot --webroot-path=/var/www/certbot --force-renewal --email pawan.apexinfosys@gmail.com --agree-tos --no-eff-email -d cvworld.me -d www.cvworld.me
+    command: certonly --webroot --webroot-path=/var/www/certbot --renew-by-default --email pawan.apexinfosys@gmail.com --agree-tos --no-eff-email -d cvworld.me -d www.cvworld.me
 
 
 networks:

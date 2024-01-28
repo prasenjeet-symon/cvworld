@@ -5,7 +5,6 @@ class ApplicationConfiguration {
   static const isServerLess = true;
   static const String appName = 'CV World';
   static const String appVersion = '1.0';
-  // http://localhost:8081
-  // https://www.cvworld.me
+  //static const String apiUrl = "http://localhost:8081";
   static const String apiUrl = "https://www.cvworld.me";
 }
