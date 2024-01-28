@@ -28,6 +28,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
     timer = Timer.periodic(const Duration(seconds: Constants.refreshSeconds), (timer) async {
       await userProfileLogic.init(setState, widget.userId, showLoading: false);
     });
+
+    TimerHolder().addTimer(timer);
   }
 
   @override

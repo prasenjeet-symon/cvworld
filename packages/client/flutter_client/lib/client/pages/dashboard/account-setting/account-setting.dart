@@ -86,6 +86,8 @@ class PricingPlanCardLogic {
     timer = Timer.periodic(const Duration(seconds: Constants.refreshSeconds), (Timer timer) {
       _fetchUserAndSetState(callback);
     });
+
+    TimerHolder().addTimer(timer);
   }
 
   Future<void> _fetchUserAndSetState(Function callback) async {

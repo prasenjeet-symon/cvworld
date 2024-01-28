@@ -27,6 +27,8 @@ class _AdminAllUsersPageState extends State<AdminAllUsersPage> {
     timer = Timer.periodic(const Duration(seconds: Constants.refreshSeconds), (timer) async {
       await adminAllUsersLogic.fetchAllUsers(setState, canShowLoading: false);
     });
+
+    TimerHolder().addTimer(timer);
   }
 
   @override

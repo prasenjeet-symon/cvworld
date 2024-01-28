@@ -35,8 +35,13 @@ class _DashboardHeaderState extends State<DashboardHeader> {
   }
 
   @override
+  dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (dashboardHeaderLogic.isLoading) {
+    if (dashboardHeaderLogic.isLoading || dashboardHeaderLogic.user == null) {
       return _buildLoadingHeader();
     }
 

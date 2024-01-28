@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cvworld/client/datasource.dart';
+import 'package:cvworld/client/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -706,7 +707,11 @@ class JwtAdminClient extends http.BaseClient {
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    jwtToken = await getToken() as String;
+    String? jwtToken = await getToken();
+    if (jwtToken == null) {
+      return http.StreamedResponse(const Stream.empty(), 401);
+    }
+
     request.headers['Authorization'] = 'Bearer $jwtToken';
     request.headers['Content-Type'] = 'application/json';
     return _inner.send(request);
@@ -721,6 +726,7 @@ class JwtAdminClient extends http.BaseClient {
 Future<void> logoutAdmin() async {
   const storage = FlutterSecureStorage();
   await storage.delete(key: 'JWT_ADMIN');
+  TimerHolder().dispose();
 }
 
 class DashboardDataService {

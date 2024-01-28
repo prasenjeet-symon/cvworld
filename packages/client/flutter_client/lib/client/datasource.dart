@@ -1454,7 +1454,11 @@ class JwtClient extends http.BaseClient {
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    jwtToken = await getToken() as String;
+    String? jwtToken = await getToken();
+    if (jwtToken == null) {
+      return http.StreamedResponse(const Stream.empty(), 401);
+    }
+
     request.headers['Authorization'] = 'Bearer $jwtToken';
     request.headers['Content-Type'] = 'application/json';
     return _inner.send(request);
@@ -1651,6 +1655,9 @@ class DatabaseService {
   Future<bool> logout() async {
     const storage = FlutterSecureStorage();
     await storage.delete(key: 'JWT');
+    TimerHolder().dispose();
+    MySubjectSingleton.instance.dispose();
+    await Authentication().logout();
     return true;
   }
 

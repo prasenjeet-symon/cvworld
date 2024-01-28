@@ -31,6 +31,7 @@ class _DashboardBodyContentState extends State<DashboardBodyContent> {
     logic.fetchAllCreatedResume();
 
     timer = Timer.periodic(const Duration(seconds: Constants.refreshSeconds), (timer) async {
+      TimerHolder().addTimer(timer);
       await logic.fetchAllCreatedResume(canShowLoading: false);
     });
   }
