@@ -28,6 +28,8 @@ class _AllTemplatesPageState extends State<AllTemplatesPage> {
     timer = Timer.periodic(const Duration(seconds: Constants.refreshSeconds), (timer) async {
       allTemplatesPageLogic.getMarketplaceTemplates(setState, canShowLoading: false);
     });
+
+    TimerHolder().addTimer(timer);
   }
 
   @override

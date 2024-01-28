@@ -1,4 +1,6 @@
 // a function to determine the page width given the context
+import 'dart:async';
+
 import 'package:cvworld/client/datasource.dart';
 import 'package:cvworld/routes/router.dart';
 import 'package:file_picker/file_picker.dart';
@@ -342,6 +344,13 @@ class Authentication {
       isAuthenticated = false;
     }
   }
+
+  /**
+   * Logout 
+   */
+  Future<void> logout() async {
+    isAuthenticated = false;
+  }
 }
 
 ///
@@ -364,5 +373,39 @@ class TutorialStatus {
 
   Future<void> bootUp() async {
     isTutorialCompleted = await DatabaseService().isTutorialCompleted();
+  }
+}
+
+///
+///
+///
+///
+/// Timer holder
+class TimerHolder {
+  TimerHolder._();
+
+  // Timer array
+  final List<Timer> _timerList = [];
+
+  static final TimerHolder _instance = TimerHolder._();
+
+  factory TimerHolder() {
+    return _instance;
+  }
+
+  // Add new timer
+  void addTimer(Timer? timer) {
+    if (timer == null) {
+      return;
+    }
+
+    _timerList.add(timer);
+  }
+
+  // Dispose all timer
+  void dispose() {
+    for (var timer in _timerList) {
+      timer.cancel();
+    }
   }
 }

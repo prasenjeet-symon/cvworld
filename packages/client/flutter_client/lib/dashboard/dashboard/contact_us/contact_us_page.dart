@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cvworld/client/utils.dart';
 import 'package:cvworld/dashboard/dashboard/users/user_profile_page.dart';
 import 'package:cvworld/dashboard/datasource_dashboard.dart';
@@ -5,7 +7,6 @@ import 'package:cvworld/routes/router.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'dart:async';
 
 class AdminContactUsPage extends StatefulWidget {
   const AdminContactUsPage({super.key});
@@ -26,6 +27,8 @@ class _AdminContactUsPageState extends State<AdminContactUsPage> {
     timer = Timer.periodic(const Duration(seconds: Constants.refreshSeconds), (timer) async {
       await contactUsLogic.fetchMessages(setState, canShowLoading: false);
     });
+
+    TimerHolder().addTimer(timer);
   }
 
   @override

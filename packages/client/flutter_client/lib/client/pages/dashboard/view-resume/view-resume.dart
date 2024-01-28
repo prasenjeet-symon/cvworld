@@ -162,6 +162,7 @@ class ResumeViewerLogic {
       }
     });
 
+    TimerHolder().addTimer(timer);
     openLinkInBrowser(url.toString());
   }
 }
