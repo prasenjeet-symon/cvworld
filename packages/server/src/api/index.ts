@@ -1630,6 +1630,8 @@ router.post("/create_subscription", async (req, res) => {
     addons: [],
     notes: {
       email: email,
+      planId: choosenPlan.planID,
+      planName: planName,
     },
   });
 

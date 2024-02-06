@@ -38,8 +38,12 @@ export class WebhookController {
       return;
     }
 
-    const { payload } = this.req.body;
-    const { event } = payload;
+    const { event } = this.req.body;
+
+    console.log("-----------------------------");
+    console.log("Webhook event received");
+    console.log(`Event: ${event}`);
+    console.log("-----------------------------");
 
     switch (event) {
       case "order.paid":
@@ -78,10 +82,41 @@ export class WebhookController {
    * Paid event
    */
   public async onPaidEvent() {
-    const { payload }: { payload: OrderPayloadNetBanking } = this.req.body;
+    const { body: payload }: { body: OrderPayloadNetBanking } = this.req;
     const templateName = payload.payload.order.entity.notes.templateName;
     const emailOfUser = payload.payload.order.entity.notes.email;
     const method = payload.payload.payment.entity.method;
+    const planName = payload.payload.order.entity.notes.planName;
+    const planId = payload.payload.order.entity.notes.planId;
+
+    console.log("-----------------------------");
+    console.log(`Template name: ${templateName}`);
+    console.log(`Email: ${emailOfUser}`);
+    console.log(`Method: ${method}`);
+    console.log("planName: " + planName);
+    console.log("planId: " + planId);
+    console.log(`Event: ${payload.event}`);
+    console.log("-----------------------------");
+
+    // There may be subscription payment
+    // If yes then instantly activate the subscription
+    if (planId) {
+      // This is related to the subscription
+      const prisma = PrismaClientSingleton.prisma;
+      await prisma.user.update({
+        where: {
+          email: emailOfUser,
+        },
+        data: {
+          subscription: {
+            update: {
+              isActive: true,
+              expireOn: moment().add(1, "month").toDate(),
+            },
+          },
+        },
+      });
+    }
 
     if (!templateName || !emailOfUser) {
       this.res.status(204).json({ error: "Template name and email is required" });
@@ -137,7 +172,7 @@ export class WebhookController {
    * Card payment
    */
   public async onCardPayment(email: string, templateName: string) {
-    const { payload: cardTransaction }: { payload: OrderPayloadCard } = this.req.body;
+    const { body: cardTransaction }: { body: OrderPayloadCard } = this.req;
 
     const prisma = PrismaClientSingleton.prisma;
 
@@ -186,7 +221,7 @@ export class WebhookController {
    * Netbanking payment
    */
   public async onNetBankingPayment(email: string, templateName: string) {
-    const { payload: netbankingTransaction }: { payload: OrderPayloadNetBanking } = this.req.body;
+    const { body: netbankingTransaction }: { body: OrderPayloadNetBanking } = this.req;
 
     const prisma = PrismaClientSingleton.prisma;
 
@@ -233,7 +268,7 @@ export class WebhookController {
    * Upi payment
    */
   public async onUpiPayment(email: string, templateName: string) {
-    const { payload: upiTransaction }: { payload: OrderPayloadUPI } = this.req.body;
+    const { body: upiTransaction }: { body: OrderPayloadUPI } = this.req;
     const prisma = PrismaClientSingleton.prisma;
 
     await prisma.user.update({
@@ -277,7 +312,7 @@ export class WebhookController {
    * Wallet payment
    */
   public async onWalletPayment(email: string, templateName: string) {
-    const { payload: walletTransaction }: { payload: OrderPayloadWallet } = this.req.body;
+    const { body: walletTransaction }: { body: OrderPayloadWallet } = this.req;
     const prisma = PrismaClientSingleton.prisma;
 
     await prisma.user.update({
@@ -321,9 +356,14 @@ export class WebhookController {
    * on subscription authorized
    */
   public async onSubscriptionAuthorized() {
-    const { payload: subscription }: { payload: SubscriptionAuthenticatedEvent } = this.req.body;
+    const { body: subscription }: { body: SubscriptionAuthenticatedEvent } = this.req;
     const prisma = PrismaClientSingleton.prisma;
     const emailOfUser = subscription.payload.subscription.entity.notes.email;
+
+    console.log("-----------------------------");
+    console.log("Type: " + subscription.event);
+    console.log(emailOfUser);
+    console.log("-----------------------------");
 
     await prisma.user.update({
       where: {
@@ -348,9 +388,14 @@ export class WebhookController {
    * On subscription activated
    */
   public async onSubscriptionActivated() {
-    const { payload: subscription }: { payload: SubscriptionActivatedEvent } = this.req.body;
+    const { body: subscription }: { body: SubscriptionActivatedEvent } = this.req;
     const emailOfUser = subscription.payload.subscription.entity.notes.email;
     const prisma = PrismaClientSingleton.prisma;
+
+    console.log("-----------------------------");
+    console.log("Type: " + subscription.event);
+    console.log(emailOfUser);
+    console.log("-----------------------------");
 
     await prisma.user.update({
       where: {
@@ -375,10 +420,16 @@ export class WebhookController {
    * On subscription charged
    */
   public async onSubscriptionCharged() {
-    const { payload: subscription }: { payload: SubscriptionChargedEvent } = this.req.body;
+    const { body: subscription }: { body: SubscriptionChargedEvent } = this.req;
     const emailOfUser = subscription.payload.subscription.entity.notes.email;
     const method = subscription.payload.payment.entity.method;
     const prisma = PrismaClientSingleton.prisma;
+
+    console.log("-----------------------------");
+    console.log("Type: " + subscription.event);
+    console.log("Email: " + emailOfUser);
+    console.log("Method: " + method);
+    console.log("-----------------------------");
 
     // if already charged return
     const alreadyCharged = await prisma.user.findUnique({
@@ -424,7 +475,7 @@ export class WebhookController {
    */
   public async onUpiSubscriptionPayment(emailOfUser: string) {
     const prisma = PrismaClientSingleton.prisma;
-    const { payload: subscriptionPayload }: { payload: SubscriptionChargedEvent } = this.req.body;
+    const { body: subscriptionPayload }: { body: SubscriptionChargedEvent } = this.req;
 
     await prisma.user.update({
       where: {
@@ -464,7 +515,7 @@ export class WebhookController {
    */
   public async onCardSubscriptionPayment(emailOfUser: string) {
     const prisma = PrismaClientSingleton.prisma;
-    const { payload: subscriptionPayload }: { payload: SubscriptionChargedEvent } = this.req.body;
+    const { body: subscriptionPayload }: { body: SubscriptionChargedEvent } = this.req;
 
     await prisma.user.update({
       where: {
@@ -505,9 +556,14 @@ export class WebhookController {
    * Subscription cancelled
    */
   public async onSubscriptionCancelled() {
-    const { payload: subscription }: { payload: SubscriptionCancelledEvent } = this.req.body;
+    const { body: subscription }: { body: SubscriptionCancelledEvent } = this.req;
     const emailOfUser = subscription.payload.subscription.entity.notes.email;
     const prisma = PrismaClientSingleton.prisma;
+
+    console.log("-----------------------------");
+    console.log("Type: " + subscription.event);
+    console.log("Email: " + emailOfUser);
+    console.log("-----------------------------");
 
     await prisma.user.update({
       where: {
@@ -529,9 +585,14 @@ export class WebhookController {
    * Subscription halted
    */
   public async onSubscriptionHalted() {
-    const { payload: subscription }: { payload: SubscriptionHaltedEvent } = this.req.body;
+    const { body: subscription }: { body: SubscriptionHaltedEvent } = this.req;
     const emailOfUser = subscription.payload.subscription.entity.notes.email;
     const prisma = PrismaClientSingleton.prisma;
+
+    console.log("-----------------------------");
+    console.log("Type: " + subscription.event);
+    console.log("Email: " + emailOfUser);
+    console.log("-----------------------------");
 
     await prisma.user.update({
       where: {
@@ -591,6 +652,9 @@ export class WebhookController {
       return false;
     }
 
+    console.log("-----------------------------");
+    console.log("Webhook signature: " + signature);
+    console.log("-----------------------------");
     return true;
   }
 
@@ -601,12 +665,18 @@ export class WebhookController {
    */
   private isValidSignature() {
     const { RAZORPAY_WEBHOOK_SECRET } = process.env;
-    const { payload } = this.req.body;
+    const payload = this.req.body;
     const { "x-razorpay-signature": signature } = this.req.headers;
 
     const expectedSignature = createHmac("sha256", RAZORPAY_WEBHOOK_SECRET || "")
       .update(JSON.stringify(payload))
       .digest("hex");
+
+    console.log("-----------------------------");
+    console.log("Secret: " + RAZORPAY_WEBHOOK_SECRET);
+    console.log("Expected signature: " + expectedSignature);
+    console.log("Actual signature: " + signature);
+    console.log("-----------------------------");
 
     if (signature !== expectedSignature) {
       this.res.status(204).json({ message: "Invalid signature" });
