@@ -1580,6 +1580,8 @@ class DatabaseService {
   late Uri getPremiumPlanRoute;
   // server/api/template/templt_p_1?token={{TOKEN}}
   late Uri getTemplateRoute;
+  // /delete_user
+  late Uri deleteUserRoute;
 
   DatabaseService() {
     // const apiBaseUrl = 'https://native-humorous-mule.ngrok-free.app';
@@ -1640,7 +1642,7 @@ class DatabaseService {
     createSubscriptionRoute = Uri.parse('$origin/server/api/create_subscription');
     cancelSubscriptionRoute = Uri.parse('$origin/server/api/cancel_subscription');
     getPremiumPlanRoute = Uri.parse('$origin/server/api/get_premium_plan');
-    // isTokenActiveRoute
+    deleteUserRoute = Uri.parse('$origin/server/api/delete_user');
   }
 
   publicResource(String path) {
@@ -2835,6 +2837,23 @@ class DatabaseService {
       }
 
       return null;
+    }
+  }
+
+  // Delete user
+  Future<void> deleteUser() async {
+    var client = JwtClient();
+    var response = await client.post(deleteUserRoute);
+    if (response.statusCode == 200) {
+      client.dispose();
+      return;
+    } else {
+      client.dispose();
+      if (kDebugMode) {
+        print('Something went wrong while deleting user');
+      }
+
+      return;
     }
   }
 

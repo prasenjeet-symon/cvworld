@@ -802,6 +802,24 @@ export async function signInOrSignUpWithGoogle(req: Request, res: Response): Pro
   }
 
   const verifiedToken = await verifyGoogleAuthToken(token);
+  const isDeleted = await isUserDeleted(verifiedToken.email);
+
+  if (isDeleted) {
+    // Change the user id and update the user data
+    const newUserId = v4();
+    const prisma = PrismaClientSingleton.prisma;
+    await prisma.user.update({
+      where: { email: verifiedToken.email },
+      data: {
+        reference: newUserId,
+        isDeleted: false,
+      },
+    });
+
+    res.status(200).json({ token: await createJwt(newUserId, verifiedToken.email) });
+    return;
+  }
+
   const oldUser = await doUserAlreadyExit(verifiedToken.email);
   if (oldUser) {
     // sign token and return
@@ -942,6 +960,30 @@ export async function doUserAlreadyExit(email: string) {
   return user;
 }
 
+/**
+ *
+ * Is user deleted
+ */
+export async function isUserDeleted(email: string) {
+  const prisma = PrismaClientSingleton.prisma;
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+  });
+
+  if (!user) {
+    return true;
+  }
+
+  const isDeleted = user.isDeleted;
+  if (isDeleted) {
+    return true;
+  }
+
+  return false;
+}
+
 /** Do admin user exit */
 export async function doAdminUserExit(email: string): Promise<any> {
   const prisma = PrismaClientSingleton.prisma;
@@ -972,6 +1014,24 @@ export async function signUpWithEmailAndPassword(req: Request, res: Response) {
       res.status(400).json({ message: "All input is required" });
       return;
     }
+    const prisma = PrismaClientSingleton.prisma;
+    const isDeleted = await isUserDeleted(email);
+
+    if (isDeleted) {
+      // Just change the user id and generate token
+      const newUserId = v4();
+      await prisma.user.update({
+        where: { email: email },
+        data: {
+          isDeleted: false,
+          reference: newUserId,
+        },
+      });
+
+      const token = await createJwt(newUserId, email);
+      res.status(200).json({ token });
+      return;
+    }
 
     const userAlreadyExit = await doUserAlreadyExit(req.body.email);
     if (userAlreadyExit) {
@@ -984,7 +1044,6 @@ export async function signUpWithEmailAndPassword(req: Request, res: Response) {
     // Save the user to the database or perform any desired actions
     const profilePicture = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
 
-    const prisma = PrismaClientSingleton.prisma;
     await prisma.user.create({
       data: {
         timeZone: timeZone,
@@ -1018,9 +1077,10 @@ export async function signInWithEmailAndPassword(req: Request, res: Response) {
 
   const email = req.body.email;
   const password = req.body.password;
-
+  const isDeleted = await isUserDeleted(email);
   const oldUser = await doUserAlreadyExit(email);
-  if (!oldUser) {
+
+  if (!oldUser || isDeleted) {
     res.status(402).json({ message: "User does not exit" });
     return;
   }
@@ -1342,16 +1402,16 @@ export function generateDummyResume(): Resume {
 export function formatDate(utcTimestamp: Date, timeZone: string) {
   const utcDate = new Date(utcTimestamp);
 
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    timeZone:timeZone,
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: timeZone,
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   });
 
   const convertedDateStr = formatter.format(utcDate);
   return convertedDateStr;
-} 
+}
 
 /** Generate the resume HTML */
 export function generateResumeHTML(resume: Resume, timeZone: string) {
@@ -1946,7 +2006,7 @@ export function razorpayPrice(price: number) {
  */
 export async function createPremiumTemplatePlan() {
   const nameOfPlan = "Premium";
-  const price = razorpayPrice(499.00); // 10 Dollar
+  const price = razorpayPrice(499.0); // 10 Dollar
   const Razorpay = require("razorpay");
   const razorpayKeyID = process.env.RAZORPAY_KEY_ID;
   const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET;
@@ -1960,7 +2020,7 @@ export async function createPremiumTemplatePlan() {
       email: adminEmail,
     },
     select: {
-      premiumTemplatePlans:true
+      premiumTemplatePlans: true,
     },
   });
 

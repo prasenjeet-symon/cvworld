@@ -13,8 +13,10 @@ import 'package:cvworld/client/pages/make-cv-pages/professional-summry-section.d
 import 'package:cvworld/client/pages/make-cv-pages/skills-section.dart';
 import 'package:cvworld/client/pages/make-cv-pages/website-links-section.dart' show WebsiteLinkSection;
 import 'package:cvworld/client/utils.dart';
+import 'package:cvworld/routes/router.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'account-setting-desktop.dart';
 
@@ -137,6 +139,24 @@ class PricingPlanCardLogic {
 ///
 ///
 ///
+class AccountDeleteCardLogic {
+  bool isLoading = true;
+
+  AccountDeleteCardLogic();
+
+  Future<void> deleteAccount(BuildContext context) async {
+    isLoading = true;
+    await DatabaseService().deleteUser();
+    isLoading = false;
+
+    // Logout
+    DatabaseService().logout().then((value) => context.pushNamed(RouteNames.signin));
+  }
+}
+
+///
+///
+///
 ///
 ///
 class PlanCardWidget extends StatelessWidget {
@@ -200,6 +220,117 @@ class PlanCardWidget extends StatelessWidget {
                           onPressed: onPressed,
                           child: const Text('Upgrade'),
                         )
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+///
+///
+///
+///
+
+class AccountDeleteCardWidget extends StatefulWidget {
+  final void Function() onPressed;
+
+  const AccountDeleteCardWidget({
+    Key? key,
+    required this.onPressed,
+  }) : super(key: key);
+
+  @override
+  _AccountDeleteCardWidgetState createState() => _AccountDeleteCardWidgetState();
+}
+
+class _AccountDeleteCardWidgetState extends State<AccountDeleteCardWidget> {
+  AccountDeleteCardLogic _logic = AccountDeleteCardLogic();
+
+  Future<void> _showDeleteAccountConfirmation(BuildContext context) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Account', textAlign: TextAlign.center),
+          content: const SingleChildScrollView(
+            child: Text(
+              'Are you sure you want to delete your account? This action cannot be undone.',
+              textAlign: TextAlign.center,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('No'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Add logic to delete account
+                widget.onPressed();
+                _logic.deleteAccount(context);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.black.withOpacity(0.03),
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 50,
+            height: 50,
+            child: Image.asset('assets/delete.png'), // You can change the image asset as per your requirement
+          ),
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Delete Account',
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(top: 5),
+                    child: Text(
+                      'Are you sure you want to delete your account? This action cannot be undone.',
+                      style: TextStyle(color: Colors.black54),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                    ),
+                    onPressed: () {
+                      _showDeleteAccountConfirmation(context);
+                    },
+                    child: const Text('Delete'),
+                  ),
                 ],
               ),
             ),
@@ -427,6 +558,7 @@ class AccountSettingBody extends StatelessWidget {
                   ),
                 const PricingPlanCard(),
                 const ImageCard(),
+                AccountDeleteCardWidget(onPressed: () {}),
                 const AccountCard(),
               ],
             ),

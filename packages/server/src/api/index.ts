@@ -3,6 +3,7 @@ import { rmSync } from "fs";
 import path from "path";
 import { Order, PrismaClientSingleton, Resume, Subscription, generateDummyResume, generateImage, generatePDF, sanitizePrismaData } from "../utils";
 import { buyTemplate } from "../views/buy-template";
+import { UserController } from "./user.controller";
 const router = express.Router();
 
 router.get("/", (req, res) => res.send("Hello World!"));
@@ -132,16 +133,15 @@ router.post("/generate", async (req, res) => {
     },
     select: {
       timeZone: true,
-    }
+    },
   });
 
-  if(!oldUser) {
+  if (!oldUser) {
     res.status(500).send("Something went wrong");
     return;
   }
 
   const timeZone = oldUser.timeZone;
-
 
   const loadTemplate = async () => {
     const template = await import(`../templates/${templateName}`);
@@ -150,7 +150,7 @@ router.post("/generate", async (req, res) => {
 
   const template = await loadTemplate();
 
-  const [imageUrl, pdfUrl] = await Promise.all([generateImage(timeZone, resume, template.default), generatePDF(timeZone,resume, template.default)]);
+  const [imageUrl, pdfUrl] = await Promise.all([generateImage(timeZone, resume, template.default), generatePDF(timeZone, resume, template.default)]);
 
   if (!imageUrl || !pdfUrl) {
     res.status(500).send("Something went wrong");
@@ -1781,7 +1781,6 @@ router.post("/cancel_subscription", async (req, res) => {
   res.json({ message: "subscription cancelled" });
 });
 
-
 // For the buy template get req with auth token and template name
 router.get("/template/:name", async (req, res) => {
   const templateName = req.params.name;
@@ -1841,7 +1840,7 @@ router.get("/template/:name", async (req, res) => {
     res.status(500).json({ message: "template already bought" });
     return;
   }
-  
+
   // generate the order
   const order: Order = await instance.orders.create({
     amount: +marketPlaceTemplate.price,
@@ -1854,30 +1853,36 @@ router.get("/template/:name", async (req, res) => {
   });
 
   // return the web page
-  res.set("Content-Type", "text/html"); 
+  res.set("Content-Type", "text/html");
   res.send(buyTemplate(marketPlaceTemplate.previewImgUrl, order.amount, order.id, user.fullName, "", user.email, hostName));
 });
 
 /** Get single the premium plan */
 router.post("/get_premium_plan", async (req, res) => {
-   const email = res.locals.email;
-   const prisma = PrismaClientSingleton.prisma;
+  const email = res.locals.email;
+  const prisma = PrismaClientSingleton.prisma;
 
-   const targetPlan = await prisma.admin.findUnique({
-     where: {
-       email: process.env.ADMIN_EMAIL || "",
-     },
-     select: {
-       premiumTemplatePlans: true,
-     },
-   });
+  const targetPlan = await prisma.admin.findUnique({
+    where: {
+      email: process.env.ADMIN_EMAIL || "",
+    },
+    select: {
+      premiumTemplatePlans: true,
+    },
+  });
 
-   if (!(targetPlan && targetPlan.premiumTemplatePlans.length !== 0)) {
-     res.status(500).json({ message: "plan not found" });
-     return;
-   }
+  if (!(targetPlan && targetPlan.premiumTemplatePlans.length !== 0)) {
+    res.status(500).json({ message: "plan not found" });
+    return;
+  }
 
-   res.json(targetPlan.premiumTemplatePlans[0]);
+  res.json(targetPlan.premiumTemplatePlans[0]);
 });
+
+/**
+ *
+ * Delete user
+ */
+router.post("/delete_user", async (req, res) => new UserController(req, res).delete());
 
 export default router;
