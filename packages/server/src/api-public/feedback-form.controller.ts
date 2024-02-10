@@ -1,15 +1,64 @@
 import { Request, Response } from "express";
+import fs from "fs";
+import multer, { diskStorage } from "multer";
 import { Logger, PrismaClientSingleton, isBoolean, isDefined, isValidEmail, isValidStringLength, isValidUUID } from "../utils";
 
 export class FeedbackFormController {
   private req: Request;
   private res: Response;
+  public static attachmentFolder = "public/feedback";
 
   constructor(req: Request, res: Response) {
     this.req = req;
     this.res = res;
   }
+  /**
+   *
+   * Upload feedback attachment
+   */
+  public async uploadFeedbackAttachment() {
+    const validator = new FeedbackFormValidator(this.req, this.res);
+    if (!validator.validateUploadFeedbackAttachment()) {
+      Logger.getInstance().logError("Feedback form validation failed");
+      return;
+    }
 
+    const filePath = this.req.file?.destination.replace("public", "") + "/" + this.req.file?.filename;
+    this.res.status(200).json({ message: filePath });
+    Logger.getInstance().logSuccess("Feedback form attachment uploaded");
+    return;
+  }
+
+  /**
+   *
+   * Attachment storage
+   */
+  public static attachmentStorage() {
+    const feedbackAttachmentUpload = diskStorage({
+      destination: (req, file, cb) => {
+        if (!fs.existsSync(FeedbackFormController.attachmentFolder)) {
+          fs.mkdirSync(FeedbackFormController.attachmentFolder);
+        }
+
+        cb(null, FeedbackFormController.attachmentFolder);
+      },
+      filename: (req, file, cb) => {
+        cb(null, file.originalname);
+      },
+    });
+
+    const feedbackUpload = multer({
+      storage: feedbackAttachmentUpload,
+      limits: { fileSize: 1048576 }, // No more than 1MB
+      fileFilter: (req, file, cb) => {
+        if (file.mimetype === "image/jpeg" || file.mimetype === "image/webp" || file.mimetype === "image/png" || file.mimetype === "application/octet-stream") {
+          cb(null, true);
+        }
+      },
+    });
+
+    return feedbackUpload.single("feedbackFile");
+  }
   /**
    *
    * Add new feedback to the application
@@ -33,6 +82,7 @@ export class FeedbackFormController {
         isRegistered: this.req.body.isRegistered,
         name: this.req.body.name,
         title: this.req.body.title,
+        attachment: this.req.body.attachment || null,
       },
       update: {
         department: this.req.body.department,
@@ -41,6 +91,7 @@ export class FeedbackFormController {
         isRegistered: this.req.body.isRegistered,
         name: this.req.body.name,
         title: this.req.body.title,
+        attachment: this.req.body.attachment || null,
       },
     });
 
@@ -114,7 +165,7 @@ class FeedbackFormValidator {
    * Validate addFeedback
    */
   public validateAddFeedback() {
-    const { department, description, email, identifier, isRegistered, name, title } = this.req.body;
+    const { department, description, email, identifier, isRegistered, name, title, attachment } = this.req.body;
 
     if (department === undefined || description === undefined || email === undefined || identifier === undefined || isRegistered === undefined || name === undefined || title === undefined) {
       this.res.status(400).json({ error: "department, description, email, identifier, isRegistered, name, title are required" });
@@ -203,6 +254,36 @@ class FeedbackFormValidator {
     if (!isValidUUID(identifier)) {
       this.res.status(400).json({ error: "Invalid identifier" });
       Logger.getInstance().logError("Invalid identifier");
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   *
+   * Validate attachFile
+   */
+  public validateAttachmentStorage() {
+    return true;
+  }
+
+  /**
+   *
+   * validateUploadFeedbackAttachment
+   */
+  public validateUploadFeedbackAttachment() {
+    const { file } = this.req;
+
+    if (file === undefined) {
+      this.res.status(400).json({ error: "file is required" });
+      Logger.getInstance().logError("file is required");
+      return false;
+    }
+
+    if (!isDefined(file)) {
+      this.res.status(400).json({ error: "file is required" });
+      Logger.getInstance().logError("file is required");
       return false;
     }
 

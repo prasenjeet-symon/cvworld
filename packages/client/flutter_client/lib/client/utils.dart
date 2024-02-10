@@ -14,6 +14,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 // SOME APPLICATION CONSTANTS
 class Constants {
+  static const String databaseName = 'cvworld';
+  static const String applicationDirectory = 'cvworld';
   static const int debounceTime = 1000;
   static const int breakPoint = 600;
   static const refreshSeconds = 5;

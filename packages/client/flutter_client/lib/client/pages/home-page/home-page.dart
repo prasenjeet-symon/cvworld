@@ -4,6 +4,7 @@ import 'package:cvworld/client/pages/home-page/components/hero_section.dart';
 import 'package:cvworld/client/pages/home-page/components/section_1.dart';
 import 'package:cvworld/client/pages/home-page/components/section_2.dart';
 import 'package:flutter/material.dart';
+import './components/feedback/feedback.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -46,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
+      floatingActionButton: const FeedbackComponent(),
     );
   }
 }

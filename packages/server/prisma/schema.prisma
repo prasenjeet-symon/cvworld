@@ -293,10 +293,11 @@ model Feedback {
   name         String
   email        String
   title        String
-  description  String
+  description  String   @db.LongText
   department   String
   isRegistered Boolean
   identifier   String   @unique
+  attachment   String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
