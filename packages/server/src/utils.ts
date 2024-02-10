@@ -1,11 +1,93 @@
 import { PrismaClient } from "@prisma/client";
 import express, { NextFunction, Request, Response } from "express";
-import { v4 } from "uuid";
+import { v4, validate } from "uuid";
 import router from "./api";
 import routerAdmin from "./api-admin/index";
 import routerPublic from "./api-public";
 import routerMedia from "./api/media";
 import routerAuth from "./auth";
+/**
+ *
+ *
+ * Logger
+ */
+export class Logger {
+  private static instance: Logger;
+
+  private constructor() {}
+
+  public static getInstance(): Logger {
+    if (!Logger.instance) {
+      Logger.instance = new Logger();
+    }
+    return Logger.instance;
+  }
+
+  private logWithColor(message: string, color: string): void {
+    console.log(`${color}%s\x1b[0m`, message);
+  }
+
+  public logWarning(message: string): void {
+    this.logWithColor(`Warning: ${message}`, "\x1b[33m"); // Yellow
+  }
+
+  public logError(message: string): void {
+    this.logWithColor(`Error: ${message}`, "\x1b[31m"); // Red
+  }
+
+  public logSuccess(message: string): void {
+    this.logWithColor(`Success: ${message}`, "\x1b[32m"); // Green
+  }
+}
+
+/**
+ *
+ * Is input integer
+ */
+export function isInteger(value: any): boolean {
+  return Number.isInteger(value);
+}
+/**
+ *
+ * Is valid email
+ */
+export function isValidEmail(email: string): boolean {
+  // Regular expression for basic email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+/**
+ *
+ * Is valid UUID
+ */
+export function isValidUUID(uuid: string): boolean {
+  return validate(uuid);
+}
+
+/**
+ * 
+ * Is valid string length
+ */
+export function isValidStringLength(value: string, min: number, max: number): boolean {
+  return value.length >= min && value.length <= max;
+}
+
+/**  
+ * 
+ * Is boolean
+ */
+export function isBoolean(value: any): boolean {
+  return typeof value === "boolean";
+}
+
+/**
+ *
+ * Is defined
+ */
+export function isDefined(value: any): boolean {
+  return value !== undefined && value !== null;
+}
 
 export type paymentMethod = "netbanking" | "card" | "wallet" | "upi";
 export enum EPaymentMethod {

@@ -28,7 +28,7 @@ model Admin {
 model PremiumTemplatePlans {
   id          Int               @id @default(autoincrement())
   planID      String            @unique
-  name        String            
+  name        String
   price       Float
   period      SubscriptionCycle
   interval    Int
@@ -47,7 +47,7 @@ model User {
   fullName       String
   profilePicture String?
   password       String?
-  timeZone       String @default("IST")
+  timeZone       String  @default("IST")
   reference      String  @unique
 
   subscription        Subscription?
@@ -102,14 +102,14 @@ model SubscriptionTransaction {
 
 // UPI payment subscription
 model UPIPaymentSubscription {
-  id            Int         @id @default(autoincrement())
-  transaction     SubscriptionTransaction @relation(fields: [transactionId], references: [id])
-  transactionId   Int                     @unique
+  id            Int                     @id @default(autoincrement())
+  transaction   SubscriptionTransaction @relation(fields: [transactionId], references: [id])
+  transactionId Int                     @unique
   vpa           String
   email         String
   mobile        String
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @default(now())
+  createdAt     DateTime                @default(now())
+  updatedAt     DateTime                @default(now())
 }
 
 model CardPaymentSubscription {
@@ -281,10 +281,24 @@ model ContactUs {
   name       String
   email      String
   phone      String
-  message    String @db.LongText
+  message    String   @db.LongText
   isResolved Boolean
   createdAt  DateTime @default(now())
   updatedAt  DateTime @default(now())
+}
+
+// Feedback form
+model Feedback {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String
+  title        String
+  description  String
+  department   String
+  isRegistered Boolean
+  identifier   String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 // for the template buy
@@ -369,14 +383,14 @@ model NetBankingPayment {
 
 // For the resume template buy
 model ResumeTemplateMarketplace {
-  id            Int      @id @default(autoincrement())
-  name          String   @unique // Unique name of the premium template
-  displayName   String   @default("")
-  displayDescription String @default("")
-  price         Float // amount in paise
-  previewImgUrl String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @default(now())
+  id                 Int      @id @default(autoincrement())
+  name               String   @unique // Unique name of the premium template
+  displayName        String   @default("")
+  displayDescription String   @default("")
+  price              Float // amount in paise
+  previewImgUrl      String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now())
 }
 
 enum CardType {
