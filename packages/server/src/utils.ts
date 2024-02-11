@@ -802,23 +802,6 @@ export async function signInOrSignUpWithGoogle(req: Request, res: Response): Pro
   }
 
   const verifiedToken = await verifyGoogleAuthToken(token);
-  const isDeleted = await isUserDeleted(verifiedToken.email);
-
-  if (isDeleted) {
-    // Change the user id and update the user data
-    const newUserId = v4();
-    const prisma = PrismaClientSingleton.prisma;
-    await prisma.user.update({
-      where: { email: verifiedToken.email },
-      data: {
-        reference: newUserId,
-        isDeleted: false,
-      },
-    });
-
-    res.status(200).json({ token: await createJwt(newUserId, verifiedToken.email) });
-    return;
-  }
 
   const oldUser = await doUserAlreadyExit(verifiedToken.email);
   if (oldUser) {
@@ -1015,24 +998,7 @@ export async function signUpWithEmailAndPassword(req: Request, res: Response) {
       return;
     }
     const prisma = PrismaClientSingleton.prisma;
-    const isDeleted = await isUserDeleted(email);
-
-    if (isDeleted) {
-      // Just change the user id and generate token
-      const newUserId = v4();
-      await prisma.user.update({
-        where: { email: email },
-        data: {
-          isDeleted: false,
-          reference: newUserId,
-        },
-      });
-
-      const token = await createJwt(newUserId, email);
-      res.status(200).json({ token });
-      return;
-    }
-
+    
     const userAlreadyExit = await doUserAlreadyExit(req.body.email);
     if (userAlreadyExit) {
       res.status(402).json({ message: "User already exit" });
@@ -1077,10 +1043,9 @@ export async function signInWithEmailAndPassword(req: Request, res: Response) {
 
   const email = req.body.email;
   const password = req.body.password;
-  const isDeleted = await isUserDeleted(email);
   const oldUser = await doUserAlreadyExit(email);
 
-  if (!oldUser || isDeleted) {
+  if (!oldUser) {
     res.status(402).json({ message: "User does not exit" });
     return;
   }

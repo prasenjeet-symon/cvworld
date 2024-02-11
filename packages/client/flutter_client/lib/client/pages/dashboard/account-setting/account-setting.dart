@@ -248,7 +248,7 @@ class AccountDeleteCardWidget extends StatefulWidget {
 }
 
 class _AccountDeleteCardWidgetState extends State<AccountDeleteCardWidget> {
-  AccountDeleteCardLogic _logic = AccountDeleteCardLogic();
+  final AccountDeleteCardLogic _logic = AccountDeleteCardLogic();
 
   Future<void> _showDeleteAccountConfirmation(BuildContext context) async {
     return showDialog(
@@ -286,57 +286,67 @@ class _AccountDeleteCardWidgetState extends State<AccountDeleteCardWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.black.withOpacity(0.03),
-      padding: const EdgeInsets.all(20),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 50,
-            height: 50,
-            child: Image.asset('assets/delete.png'), // You can change the image asset as per your requirement
-          ),
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Delete Account',
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 18,
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(top: 5),
-                    child: Text(
-                      'Are you sure you want to delete your account? This action cannot be undone.',
-                      style: TextStyle(color: Colors.black54),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                    ),
-                    onPressed: () {
-                      _showDeleteAccountConfirmation(context);
-                    },
-                    child: const Text('Delete'),
-                  ),
-                ],
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: const EdgeInsets.fromLTRB(20, 10, 0, 10),
+          child: Text('DELETE ACCOUNT', style: TextStyle(fontSize: 15, color: Colors.black.withOpacity(0.6), fontWeight: FontWeight.w500)),
+        ),
+        Container(
+          color: Colors.black.withOpacity(0.03),
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: 50,
+                height: 50,
+                child: Image.asset('assets/delete_account.png'), // You can change the image asset as per your requirement
               ),
-            ),
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Delete Account',
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(top: 5),
+                        child: Text(
+                          'Are you sure you want to delete your account? This action cannot be undone.',
+                          style: TextStyle(color: Colors.black54),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                        ),
+                        onPressed: () {
+                          _showDeleteAccountConfirmation(context);
+                        },
+                        child: const Text('Delete'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -448,7 +458,7 @@ class _PricingPlanCardState extends State<PricingPlanCard> {
     }
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(0, 25, 0, 25),
+      margin: const EdgeInsets.fromLTRB(0, 25, 0, 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,

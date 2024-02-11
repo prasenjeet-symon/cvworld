@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { PrismaClientSingleton } from "../utils";
+import { v4 } from "uuid";
 
 export class UserController {
   private req: Request;
@@ -21,11 +22,14 @@ export class UserController {
     }
 
     const email = this.res.locals.email;
+    const userId = this.res.locals.userId;
     const prisma = PrismaClientSingleton.prisma;
 
     await prisma.user.update({
       where: { email: email },
       data: {
+        email: `deleted__${v4()}`,
+        reference: `deleted__${userId}`,
         isDeleted: true,
       },
     });
