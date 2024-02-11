@@ -6,7 +6,7 @@ services:
     ports:
       - 3306:3306
     env_file:
-      - ./packages/server/.env
+      - ./packages/server/.env.local
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
@@ -22,7 +22,7 @@ services:
     depends_on:
       - mysql
     env_file:
-      - ./packages/server/.env
+      - ./packages/server/.env.local
     command: sh -c "npx prisma migrate deploy && npm run start"
     volumes:
       - ./public:/app/public
