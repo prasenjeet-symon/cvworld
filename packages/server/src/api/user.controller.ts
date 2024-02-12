@@ -30,7 +30,6 @@ export class UserController {
       data: {
         email: `deleted__${v4()}`,
         reference: `deleted__${userId}`,
-        isDeleted: true,
       },
     });
 

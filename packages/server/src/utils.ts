@@ -943,29 +943,6 @@ export async function doUserAlreadyExit(email: string) {
   return user;
 }
 
-/**
- *
- * Is user deleted
- */
-export async function isUserDeleted(email: string) {
-  const prisma = PrismaClientSingleton.prisma;
-  const user = await prisma.user.findUnique({
-    where: {
-      email: email,
-    },
-  });
-
-  if (!user) {
-    return true;
-  }
-
-  const isDeleted = user.isDeleted;
-  if (isDeleted) {
-    return true;
-  }
-
-  return false;
-}
 
 /** Do admin user exit */
 export async function doAdminUserExit(email: string): Promise<any> {
@@ -2116,4 +2093,18 @@ export async function addTemplate(name: string, price: number) {
   }
 
   return imageUrl;
+}
+
+
+/**
+ * 
+ * 
+ * Is valid email
+ */
+export function isValidEmail(email: string): boolean {
+  // Regular expression for validating email addresses
+  const emailRegex: RegExp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+  // Test the email against the regular expression
+  return emailRegex.test(email);
 }
