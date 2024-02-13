@@ -943,7 +943,6 @@ export async function doUserAlreadyExit(email: string) {
   return user;
 }
 
-
 /** Do admin user exit */
 export async function doAdminUserExit(email: string): Promise<any> {
   const prisma = PrismaClientSingleton.prisma;
@@ -975,7 +974,7 @@ export async function signUpWithEmailAndPassword(req: Request, res: Response) {
       return;
     }
     const prisma = PrismaClientSingleton.prisma;
-    
+
     const userAlreadyExit = await doUserAlreadyExit(req.body.email);
     if (userAlreadyExit) {
       res.status(402).json({ message: "User already exit" });
@@ -1947,69 +1946,77 @@ export function razorpayPrice(price: number) {
  * Create new premium resume template
  */
 export async function createPremiumTemplatePlan() {
-  const nameOfPlan = "Premium";
-  const price = razorpayPrice(499.0); // 10 Dollar
-  const Razorpay = require("razorpay");
-  const razorpayKeyID = process.env.RAZORPAY_KEY_ID;
-  const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET;
-  const adminEmail = process.env.ADMIN_EMAIL;
-  const instance = new Razorpay({ key_id: razorpayKeyID, key_secret: razorpayKeySecret });
-  const prisma = PrismaClientSingleton.prisma;
+  try {
+    const nameOfPlan = "Premium";
+    const price = razorpayPrice(499.0); // 10 Dollar
+    const Razorpay = require("razorpay");
+    const razorpayKeyID = process.env.RAZORPAY_KEY_ID;
+    const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET;
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const instance = new Razorpay({ key_id: razorpayKeyID, key_secret: razorpayKeySecret });
+    const prisma = PrismaClientSingleton.prisma;
 
-  // check if the plan already created in the database
-  const oldPlan = await prisma.admin.findUnique({
-    where: {
-      email: adminEmail,
-    },
-    select: {
-      premiumTemplatePlans: true,
-    },
-  });
-
-  if (oldPlan && oldPlan.premiumTemplatePlans.length !== 0) {
-    return true;
-  }
-
-  // Is already created on razorpay
-  const allCreatedPlans = (await instance.plans.all()) as templatePlans;
-  const marsPlan = allCreatedPlans.items.find((p) => p.item.name.toLowerCase() === nameOfPlan.toLowerCase());
-
-  let createdPlanID = marsPlan ? marsPlan.id : "";
-
-  if (allCreatedPlans.count === 0 || !!!marsPlan) {
-    const createdPlan = (await instance.plans.create({
-      period: "monthly",
-      interval: 1,
-      item: {
-        name: nameOfPlan,
-        amount: price,
-        currency: "INR",
-        description: "Access all the premium templates",
+    // Check if some plain is already created in the database
+    // If yes then just return
+    const oldPlan = await prisma.admin.findUnique({
+      where: {
+        email: adminEmail,
       },
-    })) as PremiumTemplatePlan;
+      select: {
+        premiumTemplatePlans: true,
+      },
+    });
 
-    createdPlanID = createdPlan.id;
-  }
+    if (oldPlan && oldPlan.premiumTemplatePlans.length !== 0) {
+      return true;
+    }
 
-  // this means not created in database yet , create new one
-  await prisma.admin.update({
-    where: {
-      email: adminEmail,
-    },
-    data: {
-      premiumTemplatePlans: {
-        create: {
+    // Is already created on razorpay
+    const allCreatedPlans = (await instance.plans.all()) as templatePlans;
+    const activePlan = allCreatedPlans.items.find((p) => p.item.name.toLowerCase() === nameOfPlan.toLowerCase());
+
+    let createdPlanID = activePlan ? activePlan.id : "";
+
+    if (allCreatedPlans.items.length === 0 || activePlan === undefined) {
+      const createdPlan = (await instance.plans.create({
+        period: "monthly",
+        interval: 1,
+        item: {
+          name: nameOfPlan,
+          amount: price,
           currency: "INR",
           description: "Access all the premium templates",
-          interval: 1,
-          name: nameOfPlan,
-          period: "MONTHLY",
-          planID: createdPlanID,
-          price: price,
+        },
+      })) as PremiumTemplatePlan;
+
+      createdPlanID = createdPlan.id;
+    }
+
+    await prisma.admin.update({
+      where: {
+        email: adminEmail,
+      },
+      data: {
+        premiumTemplatePlans: {
+          create: {
+            currency: "INR",
+            description: "Access all the premium templates",
+            interval: 1,
+            name: nameOfPlan,
+            period: "MONTHLY",
+            planID: createdPlanID,
+            price: price,
+          },
         },
       },
-    },
-  });
+    });
+
+    return;
+  } catch (error) {
+    console.error(error);
+    console.error("Something went wrong while creating razorpay subscription plan");
+    return;
+  }
 }
 
 /**
@@ -2095,10 +2102,9 @@ export async function addTemplate(name: string, price: number) {
   return imageUrl;
 }
 
-
 /**
- * 
- * 
+ *
+ *
  * Is valid email
  */
 export function isValidEmail(email: string): boolean {
