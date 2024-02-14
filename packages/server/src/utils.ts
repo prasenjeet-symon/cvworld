@@ -1962,22 +1962,25 @@ export async function createPremiumTemplatePlan() {
       where: {
         email: adminEmail,
       },
-      select: {
+      include: {
         premiumTemplatePlans: true,
       },
     });
 
     if (oldPlan && oldPlan.premiumTemplatePlans.length !== 0) {
+      // There is plan in database just return
       return true;
     }
 
     // Is already created on razorpay
     const allCreatedPlans = (await instance.plans.all()) as templatePlans;
-    const activePlan = allCreatedPlans.items.find((p) => p.item.name.toLowerCase() === nameOfPlan.toLowerCase());
+    const activePlan = allCreatedPlans.items.find((p) => p.item.name.toLowerCase().trim() === nameOfPlan.toLowerCase().trim());
 
-    let createdPlanID = activePlan ? activePlan.id : "";
+    let createdPlanID = activePlan ? activePlan.id : null;
 
-    if (allCreatedPlans.items.length === 0 || activePlan === undefined) {
+    if (createdPlanID === null) {
+      // There is no plan in razorpay
+      // We need to create new plan in Razorpay
       const createdPlan = (await instance.plans.create({
         period: "monthly",
         interval: 1,
@@ -1998,14 +2001,26 @@ export async function createPremiumTemplatePlan() {
       },
       data: {
         premiumTemplatePlans: {
-          create: {
-            currency: "INR",
-            description: "Access all the premium templates",
-            interval: 1,
-            name: nameOfPlan,
-            period: "MONTHLY",
-            planID: createdPlanID,
-            price: price,
+          upsert: {
+            where: { planID: createdPlanID },
+            create: {
+              currency: "INR",
+              description: "Access all the premium templates",
+              interval: 1,
+              name: nameOfPlan,
+              period: "MONTHLY",
+              planID: createdPlanID,
+              price: price,
+            },
+            update: {
+              currency: "INR",
+              description: "Access all the premium templates",
+              interval: 1,
+              name: nameOfPlan,
+              period: "MONTHLY",
+              planID: createdPlanID,
+              price: price,
+            },
           },
         },
       },
