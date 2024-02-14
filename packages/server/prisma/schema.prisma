@@ -67,7 +67,6 @@ model User {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @default(now())
   boughtTemplate TemplateBuy[]
-  isDeleted      Boolean       @default(false)
 }
 
 // subscription 

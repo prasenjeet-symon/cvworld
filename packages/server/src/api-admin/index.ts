@@ -1,5 +1,5 @@
 import express from "express";
-import { PremiumTemplatePlan, PrismaClientSingleton, addTemplate, hashPassword } from "../utils";
+import { PremiumTemplatePlan, PrismaClientSingleton, addTemplate, hashPassword, isValidEmail } from "../utils";
 
 const router = express.Router();
 
@@ -28,6 +28,7 @@ router.post("/add_template", async (req, res) => {
 });
 
 /**
+ *
  * Get all the registered users
  */
 router.get("/users", async (req, res) => {
@@ -36,12 +37,10 @@ router.get("/users", async (req, res) => {
       subscription: true,
       boughtTemplate: true,
     },
-    where: {
-      isDeleted: false,
-    },
   });
 
-  res.json(users);
+  const activeUsers = users.filter((user) => isValidEmail(user.email));
+  res.json(activeUsers);
 });
 
 // reset the password of the user

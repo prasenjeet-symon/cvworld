@@ -247,35 +247,44 @@ class _ImageCardState extends State<ImageCard> {
       return const SizedBox.shrink();
     }
 
-    return Container(
-      color: Colors.black.withOpacity(0.03),
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-      margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 80,
-            child: isLoading ? const CircularProgressIndicator(strokeWidth: 2.0, color: Colors.black, backgroundColor: Colors.white) : CircleAvatar(backgroundImage: NetworkImage(user!.profilePicture), radius: 50),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Change your profile picture', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 16),
-                  ImagePickerWidget(
-                    onImageSelected: (List<PlatformFile> files) {
-                      _uploadProfile(files);
-                    },
-                  ),
-                ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: const EdgeInsets.fromLTRB(20, 10, 0, 10),
+          child: Text('PROFILE PICTURE', style: TextStyle(fontSize: 15, color: Colors.black.withOpacity(0.6), fontWeight: FontWeight.w500)),
+        ),
+        Container(
+          color: Colors.black.withOpacity(0.03),
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+          margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 50,
+                child: isLoading ? const CircularProgressIndicator(strokeWidth: 2.0, color: Colors.black, backgroundColor: Colors.white) : CircleAvatar(backgroundImage: NetworkImage(user!.profilePicture), radius: 50),
               ),
-            ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Change your profile picture', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 16),
+                      ImagePickerWidget(
+                        onImageSelected: (List<PlatformFile> files) {
+                          _uploadProfile(files);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
