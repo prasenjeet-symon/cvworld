@@ -12,6 +12,7 @@ import 'package:cvworld/client/pages/signup-page/signup-page.dart';
 import 'package:cvworld/dashboard/dashboard/change_password/change_password.dart';
 import 'package:cvworld/dashboard/dashboard/contact_us/contact_us_full_page.dart';
 import 'package:cvworld/dashboard/dashboard/contact_us/contact_us_page.dart';
+import 'package:cvworld/dashboard/dashboard/feedback_page/feedback_page.admin.dart';
 import 'package:cvworld/dashboard/dashboard/home_page/home_page.dart';
 import 'package:cvworld/dashboard/dashboard/subscription_setting/subscription_setting.dart';
 import 'package:cvworld/dashboard/dashboard/templates/all_templates_page.dart';
@@ -50,6 +51,7 @@ class RouteNames {
   static const String adminUpdateTemplate = '/admin/updateTemplate/:templateId';
   static const String adminContactUs = '/admin/contactUs';
   static const String adminContactUsMessage = '/admin/contactUs/:messageId';
+  static const String adminFeedbackPage = '/admin/feedback-page';
 }
 
 final goRouter = GoRouter(
@@ -292,6 +294,13 @@ final goRouter = GoRouter(
       path: '/admin/contactUs/:messageId',
       builder: (context, state) => AdminContactUsFullPage(messageId: state.pathParameters['messageId']!),
       name: RouteNames.adminContactUsMessage,
+    ),
+
+    // Feedback page
+    GoRoute(
+      path: '/admin/feedback',
+      builder: (context, state) => const FeedbackPageAdmin(),
+      name: RouteNames.adminFeedbackPage,
     )
   ],
 );

@@ -87,6 +87,13 @@ class _AdminHomePageState extends State<AdminHomePage> {
                         HoverCard(title: 'Contact Us Messages', icon: Icons.message, onTap: () => context.pushNamed(RouteNames.adminContactUs)),
                         HoverCard(title: 'Sign Out', icon: Icons.logout, onTap: () => confirmLogout(context)),
                       ],
+                    ),
+                    const SizedBox(height: 50),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        HoverCard(title: 'Feedback', icon: Icons.feedback, onTap: () => context.pushNamed(RouteNames.adminFeedbackPage)),
+                      ],
                     )
                   ],
                 ),

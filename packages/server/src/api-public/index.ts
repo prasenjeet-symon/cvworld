@@ -12,7 +12,13 @@ router.get("/", (req, res) => res.send("Hello World!"));
 router.post("/feedback", (req, res) => new FeedbackFormController(req, res).addFeedback());
 
 /** Upload feedback attachment */
-router.post("/upload_feedback_file", FeedbackFormController.attachmentStorage(),(req, res) => new FeedbackFormController(req, res).uploadFeedbackAttachment());
+router.post("/upload_feedback_file", FeedbackFormController.attachmentStorage(), (req, res) => new FeedbackFormController(req, res).uploadFeedbackAttachment());
+
+/** Delete feedback */
+router.delete("/feedback", (req, res) => new FeedbackFormController(req, res).deleteFeedback());
+
+/** Get all feedback */
+router.get("/feedback", (req, res) => new FeedbackFormController(req, res).getAllFeedback());  
 
 // add contact us message
 router.post("/contact_us", async (req, res) => {

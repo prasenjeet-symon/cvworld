@@ -15,7 +15,7 @@ class _FeedbackWebComponentState extends State<FeedbackWebComponent> {
       onPressed: () {
         showDialog(context: context, builder: (context) => const FeedbackFormDialog());
       },
-      child: const Icon(Icons.message),
+      child: const Icon(Icons.feedback),
     );
   }
 }

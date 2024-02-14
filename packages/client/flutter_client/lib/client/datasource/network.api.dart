@@ -21,7 +21,6 @@ class NetworkApi {
   ///
   /// Add new feedback
   Stream<ApiResponse> addFeedback(Feedback feedback) {
-    print('called');
     return HttpManager.request(_uriFeedback.toString(), 'POST', feedback.toRecord()).map((event) {
       if (event.statusCode == 200) {
         ApiMutationSuccess data = ApiMutationSuccess.fromJson(event.data);

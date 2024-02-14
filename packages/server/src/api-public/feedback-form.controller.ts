@@ -118,7 +118,7 @@ export class FeedbackFormController {
 
     const allFeedbacks = await prisma.feedback.findMany();
 
-    this.res.status(200).json({ allFeedbacks });
+    this.res.status(200).json(allFeedbacks);
     Logger.getInstance().logSuccess("Feedback's getAllFeedback completed");
     return;
   }

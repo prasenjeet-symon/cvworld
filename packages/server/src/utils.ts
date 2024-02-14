@@ -2199,15 +2199,3 @@ export async function addTemplate(name: string, price: number) {
   return imageUrl;
 }
 
-/**
- *
- *
- * Is valid email
- */
-export function isValidEmail(email: string): boolean {
-  // Regular expression for validating email addresses
-  const emailRegex: RegExp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-  // Test the email against the regular expression
-  return emailRegex.test(email);
-}

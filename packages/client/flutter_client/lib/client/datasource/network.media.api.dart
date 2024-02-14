@@ -9,7 +9,6 @@ import 'package:cvworld/config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:rxdart/rxdart.dart';
-import 'package:uuid/uuid.dart';
 
 class NetworkMediaApi {
   final Uri _uriUploadFeedbackFile = Uri.parse('${ApplicationConfiguration.apiUrl}/server/api_public/upload_feedback_file');
