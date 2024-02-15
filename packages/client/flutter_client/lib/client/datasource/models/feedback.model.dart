@@ -75,7 +75,15 @@ class FeedbackModel {
     _emit();
 
     try {
-      await feedback.uploadFile((progress) => _emit(), (error) => throw error);
+      try {
+        await feedback.uploadFile((progress) => _emit(), (error) => throw error);
+      } catch (e) {
+        if (kDebugMode) {
+          print('cannot upload attachment for feedback');
+          print(e);
+        }
+      }
+
       await singleCall(NetworkApi().addFeedback(feedback));
       _saveLocal();
       MutationModel.getInstance().dispatch(MutationModelData(MutationModelIdentifier.FEEDBACK, feedback, MutationType.create));

@@ -8,6 +8,7 @@ CREATE TABLE `Admin` (
     `reference` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `isDeleted` BOOLEAN NOT NULL DEFAULT false,
 
     UNIQUE INDEX `Admin_email_key`(`email`),
     PRIMARY KEY (`id`)
@@ -28,7 +29,6 @@ CREATE TABLE `PremiumTemplatePlans` (
     `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     UNIQUE INDEX `PremiumTemplatePlans_planID_key`(`planID`),
-    UNIQUE INDEX `PremiumTemplatePlans_name_key`(`name`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -39,9 +39,11 @@ CREATE TABLE `User` (
     `fullName` VARCHAR(191) NOT NULL,
     `profilePicture` VARCHAR(191) NULL,
     `password` VARCHAR(191) NULL,
+    `timeZone` VARCHAR(191) NOT NULL DEFAULT 'IST',
     `reference` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `isDeleted` BOOLEAN NOT NULL DEFAULT false,
 
     UNIQUE INDEX `User_email_key`(`email`),
     UNIQUE INDEX `User_reference_key`(`reference`),
@@ -280,6 +282,24 @@ CREATE TABLE `ContactUs` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Feedback` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NOT NULL,
+    `email` VARCHAR(191) NOT NULL,
+    `title` VARCHAR(191) NOT NULL,
+    `description` LONGTEXT NOT NULL,
+    `department` VARCHAR(191) NOT NULL,
+    `isRegistered` BOOLEAN NOT NULL,
+    `identifier` VARCHAR(191) NOT NULL,
+    `attachment` VARCHAR(191) NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    UNIQUE INDEX `Feedback_identifier_key`(`identifier`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

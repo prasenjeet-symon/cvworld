@@ -233,7 +233,7 @@ class _FeedbackFormDialogState extends State<FeedbackFormDialog> {
         department: feedbackType,
         isRegistered: false,
         identifier: const Uuid().v4(),
-        attachment: '',
+        attachment: null,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );

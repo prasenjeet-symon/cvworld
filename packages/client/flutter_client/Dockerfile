@@ -17,7 +17,7 @@ RUN flutter pub get
 COPY . .
 
 # Build the Flutter web application
-RUN flutter build web --release --web-renderer=auto
+RUN flutter build web --release --web-renderer=html
 
 # Cleanup unused files
 RUN rm -rf /app/build/web/*.dart
