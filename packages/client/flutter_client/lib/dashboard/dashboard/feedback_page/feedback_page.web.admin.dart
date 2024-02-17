@@ -6,6 +6,7 @@ import 'package:cvworld/client/utils.dart';
 import 'package:cvworld/dashboard/dashboard/feedback_page/feedback_page.controller.admin.dart';
 import 'package:cvworld/dashboard/dashboard/users/user_profile_page.dart';
 import 'package:cvworld/dashboard/datasource/network.media.api.admin.dart';
+import 'package:cvworld/dashboard/utils.dart';
 import 'package:flutter/material.dart';
 
 class FeedbackPageWebAdmin extends StatefulWidget {
@@ -35,16 +36,28 @@ class _FeedbackPageWebAdminState extends State<FeedbackPageWebAdmin> {
       }
     });
 
-    // Listen for the search
     searchController.addListener(() {
       String query = searchController.text;
       controller.search(query);
     });
   }
 
-  // Delete feedback
   void deleteFeedback(clientSchema.Feedback feedback) {
     controller.deleteFeedback(feedback);
+    Navigator.pop(context);
+  }
+
+  // Delete confirm
+  void deleteConfirm(clientSchema.Feedback feedback) {
+    showDialog(
+      context: context,
+      builder: (context) => DeleteConfirmationDialog(
+        title: 'Delete Feedback',
+        content: 'Are you sure you want to delete this feedback?',
+        onConfirm: () => deleteFeedback(feedback),
+        onCancel: () => Navigator.pop(context),
+      ),
+    );
   }
 
   @override
@@ -121,13 +134,9 @@ class _FeedbackPageWebAdminState extends State<FeedbackPageWebAdmin> {
                                     iconSize: 12,
                                     padding: EdgeInsets.zero,
                                     onPressed: () {
-                                      deleteFeedback(feedback);
+                                      deleteConfirm(feedback);
                                     },
-                                    icon: const Icon(
-                                      Icons.delete,
-                                      color: Colors.red,
-                                      size: 20,
-                                    ),
+                                    icon: const Icon(Icons.delete, color: Colors.red, size: 20),
                                   ),
                                 ],
                               ),

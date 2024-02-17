@@ -57,47 +57,46 @@ class _AdminHomePageState extends State<AdminHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: adminHomePageLogic.isLoading
-            ? const Center(
-                child: Padding(
-                padding: EdgeInsets.all(50),
-                child: CircularProgressIndicator(),
-              ))
-            : Container(
-                margin: const EdgeInsets.only(top: 70),
-                width: 800,
-                child: Column(
-                  children: [
-                    Text('Welcome, ${adminHomePageLogic.admin!.fullName}!', style: const TextStyle(fontSize: 50, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 50),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        HoverCard(title: 'All Users', icon: Icons.people, onTap: () => context.pushNamed(RouteNames.adminAllUsers)),
-                        HoverCard(title: 'All Templates', icon: Icons.format_list_bulleted, onTap: () => {context.pushNamed(RouteNames.adminAllTemplates)}),
-                        HoverCard(title: 'Subscription Settings', icon: Icons.settings, onTap: () => context.pushNamed(RouteNames.adminSubscriptionSetting)),
-                      ],
-                    ),
-                    const SizedBox(height: 50),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        HoverCard(title: 'Update Password', icon: Icons.password, onTap: () => context.pushNamed(RouteNames.adminChangePassword)),
-                        HoverCard(title: 'Contact Us Messages', icon: Icons.message, onTap: () => context.pushNamed(RouteNames.adminContactUs)),
-                        HoverCard(title: 'Sign Out', icon: Icons.logout, onTap: () => confirmLogout(context)),
-                      ],
-                    ),
-                    const SizedBox(height: 50),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        HoverCard(title: 'Feedback', icon: Icons.feedback, onTap: () => context.pushNamed(RouteNames.adminFeedbackPage)),
-                      ],
-                    )
-                  ],
+      body: SingleChildScrollView(
+        child: Center(
+          child: adminHomePageLogic.isLoading
+              ? const Center(child: Padding(padding: EdgeInsets.all(50), child: CircularProgressIndicator()))
+              : Container(
+                  margin: const EdgeInsets.only(top: 70),
+                  width: 800,
+                  child: Column(
+                    children: [
+                      Text('Welcome, ${adminHomePageLogic.admin!.fullName}!', style: const TextStyle(fontSize: 50, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 50),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          HoverCard(title: 'All Users', icon: Icons.people, onTap: () => context.pushNamed(RouteNames.adminAllUsers)),
+                          HoverCard(title: 'All Templates', icon: Icons.format_list_bulleted, onTap: () => {context.pushNamed(RouteNames.adminAllTemplates)}),
+                          HoverCard(title: 'Subscription Settings', icon: Icons.settings, onTap: () => context.pushNamed(RouteNames.adminSubscriptionSetting)),
+                        ],
+                      ),
+                      const SizedBox(height: 50),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          HoverCard(title: 'Update Password', icon: Icons.password, onTap: () => context.pushNamed(RouteNames.adminChangePassword)),
+                          HoverCard(title: 'Contact Us Messages', icon: Icons.message, onTap: () => context.pushNamed(RouteNames.adminContactUs)),
+                          HoverCard(title: 'Feedback', icon: Icons.feedback, onTap: () => context.pushNamed(RouteNames.adminFeedbackPage)),
+                        ],
+                      ),
+                      const SizedBox(height: 50),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          HoverCard(title: 'Sign Out', icon: Icons.logout, onTap: () => confirmLogout(context)),
+                        ],
+                      ),
+                      const SizedBox(height: 100),
+                    ],
+                  ),
                 ),
-              ),
+        ),
       ),
     );
   }

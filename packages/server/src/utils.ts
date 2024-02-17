@@ -1139,6 +1139,8 @@ export async function signInAdmin(req: Request, res: Response) {
   const email = req.body.email;
   const password = req.body.password;
 
+  console.log("email :", email, "password :", password);
+
   if (!(email && password)) {
     res.status(400).json({ message: "All input is required" });
     return;
@@ -1171,6 +1173,8 @@ export async function signUpAdmin() {
   // extract the email and password from the ENV
   const email = process.env.ADMIN_EMAIL;
   const password = process.env.ADMIN_PASSWORD;
+
+  console.log("email", email, "password", password);
 
   if (!(email && password)) {
     throw new Error("Admin email and password are required");
