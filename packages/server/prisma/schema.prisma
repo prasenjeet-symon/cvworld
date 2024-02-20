@@ -22,7 +22,7 @@ model Admin {
   premiumTemplatePlans PremiumTemplatePlans[]
   createdAt            DateTime               @default(now())
   updatedAt            DateTime               @default(now())
-  isDeleted             Boolean                @default(false)
+  isDeleted            Boolean                @default(false)
 }
 
 // For the premium plans
@@ -43,13 +43,14 @@ model PremiumTemplatePlans {
 
 // User Model
 model User {
-  id             Int     @id @default(autoincrement())
-  email          String  @unique
-  fullName       String
-  profilePicture String?
-  password       String?
-  timeZone       String  @default("IST")
-  reference      String  @unique
+  id              Int     @id @default(autoincrement())
+  email           String  @unique
+  fullName        String
+  profilePicture  String?
+  password        String?
+  timeZone        String  @default("IST")
+  reference       String  @unique
+  isEmailVerified Boolean @default(false)
 
   subscription        Subscription?
   personalDetails     PersonalDetails?
