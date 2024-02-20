@@ -6,6 +6,66 @@ import routerAdmin from "./api-admin/index";
 import routerPublic from "./api-public";
 import routerMedia from "./api/media";
 import routerAuth from "./auth";
+
+/*
+ *
+ *
+ * Create JWT
+ */
+export async function createJwt(userId: string, email: string, isAdmin: boolean = false, expiresIn: string | null = null, timeZone: string | null = null): Promise<string> {
+  const jwt = require("jsonwebtoken");
+  const JWT_SECRET = process.env.JWT_SECRET;
+  const JWT_EXPIRES_IN = expiresIn || process.env.JWT_EXPIRES_IN || "1d";
+
+  if (!JWT_SECRET) {
+    Logger.getInstance().logError("JWT_SECRET not set in the environment variables");
+    throw new Error("JWT_SECRET not set in the environment variables");
+  }
+
+  return jwt.sign({ userId, email, isAdmin: isAdmin, timeZone }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+}
+
+/*
+ *
+ * Get client ip address
+ */
+export function getClientIP(req: Request): string {
+  // Check if the request is coming through a proxy
+  const forwardedFor = req.headers["x-forwarded-for"];
+  if (forwardedFor && typeof forwardedFor === "string") {
+    // Extract the client IP from the X-Forwarded-For header
+    const ips = forwardedFor.split(",");
+    return ips[0].trim();
+  }
+
+  // If not behind a proxy, simply use the remote address from the request
+  return req.ip || "";
+}
+
+/*
+ *
+ * Get client location
+ */
+export async function getClientLocation(req: Request): Promise<LocationInfo | undefined> {
+  const { IPINFO_TOKEN } = process.env;
+  if (IPINFO_TOKEN === undefined) {
+    Logger.getInstance().logError("IPINFO_TOKEN is not defined. Please set it in .env file");
+    return;
+  }
+
+  const clientIP = getClientIP(req);
+  console.log("Client IP: " + clientIP);
+
+  try {
+    // Make a request to the ipinfo.io API to get location information
+    const response = await axios.get<LocationInfo>(`https://ipinfo.io/${clientIP}?token=${IPINFO_TOKEN}`);
+    return response.data;
+  } catch (error) {
+    Logger.getInstance().logError("Error getting client location : " + error);
+    return;
+  }
+}
+
 /**
  *
  *
@@ -21,6 +81,10 @@ export class Logger {
       Logger.instance = new Logger();
     }
     return Logger.instance;
+  }
+
+  private log(message: any) {
+    console.log(message);
   }
 
   private logWithColor(message: string, color: string): void {
@@ -66,15 +130,15 @@ export function isValidUUID(uuid: string): boolean {
 }
 
 /**
- * 
+ *
  * Is valid string length
  */
 export function isValidStringLength(value: string, min: number, max: number): boolean {
   return value.length >= min && value.length <= max;
 }
 
-/**  
- * 
+/**
+ *
  * Is boolean
  */
 export function isBoolean(value: any): boolean {
@@ -959,18 +1023,6 @@ export async function verifyGoogleAuthToken(token: string): Promise<IGoogleAuthT
   return { success: true, userId, email, name, profile: picture };
 }
 
-/** Create the JSON web token */
-export async function createJwt(userId: string, email: string, isAdmin: boolean = false): Promise<string> {
-  const jwt = require("jsonwebtoken");
-  const JWT_SECRET = process.env.JWT_SECRET;
-  const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1d";
-  if (!JWT_SECRET) {
-    throw new Error("JWT_SECRET not set");
-  }
-
-  return jwt.sign({ userId, email, isAdmin: isAdmin }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-}
-
 /** Verify the JSON WEB TOKEN */
 export const authenticateUser = (req: Request, res: Response, next: NextFunction) => {
   const JWT_SECRET = process.env.JWT_SECRET;
@@ -1315,6 +1367,7 @@ export interface Resume {
 
 import { faker } from "@faker-js/faker";
 import axios from "axios";
+import { LocationInfo } from "./schema";
 
 // Generate dummy data for the Resume interface
 export function generateDummyResume(): Resume {
@@ -2202,4 +2255,3 @@ export async function addTemplate(name: string, price: number) {
 
   return imageUrl;
 }
-
