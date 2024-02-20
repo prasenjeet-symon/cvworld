@@ -1,11 +1,19 @@
 import express from "express";
 import { authenticateUser, isTokenExpired, signInAdmin, signInOrSignUpWithGoogle, signInWithEmailAndPassword, signUpWithEmailAndPassword } from "../utils";
+import { EmailPasswordSignInController } from "./email-password-signin.controller";
+import { EmailPasswordSignUpController } from "./email-password-signup.controller";
 
 const router = express.Router();
 
 router.get("/", (req, res) => {
   res.send({ message: "Authentication working..." });
 });
+
+/** Signup with email and password */
+router.post("/sign_up", (req, res) => new EmailPasswordSignUpController(req, res).signupWithEmailPassword());
+
+/** Sign in with email and password */
+router.post("/sign_in", (req, res) => new EmailPasswordSignInController(req, res).signinWithEmailPassword());
 
 /** Is token active */
 router.post("/is_token_active", (req, res) => {

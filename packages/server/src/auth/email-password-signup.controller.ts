@@ -37,7 +37,7 @@ export class EmailPasswordSignUpController {
     });
 
     if (oldUser) {
-      this.res.status(400).send("User with same email already exists. Please login");
+      this.res.status(400).json({ error: "User with same email already exists. Please login" });
       Logger.getInstance().logError("signupWithEmailPassword:: User already exists");
       return;
     }
@@ -98,19 +98,19 @@ class EmailPasswordSignUpValidator {
     const { email, password, fullName, timeZone } = this.req.body;
 
     if (email === undefined || password === undefined || fullName === undefined || timeZone === undefined) {
-      this.res.status(400).send("email, password, fullName, timeZone are required");
+      this.res.status(400).json({ error: "email, password, fullName, timeZone are required" });
       Logger.getInstance().logError("email, password, fullName, timeZone are required");
       return false;
     }
 
     if (!isDefined(email) || !isDefined(password) || !isDefined(fullName) || !isDefined(timeZone)) {
-      this.res.status(400).send("email, password, fullName, timeZone are required");
+      this.res.status(400).json({ error: "email, password, fullName, timeZone are required" });
       Logger.getInstance().logError("email, password, fullName, timeZone are required");
       return false;
     }
 
     if (!isValidEmail(email)) {
-      this.res.status(400).send("Invalid email");
+      this.res.status(400).json({ error: "Invalid email" });
       Logger.getInstance().logError("Invalid email");
       return false;
     }
