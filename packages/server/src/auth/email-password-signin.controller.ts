@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { ApiEvent, ApiEventNames } from "../events";
 import { Logger, PrismaClientSingleton, createJwt, hashPassword, isDefined, isTokenActive, isValidEmail } from "../utils";
 
 export class EmailPasswordSignInController {
@@ -98,8 +99,9 @@ export class EmailPasswordSignInController {
 
     const token = await createJwt(user.reference, user.email, false, JWT_PASSWORD_RESET_TOKEN_EXPIRES_IN, user.timeZone);
     const link = `${PASSWORD_RESET_BASE_LINK}/?token=${token}&userId=${user.reference}`;
-    // TODO: Sent email with a link to reset password where query param contains token and userId
 
+    ApiEvent.getInstance().dispatch(ApiEventNames.SEND_PASSWORD_RESET_LINK_EMAIL, { email: email, link: link });
+    
     this.res.status(200).json({ message: `Password reset link has been sent to ${email}` });
     return;
   }
@@ -165,7 +167,7 @@ export class EmailPasswordSignInController {
       userName: oldUser.userName,
     });
 
-    // TODO: Send email regarding password reset success
+    ApiEvent.getInstance().dispatch(ApiEventNames.SEND_RESET_PASSWORD_SUCCESS_EMAIL, { email: oldUser.email });
 
     Logger.getInstance().logSuccess("resetPassword:: Password reset successful");
     return;

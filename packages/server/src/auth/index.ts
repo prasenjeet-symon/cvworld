@@ -18,6 +18,12 @@ router.post("/sign_up", (req, res) => new EmailPasswordSignUpController(req, res
 /** Sign in with email and password */
 router.post("/sign_in", (req, res) => new EmailPasswordSignInController(req, res).signinWithEmailPassword());
 
+/** Forgot password */
+router.post("/forgot_password", (req, res) => new EmailPasswordSignInController(req, res).forgotPassword());
+
+/** Reset password */
+router.post("/reset_password", (req, res) => new EmailPasswordSignInController(req, res).resetPassword());  
+
 /** Login with google */
 router.post("/google_login", (req, res) => new GoogleController(req, res).signinWithGoogle());
 

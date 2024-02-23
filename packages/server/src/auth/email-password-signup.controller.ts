@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { v4 } from "uuid";
+import { ApiEvent, ApiEventNames } from "../events";
 import { Logger, PrismaClientSingleton, createJwt, getClientLocation, hashPassword, isDefined, isTokenActive, isValidEmail } from "../utils";
 
 export class EmailPasswordSignUpController {
@@ -103,8 +104,8 @@ export class EmailPasswordSignUpController {
     });
 
     Logger.getInstance().logSuccess("signupWithEmailPassword:: User created successfully");
+    ApiEvent.getInstance().dispatch(ApiEventNames.SEND_GREETING_EMAIL, { email: email });
 
-    // TODO: send welcome email
     // TODO: send email to verify email
 
     return;

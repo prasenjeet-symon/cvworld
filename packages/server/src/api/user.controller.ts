@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { PrismaClientSingleton } from "../utils";
 import { v4 } from "uuid";
+import { Logger, PrismaClientSingleton } from "../utils";
 
 export class UserController {
   private req: Request;
@@ -17,12 +17,11 @@ export class UserController {
    */
   public async delete() {
     if (!this.validateDelete()) {
-      console.log("Delete validation failed");
+      Logger.getInstance().logError("delete:: Error validating method delete");
       return;
     }
 
-    const email = this.res.locals.email;
-    const userId = this.res.locals.userId;
+    const { email, userId } = this.res.locals;
     const prisma = PrismaClientSingleton.prisma;
 
     await prisma.user.update({
@@ -30,11 +29,12 @@ export class UserController {
       data: {
         email: `deleted__${v4()}`,
         reference: `deleted__${userId}`,
+        isDeleted: true,
       },
     });
 
-    this.res.status(200).json({ message: "Success" });
-    console.log("User deleted");
+    this.res.status(200).json({ message: "Deleted user successfully" });
+    Logger.getInstance().logSuccess("delete:: Deleted user successfully");
     return;
   }
 

@@ -40,6 +40,14 @@ export class ApiEvent {
           new AuthenticationEvent(data).sendGreetingEmail();
           break;
 
+        case ApiEventNames.SEND_PASSWORD_RESET_LINK_EMAIL:
+          new AuthenticationEvent(data).sendPasswordResetLink();
+          break;
+
+        case ApiEventNames.SEND_RESET_PASSWORD_SUCCESS_EMAIL:
+          new AuthenticationEvent(data).sendPasswordResetSuccessful();
+          break;
+
         default:
           break;
       }
