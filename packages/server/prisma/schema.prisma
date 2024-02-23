@@ -50,6 +50,7 @@ model User {
   password        String?
   timeZone        String  @default("IST")
   reference       String  @unique
+  userName        String?
   isEmailVerified Boolean @default(false)
 
   subscription        Subscription?

@@ -6,6 +6,36 @@ import routerAdmin from "./api-admin/index";
 import routerPublic from "./api-public";
 import routerMedia from "./api/media";
 import routerAuth from "./auth";
+/** 
+ * 
+ * Get random user name
+ */
+
+export function generateUniqueUsername(fullName: string): string {
+  const randomNumber = Math.floor(1000 + Math.random() * 9000); // Generate random number between 1000 and 9999
+  const username = `${fullName}_${randomNumber}`.toLowerCase();
+  return username;
+}
+
+
+export function isTokenActive(token: string): { isActive: boolean; payload?: any } {
+  try {
+    const jwt = require("jsonwebtoken");
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "", {
+      ignoreExpiration: false,
+    });
+
+    Logger.getInstance().logSuccess(JSON.stringify(decoded));
+
+    // Return both the status and the payload
+    return { isActive: true, payload: decoded };
+  } catch (error) {
+    console.error(error);
+    // An error occurred while decoding the token
+    return { isActive: false };
+  }
+}
 
 /*
  *

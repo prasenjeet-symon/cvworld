@@ -22,11 +22,12 @@ export class EmailPasswordSignUpController {
       return;
     }
 
-    const { email, password, fullName, timeZone } = this.req.body as {
+    const { email, password, fullName, timeZone, userName } = this.req.body as {
       email: string;
       password: string;
       fullName: string;
       timeZone: string;
+      userName: string;
     };
 
     const prisma = PrismaClientSingleton.prisma;
@@ -54,12 +55,14 @@ export class EmailPasswordSignUpController {
         fullName: fullName,
         reference: v4(),
         timeZone: timeZoneName,
+        userName: userName,
       },
       select: {
         reference: true,
         email: true,
         fullName: true,
         timeZone: true,
+        userName: true,
       },
     });
 
@@ -71,6 +74,7 @@ export class EmailPasswordSignUpController {
       email: newUser.email,
       fullName: newUser.fullName,
       timeZone: newUser.timeZone,
+      userName: newUser.userName,
     });
 
     Logger.getInstance().logSuccess("signupWithEmailPassword:: User created successfully");
@@ -95,17 +99,17 @@ class EmailPasswordSignUpValidator {
    * Validate signup with email and password
    */
   public validateSignupWithEmailPassword(): boolean {
-    const { email, password, fullName, timeZone } = this.req.body;
+    const { email, password, fullName, timeZone, userName } = this.req.body;
 
-    if (email === undefined || password === undefined || fullName === undefined || timeZone === undefined) {
-      this.res.status(400).json({ error: "email, password, fullName, timeZone are required" });
-      Logger.getInstance().logError("email, password, fullName, timeZone are required");
+    if (email === undefined || password === undefined || fullName === undefined || timeZone === undefined || userName === undefined) {
+      this.res.status(400).json({ error: "email, password, fullName, timeZone, userName are required" });
+      Logger.getInstance().logError("email, password, fullName, timeZone, userName are required");
       return false;
     }
 
-    if (!isDefined(email) || !isDefined(password) || !isDefined(fullName) || !isDefined(timeZone)) {
-      this.res.status(400).json({ error: "email, password, fullName, timeZone are required" });
-      Logger.getInstance().logError("email, password, fullName, timeZone are required");
+    if (!isDefined(email) || !isDefined(password) || !isDefined(fullName) || !isDefined(timeZone) || !isDefined(userName)) {
+      this.res.status(400).json({ error: "email, password, fullName, timeZone, userName are required" });
+      Logger.getInstance().logError("email, password, fullName, timeZone, userName are required");
       return false;
     }
 

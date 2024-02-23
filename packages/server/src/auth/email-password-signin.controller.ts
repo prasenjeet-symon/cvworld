@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Logger, PrismaClientSingleton, createJwt, hashPassword, isDefined, isValidEmail } from "../utils";
+import { Logger, PrismaClientSingleton, createJwt, hashPassword, isDefined, isTokenActive, isValidEmail } from "../utils";
 
 export class EmailPasswordSignInController {
   private req: Request;
@@ -32,6 +32,7 @@ export class EmailPasswordSignInController {
         password: true,
         fullName: true,
         timeZone: true,
+        userName: true,
       },
     });
 
@@ -57,6 +58,7 @@ export class EmailPasswordSignInController {
       email: user.email,
       fullName: user.fullName,
       timeZone: user.timeZone,
+      userName: user.userName,
     });
 
     Logger.getInstance().logSuccess("signinWithEmailPassword:: Login successful");
@@ -101,6 +103,74 @@ export class EmailPasswordSignInController {
     this.res.status(200).json({ message: `Password reset link has been sent to ${email}` });
     return;
   }
+
+  /**
+   *
+   * Reset password
+   */
+  public async resetPassword() {
+    const validator = new EmailPasswordSignInValidator(this.req, this.res);
+    if (!validator.validateResetPassword()) {
+      Logger.getInstance().logError("resetPassword:: Error validating method resetPassword");
+      return;
+    }
+
+    const { userId, token, password } = this.req.body;
+    const prisma = PrismaClientSingleton.prisma;
+
+    const oldUser = await prisma.user.findUnique({
+      where: { reference: userId },
+    });
+
+    if (!oldUser) {
+      this.res.status(404).json({ error: "User not found" });
+      Logger.getInstance().logError("resetPassword:: User not found");
+      return;
+    }
+
+    const isTokenAct = isTokenActive(token);
+
+    if (!isTokenAct.isActive) {
+      this.res.status(400).json({ error: "Invalid token" });
+      Logger.getInstance().logError("resetPassword:: Invalid token");
+      return;
+    }
+
+    // If same user token or not
+    const { payload } = isTokenAct;
+    const { userId: tokenUserId } = payload;
+
+    if (tokenUserId !== userId) {
+      this.res.status(400).json({ error: "Invalid token" });
+      Logger.getInstance().logError("resetPassword:: Invalid token");
+      return;
+    }
+
+    const hashedPassword = hashPassword(password);
+
+    // Update user's password
+    await prisma.user.update({
+      where: { reference: userId },
+      data: { password: hashedPassword },
+    });
+
+    const jwtToken = await createJwt(oldUser.reference, oldUser.email, false, null, oldUser.timeZone);
+
+    this.res.status(200).json({
+      token: jwtToken,
+      userId: oldUser.reference,
+      email: oldUser.email,
+      fullName: oldUser.fullName,
+      timeZone: oldUser.timeZone,
+      userName: oldUser.userName,
+    });
+
+
+    // TODO: Send email regarding password reset success
+
+    Logger.getInstance().logSuccess("resetPassword:: Password reset successful");
+    return;
+  }
 }
 /**
  *
@@ -132,6 +202,20 @@ class EmailPasswordSignInValidator {
     if (!isValidEmail(email)) {
       this.res.status(400).json({ error: "Invalid email" });
       Logger.getInstance().logError("Invalid email");
+      return false;
+    }
+
+    const { JWT_SECRET } = process.env;
+
+    if (JWT_SECRET === undefined) {
+      this.res.status(500).json({ error: "Internal server error" });
+      Logger.getInstance().logError("JWT_SECRET is not set in .env");
+      return false;
+    }
+
+    if (!isDefined(JWT_SECRET)) {
+      this.res.status(500).json({ error: "Internal server error" });
+      Logger.getInstance().logError("JWT_SECRET is not set in .env");
       return false;
     }
 
@@ -174,6 +258,56 @@ class EmailPasswordSignInValidator {
     if (!isDefined(JWT_PASSWORD_RESET_TOKEN_EXPIRES_IN)) {
       this.res.status(500).json({ error: "Internal server error" });
       Logger.getInstance().logError("validateForgotPassword:: JWT_PASSWORD_RESET_TOKEN_EXPIRES_IN is not set in .env");
+      return false;
+    }
+
+    const { JWT_SECRET } = process.env;
+
+    if (JWT_SECRET === undefined) {
+      this.res.status(500).json({ error: "Internal server error" });
+      Logger.getInstance().logError("validateForgotPassword:: JWT_SECRET is not set in .env");
+      return false;
+    }
+
+    if (!isDefined(JWT_SECRET)) {
+      this.res.status(500).json({ error: "Internal server error" });
+      Logger.getInstance().logError("validateForgotPassword:: JWT_SECRET is not set in .env");
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   *
+   * Validate reset password
+   */
+  public validateResetPassword(): boolean {
+    const { userId, token, password } = this.req.body;
+
+    if (userId === undefined || token === undefined || password === undefined) {
+      this.res.status(400).json({ error: "userId, token, password are required" });
+      Logger.getInstance().logError("validateResetPassword:: userId, token, password are required");
+      return false;
+    }
+
+    if (!isDefined(userId) || !isDefined(token) || !isDefined(password)) {
+      this.res.status(400).json({ error: "userId, token, password are required" });
+      Logger.getInstance().logError("validateResetPassword:: userId, token, password are required");
+      return false;
+    }
+
+    const { JWT_SECRET } = process.env;
+
+    if (JWT_SECRET === undefined) {
+      this.res.status(500).json({ error: "Internal server error" });
+      Logger.getInstance().logError("validateResetPassword:: JWT_SECRET is not set in .env");
+      return false;
+    }
+
+    if (!isDefined(JWT_SECRET)) {
+      this.res.status(500).json({ error: "Internal server error" });
+      Logger.getInstance().logError("validateResetPassword:: JWT_SECRET is not set in .env");
       return false;
     }
 

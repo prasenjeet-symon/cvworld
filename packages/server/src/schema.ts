@@ -8,3 +8,11 @@ export interface LocationInfo {
   postal: string;
   timezone: string;
 }
+
+export interface IGoogleAuthTokenResponse {
+  userId: string;
+  email: string;
+  name: string;
+  profile: string;
+  success: boolean;
+}
