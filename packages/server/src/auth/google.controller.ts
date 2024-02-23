@@ -77,7 +77,55 @@ export class GoogleController {
       userName: newUser.userName,
     });
 
+    //TODO : Send greeting email to the user
     Logger.getInstance().logSuccess("signupWithGoogle :: Login successful");
+    return;
+  }
+
+  /**
+   *
+   * Google signin
+   */
+  public async signinWithGoogle() {
+    const validator = new GoogleValidator(this.req, this.res);
+    if (!validator.validateSigninWithGoogle()) {
+      Logger.getInstance().logError("signinWithGoogle :: Error validating method signinWithGoogle");
+      return;
+    }
+
+    const { token } = this.req.body;
+    const googleAuthTokenResponse = await this.verifyGoogleAuthToken(token);
+    if (!googleAuthTokenResponse) {
+      this.res.status(400).json({ error: "Invalid google auth token" });
+      Logger.getInstance().logError("signinWithGoogle :: Invalid google auth token");
+      return;
+    }
+
+    const { userId, email, name, profile } = googleAuthTokenResponse;
+    const prisma = PrismaClientSingleton.prisma;
+
+    const oldUser = await prisma.user.findUnique({
+      where: { email: email },
+    });
+
+    if (!oldUser) {
+      this.res.status(404).json({ error: "User with associated email not found. Please signup to continue" });
+      Logger.getInstance().logError("signinWithGoogle :: User not found");
+      return;
+    }
+
+    const tokenFinal = await createJwt(oldUser.reference, oldUser.email, false, null, oldUser.timeZone);
+
+    this.res.status(200).json({
+      token: tokenFinal,
+      userId: oldUser.reference,
+      email: oldUser.email,
+      fullName: oldUser.fullName,
+      timeZone: oldUser.timeZone,
+      userName: oldUser.userName,
+    });
+
+    Logger.getInstance().logSuccess("signinWithGoogle :: Login successful");
     return;
   }
 
@@ -148,6 +196,17 @@ class GoogleValidator {
       Logger.getInstance().logError("validateSignupWithGoogle :: token, timeZone are required");
       return false;
     }
+
+    return true;
+  }
+
+  /**
+   *
+   *
+   * Validate signin with google
+   */
+  public validateSigninWithGoogle() {
+    const { token } = this.req.body;
 
     return true;
   }

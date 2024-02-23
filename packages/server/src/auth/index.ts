@@ -1,10 +1,13 @@
 import express from "express";
-import { authenticateUser, isTokenExpired, signInAdmin, signInOrSignUpWithGoogle, signInWithEmailAndPassword, signUpWithEmailAndPassword } from "../utils";
+import { authenticateUser } from "../utils";
+import { AdminController } from "./admin.controller";
 import { EmailPasswordSignInController } from "./email-password-signin.controller";
 import { EmailPasswordSignUpController } from "./email-password-signup.controller";
+import { GoogleController } from "./google.controller";
 
 const router = express.Router();
 
+/** Home route */
 router.get("/", (req, res) => {
   res.send({ message: "Authentication working..." });
 });
@@ -15,42 +18,17 @@ router.post("/sign_up", (req, res) => new EmailPasswordSignUpController(req, res
 /** Sign in with email and password */
 router.post("/sign_in", (req, res) => new EmailPasswordSignInController(req, res).signinWithEmailPassword());
 
+/** Login with google */
+router.post("/google_login", (req, res) => new GoogleController(req, res).signinWithGoogle());
+
+/** Signup with google */
+router.post("/google_signup", (req, res) => new GoogleController(req, res).signupWithGoogle());
+
 /** Is token active */
-router.post("/is_token_active", (req, res) => {
-  const token = req.body.token;
+router.post("/is_token_active", (req, res) => new EmailPasswordSignUpController(req, res).isTokenActive());
 
-  if (!token) {
-    res.status(400).json({ error: "Missing token" });
-    return;
-  }
-
-  if (isTokenExpired(token)) {
-    res.status(401).json({ error: "Token expired" });
-    return;
-  }
-
-  res.status(200).json({ message: "Token is active" });
-});
-
-/** Sign in with Google */
-router.post("/continue_with_google", async (req, res) => {
-  await signInOrSignUpWithGoogle(req, res);
-});
-
-/** Sign in with email and password */
-router.post("/sign_in_with_email_and_password", async (req, res) => {
-  await signInWithEmailAndPassword(req, res);
-});
-
-/** Sign up with email and password  */
-router.post("/sign_up_with_email_and_password", async (req, res) => {
-  await signUpWithEmailAndPassword(req, res);
-});
-
-/** Sign the ADMIN */
-router.post("/sign_in_as_admin", async (req, res) => {
-  await signInAdmin(req, res);
-});
+/** Admin login */
+router.post("/admin_signin", async (req, res) => new AdminController(req, res).signinAsAdmin());
 
 router.post("/session", (req, res) => {
   authenticateUser(req, res, () => {

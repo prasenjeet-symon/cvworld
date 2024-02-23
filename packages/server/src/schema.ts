@@ -16,3 +16,16 @@ export interface IGoogleAuthTokenResponse {
   profile: string;
   success: boolean;
 }
+
+export interface EmailOptions {
+  to: string;
+  subject: string;
+  text?: string;
+  html?: string;
+}
+
+export interface ApiEventData {
+  name: string;
+  data: any;
+  timestamp: number; // in sec
+}

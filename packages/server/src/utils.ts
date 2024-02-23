@@ -6,6 +6,31 @@ import routerAdmin from "./api-admin/index";
 import routerPublic from "./api-public";
 import routerMedia from "./api/media";
 import routerAuth from "./auth";
+import { Resend } from 'resend';
+/** 
+ * 
+ * Send email using resend
+ */
+export async function sendEmail(data: EmailOptions): Promise<string | undefined> {
+  const from = process.env.RESEND_FROM || 'onboarding@resend.dev';
+  const API_KEY = process.env.RESEND_API_KEY || '';
+  const resend = new Resend(API_KEY);
+
+  try {
+      const sendResult = await resend.emails.send({
+          from: from,
+          to: data.to,
+          subject: data.subject,
+          html: data.html || '',
+      });
+
+      if (sendResult.error) throw sendResult.error;
+      return sendResult.data?.id;
+  } catch (error: any) {
+      Logger.getInstance().logError('Error sending email : ' + error);
+      return undefined;
+  }
+}
 /** 
  * 
  * Get random user name
@@ -1397,7 +1422,7 @@ export interface Resume {
 
 import { faker } from "@faker-js/faker";
 import axios from "axios";
-import { LocationInfo } from "./schema";
+import { EmailOptions, LocationInfo } from "./schema";
 
 // Generate dummy data for the Resume interface
 export function generateDummyResume(): Resume {

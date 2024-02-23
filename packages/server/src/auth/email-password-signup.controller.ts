@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { v4 } from "uuid";
-import { Logger, PrismaClientSingleton, createJwt, getClientLocation, hashPassword, isDefined, isValidEmail } from "../utils";
+import { Logger, PrismaClientSingleton, createJwt, getClientLocation, hashPassword, isDefined, isTokenActive, isValidEmail } from "../utils";
 
 export class EmailPasswordSignUpController {
   private req: Request;
@@ -9,6 +9,31 @@ export class EmailPasswordSignUpController {
   constructor(req: Request, res: Response) {
     this.req = req;
     this.res = res;
+  }
+
+  /**
+   *
+   * Is token active
+   */
+  public async isTokenActive() {
+    const validator = new EmailPasswordSignUpValidator(this.req, this.res);
+    if (!validator.validateIsTokenActive()) {
+      Logger.getInstance().logError("isTokenActive :: Error validating method isTokenActive");
+      return;
+    }
+
+    const { token } = this.req.body;
+    const isTokenAct = isTokenActive(token);
+
+    if (!isTokenAct.isActive) {
+      this.res.status(401).json({ error: "Token expired" });
+      Logger.getInstance().logError("isTokenActive :: Token expired");
+      return;
+    }
+
+    this.res.status(200).json({ message: "Token is active" });
+    Logger.getInstance().logSuccess("isTokenActive :: Token is active");
+    return;
   }
 
   /**
@@ -116,6 +141,28 @@ class EmailPasswordSignUpValidator {
     if (!isValidEmail(email)) {
       this.res.status(400).json({ error: "Invalid email" });
       Logger.getInstance().logError("Invalid email");
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   *
+   * Validate is token active
+   */
+  public validateIsTokenActive(): boolean {
+    const { token } = this.req.body;
+
+    if (token === undefined) {
+      this.res.status(400).json({ error: "token is required" });
+      Logger.getInstance().logError("validateIsTokenActive :: token is required");
+      return false;
+    }
+
+    if (!isDefined(token)) {
+      this.res.status(400).json({ error: "token is required" });
+      Logger.getInstance().logError("validateIsTokenActive :: token is required");
       return false;
     }
 

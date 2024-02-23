@@ -78,7 +78,7 @@ export class EmailPasswordSignInController {
     }
 
     const { email } = this.req.body;
-    const { JWT_PASSWORD_RESET_TOKEN_EXPIRES_IN } = process.env;
+    const { JWT_PASSWORD_RESET_TOKEN_EXPIRES_IN, PASSWORD_RESET_BASE_LINK } = process.env;
     const prisma = PrismaClientSingleton.prisma;
 
     const user = await prisma.user.findUnique({
@@ -97,7 +97,7 @@ export class EmailPasswordSignInController {
     }
 
     const token = await createJwt(user.reference, user.email, false, JWT_PASSWORD_RESET_TOKEN_EXPIRES_IN, user.timeZone);
-
+    const link = `${PASSWORD_RESET_BASE_LINK}/?token=${token}&userId=${user.reference}`;
     // TODO: Sent email with a link to reset password where query param contains token and userId
 
     this.res.status(200).json({ message: `Password reset link has been sent to ${email}` });
@@ -164,7 +164,6 @@ export class EmailPasswordSignInController {
       timeZone: oldUser.timeZone,
       userName: oldUser.userName,
     });
-
 
     // TODO: Send email regarding password reset success
 
