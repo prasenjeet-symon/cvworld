@@ -208,6 +208,18 @@ class GoogleValidator {
   public validateSigninWithGoogle() {
     const { token } = this.req.body;
 
+    if (token === undefined) {
+      this.res.status(400).json({ error: "token is required" });
+      Logger.getInstance().logError("validateSigninWithGoogle :: token is required");
+      return false;
+    }
+
+    if (!isDefined(token)) {
+      this.res.status(400).json({ error: "token is required" });
+      Logger.getInstance().logError("validateSigninWithGoogle :: token is required");
+      return false;
+    }
+
     return true;
   }
 }

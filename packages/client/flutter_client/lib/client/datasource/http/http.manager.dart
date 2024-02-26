@@ -54,7 +54,6 @@ class ApplicationToken {
 }
 
 /// HttpManager class
-
 class HttpManager {
   static Future<ApiResponse> makeHttpRequest(String? token, String url, String method, [Map<String, dynamic>? body]) async {
     late http.Response response;
@@ -100,9 +99,8 @@ class HttpManager {
   }
 
   static Stream<ApiResponse> request(String url, String method, [Map<String, dynamic>? body]) {
-    return ApplicationToken.getInstance().observable.switchMap((tokenValue) {
-      return makeHttpRequest(tokenValue, url, method, body).asStream();
-    });
+    String? tokenValue = ApplicationToken.getInstance().getToken;
+    return makeHttpRequest(tokenValue, url, method, body).asStream();
   }
 }
 

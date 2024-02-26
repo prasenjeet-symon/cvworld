@@ -7,5 +7,7 @@ class ApplicationConfiguration {
   static const String appName = 'CV World';
   static const String appVersion = '1.0';
   static const String apiUrl = "http://localhost:8081";
+  static const double pageContentWidth = 0.7;
   // static const String apiUrl = "https://www.cvworld.me";
+  static const String subscriptionPrice = '10';
 }

@@ -14,6 +14,37 @@ export class EmailPasswordSignUpController {
 
   /**
    *
+   * Is username already taken
+   */
+  public async isUsernameTaken() {
+    const validator = new EmailPasswordSignUpValidator(this.req, this.res);
+    if (!validator.validateIsUsernameTaken()) {
+      Logger.getInstance().logError("isUsernameTaken :: Error validating method isUsernameTaken");
+      return;
+    }
+
+    const { username } = this.req.body;
+    const prisma = PrismaClientSingleton.prisma;
+
+    const user = await prisma.user.findFirst({
+      where: {
+        userName: username,
+      },
+    });
+
+    if (user) {
+      this.res.status(400).json({ error: "Username already taken" });
+      Logger.getInstance().logError("isUsernameTaken :: Username already taken");
+      return;
+    }
+
+    this.res.status(200).json({ message: "Username is available" });
+    Logger.getInstance().logSuccess("isUsernameTaken :: Username is available");
+    return;
+  }
+
+  /**
+   *
    * Is token active
    */
   public async isTokenActive() {
@@ -119,6 +150,28 @@ export class EmailPasswordSignUpController {
  */
 class EmailPasswordSignUpValidator {
   constructor(private req: Request, private res: Response) {}
+
+  /**
+   *
+   * Validate is username already taken
+   */
+  public validateIsUsernameTaken(): boolean {
+    const { username } = this.req.body;
+
+    if (username === undefined) {
+      this.res.status(400).json({ error: "username is required" });
+      Logger.getInstance().logError("username is required");
+      return false;
+    }
+
+    if (!isDefined(username)) {
+      this.res.status(400).json({ error: "username is required" });
+      Logger.getInstance().logError("username is required");
+      return false;
+    }
+
+    return true;
+  }
 
   /**
    *

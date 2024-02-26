@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cvworld/client/datasource/http/error.manager.dart';
+import 'package:cvworld/client/datasource/http/success.manager.dart';
 import 'package:cvworld/client/datasource/schema.dart';
 import 'package:cvworld/client/utils.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
@@ -89,5 +92,67 @@ class MutationModel {
   // Dispose
   void dispose() {
     _subject.close();
+  }
+}
+
+///
+///
+///
+/// Notification Manager
+class NotificationManager {
+  late BuildContext ctx;
+  static NotificationManager? _instance;
+
+  NotificationManager._() {
+    SuccessManager.getInstance().observable.listen((message) {
+      showSuccess(message);
+    });
+
+    ErrorManager.getInstance().observable.listen((message) {
+      showError(message);
+    });
+  }
+
+  static NotificationManager getInstance({required BuildContext ctx}) {
+    _instance ??= NotificationManager._();
+    _instance!.ctx = ctx;
+    return _instance!;
+  }
+
+  ///
+  ///
+  /// Show success snackbar
+  void showSuccess(String message) {
+    ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
+      backgroundColor: Colors.green,
+      duration: const Duration(seconds: 5),
+      behavior: SnackBarBehavior.floating,
+      content: Text(message, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white)),
+      action: SnackBarAction(
+        label: 'OK',
+        onPressed: () {
+          ScaffoldMessenger.of(ctx).hideCurrentSnackBar();
+        },
+      ),
+    ));
+  }
+
+  ///
+  ///
+  /// Show error snackbar
+  void showError(String message) {
+    ScaffoldMessenger.of(ctx).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 5),
+        behavior: SnackBarBehavior.floating,
+        content: Text(message, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white)),
+        action: SnackBarAction(
+            label: 'OK',
+            onPressed: () {
+              ScaffoldMessenger.of(ctx).hideCurrentSnackBar();
+            }),
+      ),
+    );
   }
 }

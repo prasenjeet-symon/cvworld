@@ -22,7 +22,7 @@ router.post("/sign_in", (req, res) => new EmailPasswordSignInController(req, res
 router.post("/forgot_password", (req, res) => new EmailPasswordSignInController(req, res).forgotPassword());
 
 /** Reset password */
-router.post("/reset_password", (req, res) => new EmailPasswordSignInController(req, res).resetPassword());  
+router.post("/reset_password", (req, res) => new EmailPasswordSignInController(req, res).resetPassword());
 
 /** Login with google */
 router.post("/google_login", (req, res) => new GoogleController(req, res).signinWithGoogle());
@@ -32,6 +32,9 @@ router.post("/google_signup", (req, res) => new GoogleController(req, res).signu
 
 /** Is token active */
 router.post("/is_token_active", (req, res) => new EmailPasswordSignUpController(req, res).isTokenActive());
+
+/** Is username already taken */
+router.post("/is_username_taken", (req, res) => new EmailPasswordSignUpController(req, res).isUsernameTaken());
 
 /** Admin login */
 router.post("/admin_signin", async (req, res) => new AdminController(req, res).signinAsAdmin());

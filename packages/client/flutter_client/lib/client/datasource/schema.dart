@@ -194,6 +194,66 @@ class ApiMutationError implements Network<ApiMutationError> {
 ///
 ///
 ///
+/// Authentication
+class Authentication implements Network<Authentication> {
+  final String token;
+  final String userId;
+  final String email;
+  final String fullName;
+  final String timeZone;
+  final String? userName;
+
+  Authentication({
+    required this.token,
+    required this.userId,
+    required this.email,
+    required this.fullName,
+    required this.timeZone,
+    required this.userName,
+  });
+
+  static Authentication fromJson(String json) {
+    Map<String, dynamic> data = jsonDecode(json);
+    return Authentication.fromRecord(data);
+  }
+
+  static Authentication fromRecord(Map<String, dynamic> record) {
+    String parsedToken = record['token'].toString();
+    String parsedUserId = record['userId'].toString();
+    String parsedEmail = record['email'].toString();
+    String parsedFullName = record['fullName'].toString();
+    String parsedTimeZone = record['timeZone'].toString();
+    String? parsedUserName = record['userName']?.toString();
+
+    return Authentication(token: parsedToken, userId: parsedUserId, email: parsedEmail, fullName: parsedFullName, timeZone: parsedTimeZone, userName: parsedUserName);
+  }
+
+  @override
+  String toJson() {
+    return jsonEncode(toRecord());
+  }
+
+  @override
+  Map<String, dynamic> toRecord() {
+    return {
+      'token': token,
+      'userId': userId,
+      'email': email,
+      'fullName': fullName,
+      'timeZone': timeZone,
+      'userName': userName,
+    };
+  }
+
+  @override
+  Authentication deepCopy() {
+    return Authentication.fromRecord(toRecord());
+  }
+}
+
+///
+///
+///
 /// Feedback
 class Feedback implements Network<Feedback> {
   final int id;
