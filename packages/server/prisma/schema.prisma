@@ -71,6 +71,8 @@ model User {
   updatedAt      DateTime      @default(now())
   boughtTemplate TemplateBuy[]
   isDeleted      Boolean       @default(false)
+
+  favouriteTemplates ResumeTemplateMarketplace[]
 }
 
 // subscription 
@@ -391,10 +393,11 @@ model ResumeTemplateMarketplace {
   name               String   @unique // Unique name of the premium template
   displayName        String   @default("")
   displayDescription String   @default("")
-  price              Float // amount in paise
+  price              Float // amount in paisa
   previewImgUrl      String
   createdAt          DateTime @default(now())
   updatedAt          DateTime @default(now())
+  favouriteOf        User[]
 }
 
 enum CardType {

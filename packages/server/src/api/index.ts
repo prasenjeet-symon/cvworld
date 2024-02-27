@@ -4,9 +4,32 @@ import path from "path";
 import { Order, PrismaClientSingleton, Resume, Subscription, generateDummyResume, generateImage, generatePDF, sanitizePrismaData } from "../utils";
 import { buyTemplate } from "../views/buy-template";
 import { UserController } from "./user.controller";
+import { TemplateController } from "./template.controller";
 const router = express.Router();
 
+/** Home route */
 router.get("/", (req, res) => res.send("Hello World!"));
+
+/** Get user */
+router.get("/user", (req, res) => new UserController(req, res).getUser());
+
+/** Delete user */
+router.delete("/user", (req, res) => new UserController(req, res).delete());
+
+/** Get user's transactions */
+router.get("/user/transactions", (req, res) => new UserController(req, res).getTransactions());
+
+/** Get user's subscription */
+router.get("/user/subscription", (req, res) => new UserController(req, res).getSubscription());
+
+/** Get application's templates */
+router.get("/templates", (req, res) => new TemplateController(req, res).getTemplates());
+
+/** Add template as favorite */
+router.post("/user/favorite", (req, res) => new TemplateController(req, res).markTemplateFavorite());
+
+/** Get user's favorite templates */
+router.get("/user/favorites", (req, res) => new UserController(req, res).getFavoriteTemplates());
 
 /** Update the resume */
 router.post("/update_resume", async (req, res) => {
