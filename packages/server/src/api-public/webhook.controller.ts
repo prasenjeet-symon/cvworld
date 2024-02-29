@@ -571,8 +571,8 @@ export class WebhookController {
       },
       data: {
         subscription: {
-          delete: true,
-        },
+          delete:true
+        }
       },
     });
 

@@ -23,6 +23,15 @@ class ApplicationMutationData {
 enum ApplicationMutationIdentifier {
   CREATE_FEEDBACK,
   UPDATE_FEEDBACK,
+  ADD_FAVORITE,
+  REMOVE_FAVORITE,
+  DELETE_USER,
+  UPDATE_USER,
+  SUBSCRIPTION_STATUS_START_LISTENING,
+  CANCEL_SUBSCRIPTION,
+  ADD_DEFAULT_TEMPLATE,
+  REMOVE_DEFAULT_TEMPLATE,
+  REFRESH_TRANSACTION
 }
 
 ///
@@ -54,9 +63,7 @@ class MutationModelData {
 ///
 ///
 ///
-enum MutationModelIdentifier {
-  FEEDBACK,
-}
+enum MutationModelIdentifier { FEEDBACK, USER, TRANSACTION, SUBSCRIPTION, TEMPLATE, FAVORITE, SUBSCRIPTION_PLAN }
 
 ///
 ///
@@ -360,5 +367,466 @@ class Feedback implements Network<Feedback> {
     } catch (e) {
       onError(e);
     }
+  }
+}
+
+///
+///
+///
+/// User
+class User implements Network<User> {
+  String email;
+  String fullName;
+  String? profilePicture;
+  String timeZone;
+  String reference;
+  String userName;
+  bool isEmailVerified;
+  bool isDeleted;
+
+  // Default value
+  double fileUploadProgress = 0.00;
+  Uint8List? profilePictureFile;
+  String? profilePictureFileName;
+
+  User({
+    required this.email,
+    required this.fullName,
+    required this.profilePicture,
+    required this.timeZone,
+    required this.reference,
+    required this.userName,
+    required this.isEmailVerified,
+    required this.isDeleted,
+  });
+
+  static User fromJson(String json) {
+    Map<String, dynamic> data = jsonDecode(json);
+    return User.fromRecord(data);
+  }
+
+  static User fromRecord(Map<String, dynamic> record) {
+    String parsedEmail = record['email'].toString();
+    String parsedFullName = record['fullName'].toString();
+    String? parsedProfilePicture = record['profilePicture']?.toString();
+    String parsedTimeZone = record['timeZone'].toString();
+    String parsedReference = record['reference'].toString();
+    String parsedUserName = record['userName'].toString();
+    bool parsedIsEmailVerified = bool.parse(record['isEmailVerified'].toString());
+    bool parsedIsDeleted = bool.parse(record['isDeleted'].toString());
+
+    return User(
+      email: parsedEmail,
+      fullName: parsedFullName,
+      profilePicture: parsedProfilePicture,
+      timeZone: parsedTimeZone,
+      reference: parsedReference,
+      userName: parsedUserName,
+      isEmailVerified: parsedIsEmailVerified,
+      isDeleted: parsedIsDeleted,
+    );
+  }
+
+  @override
+  String toJson() {
+    return jsonEncode(toRecord());
+  }
+
+  @override
+  Map<String, dynamic> toRecord() {
+    return {
+      'email': email,
+      'fullName': fullName,
+      'profilePicture': profilePicture,
+      'timeZone': timeZone,
+      'reference': reference,
+      'userName': userName,
+      'isEmailVerified': isEmailVerified,
+      'isDeleted': isDeleted,
+    };
+  }
+
+  @override
+  User deepCopy() {
+    return User.fromRecord(toRecord());
+  }
+
+  // Profile picture upload
+  Future<void> uploadProfilePicture(Function(double progress) onProgress, Function(dynamic error) onError) async {
+    try {
+      fileUploadProgress = 50.00;
+      onProgress(fileUploadProgress);
+      ApiResponse response = await singleCall(NetworkMediaApi().uploadProfilePicture(profilePictureFile, profilePictureFileName ?? '${const Uuid().v4()}.jpg'));
+      fileUploadProgress = 100;
+      profilePicture = (response.data as ApiMutationSuccess).message;
+      onProgress(fileUploadProgress);
+    } catch (e) {
+      onError(e);
+    }
+  }
+}
+
+///
+///
+///
+/// User's Subscription
+class UserSubscription implements Network<UserSubscription> {
+  int id;
+  String subscriptionID;
+  String subscriptionLink;
+  String planName;
+  bool isActive;
+  DateTime expireOn;
+  DateTime activatedOn;
+  String cycle;
+  double discount;
+  double basePrice;
+  DateTime createdAt;
+  DateTime updatedAt;
+
+  UserSubscription({
+    required this.id,
+    required this.subscriptionID,
+    required this.subscriptionLink,
+    required this.planName,
+    required this.isActive,
+    required this.expireOn,
+    required this.activatedOn,
+    required this.cycle,
+    required this.discount,
+    required this.basePrice,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  static UserSubscription fromJson(String json) {
+    Map<String, dynamic> data = jsonDecode(json);
+    return UserSubscription.fromRecord(data);
+  }
+
+  static UserSubscription fromRecord(Map<String, dynamic> record) {
+    int parsedId = int.parse(record['id'].toString());
+    String parsedSubscriptionID = record['subscriptionID'].toString();
+    String parsedSubscriptionLink = record['subscriptionLink'].toString();
+    String parsedPlanName = record['planName'].toString();
+    bool parsedIsActive = bool.parse(record['isActive'].toString());
+    DateTime parsedExpireOn = DateTime.parse(record['expireOn']);
+    DateTime parsedActivatedOn = DateTime.parse(record['activatedOn']);
+    String parsedCycle = record['cycle'].toString();
+    double parsedDiscount = double.parse(record['discount'].toString());
+    double parsedBasePrice = double.parse(record['basePrice'].toString());
+    DateTime parsedCreatedAt = DateTime.parse(record['createdAt']);
+    DateTime parsedUpdatedAt = DateTime.parse(record['updatedAt']);
+
+    return UserSubscription(
+      id: parsedId,
+      subscriptionID: parsedSubscriptionID,
+      subscriptionLink: parsedSubscriptionLink,
+      planName: parsedPlanName,
+      isActive: parsedIsActive,
+      expireOn: parsedExpireOn,
+      activatedOn: parsedActivatedOn,
+      cycle: parsedCycle,
+      discount: parsedDiscount,
+      basePrice: parsedBasePrice,
+      createdAt: parsedCreatedAt,
+      updatedAt: parsedUpdatedAt,
+    );
+  }
+
+  @override
+  String toJson() {
+    return jsonEncode(toRecord());
+  }
+
+  @override
+  Map<String, dynamic> toRecord() {
+    return {
+      'id': id,
+      'subscriptionID': subscriptionID,
+      'subscriptionLink': subscriptionLink,
+      'planName': planName,
+      'isActive': isActive,
+      'expireOn': expireOn.toUtc().toIso8601String(),
+      'activatedOn': activatedOn.toUtc().toIso8601String(),
+      'cycle': cycle,
+      'discount': discount,
+      'basePrice': basePrice,
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
+    };
+  }
+
+  @override
+  UserSubscription deepCopy() {
+    return UserSubscription.fromRecord(toRecord());
+  }
+}
+
+///
+///
+/// User's transaction
+class UserTransaction implements Network<UserTransaction> {
+  int id;
+  String orderId;
+  int amount;
+  int amountPaid;
+  int amountDue;
+  String currency;
+  String status;
+  bool isInternational;
+  String method;
+  String templateName;
+  double templatePrice;
+  DateTime createdAt;
+  DateTime updatedAt;
+
+  UserTransaction({
+    required this.id,
+    required this.orderId,
+    required this.amount,
+    required this.amountPaid,
+    required this.amountDue,
+    required this.currency,
+    required this.status,
+    required this.isInternational,
+    required this.method,
+    required this.templateName,
+    required this.templatePrice,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  static UserTransaction fromJson(String json) {
+    Map<String, dynamic> data = jsonDecode(json);
+    return UserTransaction.fromRecord(data);
+  }
+
+  static UserTransaction fromRecord(Map<String, dynamic> record) {
+    int parsedId = int.parse(record['id'].toString());
+    String parsedOrderId = record['orderId'].toString();
+    int parsedAmount = int.parse(record['amount'].toString());
+    int parsedAmountPaid = int.parse(record['amountPaid'].toString());
+    int parsedAmountDue = int.parse(record['amountDue'].toString());
+    String parsedCurrency = record['currency'].toString();
+    String parsedStatus = record['status'].toString();
+    bool parsedIsInternational = bool.parse(record['isInternational'].toString());
+    String parsedMethod = record['method'].toString();
+    String parsedTemplateName = record['templateName'].toString();
+    double parsedTemplatePrice = double.parse(record['templatePrice'].toString());
+    DateTime parsedCreatedAt = DateTime.parse(record['createdAt']);
+    DateTime parsedUpdatedAt = DateTime.parse(record['updatedAt']);
+
+    return UserTransaction(
+      id: parsedId,
+      orderId: parsedOrderId,
+      amount: parsedAmount,
+      amountPaid: parsedAmountPaid,
+      amountDue: parsedAmountDue,
+      currency: parsedCurrency,
+      status: parsedStatus,
+      isInternational: parsedIsInternational,
+      method: parsedMethod,
+      templateName: parsedTemplateName,
+      templatePrice: parsedTemplatePrice,
+      createdAt: parsedCreatedAt,
+      updatedAt: parsedUpdatedAt,
+    );
+  }
+
+  @override
+  String toJson() {
+    return jsonEncode(toRecord());
+  }
+
+  @override
+  Map<String, dynamic> toRecord() {
+    return {
+      'id': id,
+      'orderId': orderId,
+      'amount': amount,
+      'amountPaid': amountPaid,
+      'amountDue': amountDue,
+      'currency': currency,
+      'status': status,
+      'isInternational': isInternational,
+      'method': method,
+      'templateName': templateName,
+      'templatePrice': templatePrice,
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
+    };
+  }
+
+  @override
+  UserTransaction deepCopy() {
+    return UserTransaction.fromRecord(toRecord());
+  }
+}
+
+///
+///
+///
+/// Application template
+class Template implements Network<Template> {
+  int id;
+  String name;
+  String displayName;
+  String displayDescription;
+  double price; // Price in paisa
+  String previewImgUrl;
+  DateTime createdAt;
+  DateTime updatedAt;
+
+  // Default value
+  bool isMyFavourite = false;
+  bool isMyDefault = false;
+
+  Template({
+    required this.id,
+    required this.name,
+    required this.displayName,
+    required this.displayDescription,
+    required this.price,
+    required this.previewImgUrl,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  static Template fromJson(String json) {
+    Map<String, dynamic> data = jsonDecode(json);
+    return Template.fromRecord(data);
+  }
+
+  static Template fromRecord(Map<String, dynamic> record) {
+    int parsedId = int.parse(record['id'].toString());
+    String parsedName = record['name'].toString();
+    String parsedDisplayName = record['displayName'].toString();
+    String parsedDisplayDescription = record['displayDescription'].toString();
+    double parsedPrice = double.parse(record['price'].toString());
+    String parsedPreviewImgUrl = record['previewImgUrl'].toString();
+    DateTime parsedCreatedAt = DateTime.parse(record['createdAt']);
+    DateTime parsedUpdatedAt = DateTime.parse(record['updatedAt']);
+
+    return Template(
+      id: parsedId,
+      name: parsedName,
+      displayName: parsedDisplayName,
+      displayDescription: parsedDisplayDescription,
+      price: parsedPrice,
+      previewImgUrl: parsedPreviewImgUrl,
+      createdAt: parsedCreatedAt,
+      updatedAt: parsedUpdatedAt,
+    );
+  }
+
+  @override
+  String toJson() {
+    return jsonEncode(toRecord());
+  }
+
+  @override
+  Map<String, dynamic> toRecord() {
+    return {
+      'id': id,
+      'name': name,
+      'displayName': displayName,
+      'displayDescription': displayDescription,
+      'price': price,
+      'previewImgUrl': previewImgUrl,
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
+    };
+  }
+
+  @override
+  Template deepCopy() {
+    return Template.fromRecord(toRecord());
+  }
+}
+
+///
+///
+/// Subscription
+class Subscription implements Network<Subscription> {
+  int id;
+  String planID;
+  String name;
+  double price;
+  String period;
+  int interval;
+  String currency;
+  String description;
+  DateTime createdAt;
+  DateTime updatedAt;
+
+  Subscription({
+    required this.id,
+    required this.planID,
+    required this.name,
+    required this.price,
+    required this.period,
+    required this.interval,
+    required this.currency,
+    required this.description,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  static Subscription fromJson(String json) {
+    Map<String, dynamic> data = jsonDecode(json);
+    return Subscription.fromRecord(data);
+  }
+
+  static Subscription fromRecord(Map<String, dynamic> record) {
+    int parsedId = int.parse(record['id'].toString());
+    String parsedPlanID = record['planID'].toString();
+    String parsedName = record['name'].toString();
+    double parsedPrice = double.parse(record['price'].toString());
+    String parsedPeriod = record['period'].toString();
+    int parsedInterval = int.parse(record['interval'].toString());
+    String parsedCurrency = record['currency'].toString();
+    String parsedDescription = record['description'].toString();
+    DateTime parsedCreatedAt = DateTime.parse(record['createdAt']);
+    DateTime parsedUpdatedAt = DateTime.parse(record['updatedAt']);
+
+    return Subscription(
+      id: parsedId,
+      planID: parsedPlanID,
+      name: parsedName,
+      price: parsedPrice,
+      period: parsedPeriod,
+      interval: parsedInterval,
+      currency: parsedCurrency,
+      description: parsedDescription,
+      createdAt: parsedCreatedAt,
+      updatedAt: parsedUpdatedAt,
+    );
+  }
+
+  @override
+  String toJson() {
+    return jsonEncode(toRecord());
+  }
+
+  @override
+  Map<String, dynamic> toRecord() {
+    return {
+      'id': id,
+      'planID': planID,
+      'name': name,
+      'price': price,
+      'period': period,
+      'interval': interval,
+      'currency': currency,
+      'description': description,
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt.toUtc().toIso8601String(),
+    };
+  }
+
+  @override
+  Subscription deepCopy() {
+    return Subscription.fromRecord(toRecord());
   }
 }

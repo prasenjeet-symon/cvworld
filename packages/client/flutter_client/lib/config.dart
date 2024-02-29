@@ -10,4 +10,5 @@ class ApplicationConfiguration {
   static const double pageContentWidth = 0.7;
   // static const String apiUrl = "https://www.cvworld.me";
   static const String subscriptionPrice = '10';
+  static const int subscriptionWaitingTime = 250; // sec
 }

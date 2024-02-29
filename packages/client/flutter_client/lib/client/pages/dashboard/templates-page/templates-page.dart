@@ -1,3 +1,7 @@
+import 'package:cvworld/client/datasource/network.api.dart';
+import 'package:cvworld/client/datasource/schema.dart';
+import 'package:cvworld/client/pages/dashboard/market-place/market-place.dart';
+import 'package:cvworld/client/pages/dashboard/templates-page/templates-page.controller.dart';
 import 'package:cvworld/client/pages/dashboard/templates-page/templates-page.mobile.dart';
 import 'package:cvworld/client/pages/dashboard/templates-page/templates-page.web.dart';
 import 'package:cvworld/client/utils.dart';
@@ -24,8 +28,42 @@ class TemplatesPage extends StatelessWidget {
 ///
 ///
 /// Template item free
-class TemplateItem extends StatelessWidget {
-  const TemplateItem({super.key});
+class TemplateItem extends StatefulWidget {
+  final Template template;
+
+  const TemplateItem({super.key, required this.template});
+
+  @override
+  State<TemplateItem> createState() => _TemplateItemState();
+}
+
+class _TemplateItemState extends State<TemplateItem> {
+  TemplatePageController controller = TemplatePageController();
+
+  // Open sample image in browser
+  _openSample() {
+    openLinkInBrowser(NetworkApi.publicResource(widget.template.previewImgUrl));
+  }
+
+  // Add to like
+  void _addToLike() {
+    controller.addToLike(widget.template);
+  }
+
+  // Remove from like
+  void _removeFromLike() {
+    controller.removeFromLike(widget.template);
+  }
+
+  // Add to default
+  void _addToDefault() {
+    controller.addToDefault(widget.template);
+  }
+
+  // Remove from default
+  void _removeFromDefault() {
+    controller.removeFromDefault(widget.template);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,42 +71,67 @@ class TemplateItem extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(10),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Stack(
               children: [
                 Container(
-                  height: 250,
+                  height: 245,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
-                    image: const DecorationImage(image: NetworkImage('https://picsum.photos/200'), fit: BoxFit.cover),
+                    image: DecorationImage(image: NetworkImage(NetworkApi.publicResource(widget.template.previewImgUrl)), fit: BoxFit.cover),
                   ),
                 ),
-                Positioned(
-                  child: Chip(backgroundColor: Colors.green, label: Text('Premium', style: TextStyle(color: Colors.white))),
-                  top: 10,
-                  right: 10,
-                ),
-                // Mark as favorite
-                Positioned(
-                  child: IconButton(onPressed: () {}, icon: const Icon(Icons.favorite_border, color: Colors.white)),
-                  top: 10,
-                  left: 10,
-                ),
-                // Open to browser
-                Positioned(
-                  child: IconButton(onPressed: () {}, icon: const Icon(Icons.open_in_browser, color: Colors.white)),
-                  top: 10,
-                  left: 50,
-                )
+                formatAsIndianRupee(widget.template.price) != formatAsIndianRupee(0.00)
+                    ? const Positioned(
+                        top: 10,
+                        right: 10,
+                        child: Chip(backgroundColor: Colors.green, label: Text('Premium', style: TextStyle(color: Colors.white))),
+                      )
+                    : Container(),
               ],
             ),
             // Price bold
             Container(
               margin: const EdgeInsets.fromLTRB(0, 10, 0, 5),
-              child: Text('₹ 50.00', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.green), textAlign: TextAlign.center),
+              child: Row(
+                children: [
+                  Text(formatAsIndianRupee(widget.template.price), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.green), textAlign: TextAlign.center),
+                  const Expanded(child: SizedBox()),
+                  widget.template.isMyFavourite
+                      ? IconButton(
+                          onPressed: () {
+                            _removeFromLike();
+                          },
+                          icon: const Icon(Icons.favorite, color: Colors.red))
+                      : IconButton(
+                          onPressed: () {
+                            _addToLike();
+                          },
+                          icon: const Icon(Icons.favorite_border, color: Colors.red)),
+                  IconButton(
+                    onPressed: () {
+                      _openSample();
+                    },
+                    icon: const Icon(Icons.open_in_browser, color: Colors.blue),
+                  ),
+                  widget.template.isMyDefault
+                      ? IconButton(
+                          onPressed: () {
+                            _removeFromDefault();
+                          },
+                          icon: const Icon(Icons.pin_drop, color: Colors.blue))
+                      : IconButton(
+                          onPressed: () {
+                            _addToDefault();
+                          },
+                          icon: const Icon(Icons.pin_drop_outlined, color: Colors.blue)),
+                ],
+              ),
             ),
             // Name of template
-            Text('Template One', style: TextStyle(fontSize: 15, color: Colors.grey.shade700), textAlign: TextAlign.center),
+            Text(widget.template.displayName, style: TextStyle(fontSize: 15, color: Colors.grey.shade700), textAlign: TextAlign.start),
           ],
         ),
       ),
@@ -80,9 +143,16 @@ class TemplateItem extends StatelessWidget {
 ///
 ///
 /// List all templates
-class TemplatesPageList extends StatelessWidget {
-  const TemplatesPageList({super.key});
+class TemplatesPageList extends StatefulWidget {
+  final List<Template> templates;
 
+  const TemplatesPageList({super.key, required this.templates});
+
+  @override
+  State<TemplatesPageList> createState() => _TemplatesPageListState();
+}
+
+class _TemplatesPageListState extends State<TemplatesPageList> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -93,14 +163,7 @@ class TemplatesPageList extends StatelessWidget {
           return GridView.count(
             crossAxisCount: MediaQuery.of(context).size.width > Constants.breakPoint ? 3 : 1,
             shrinkWrap: true,
-            children: [
-              TemplateItem(),
-              TemplateItem(),
-              TemplateItem(),
-              TemplateItem(),
-              TemplateItem(),
-              TemplateItem(),
-            ],
+            children: [...widget.templates.map((e) => TemplateItem(key: ValueKey(e.name), template: e))],
           );
         },
       ),

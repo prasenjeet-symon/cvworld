@@ -3,8 +3,10 @@ import { rmSync } from "fs";
 import path from "path";
 import { Order, PrismaClientSingleton, Resume, Subscription, generateDummyResume, generateImage, generatePDF, sanitizePrismaData } from "../utils";
 import { buyTemplate } from "../views/buy-template";
-import { UserController } from "./user.controller";
 import { TemplateController } from "./template.controller";
+import { UserController } from "./user.controller";
+import { UserMediaController } from "./user.media.controller";
+import { SubscriptionPlanController } from "./subscription-plan.controller";
 const router = express.Router();
 
 /** Home route */
@@ -16,20 +18,35 @@ router.get("/user", (req, res) => new UserController(req, res).getUser());
 /** Delete user */
 router.delete("/user", (req, res) => new UserController(req, res).delete());
 
+/** Update user */
+router.put("/user", (req, res) => new UserController(req, res).updateUser());
+
 /** Get user's transactions */
-router.get("/user/transactions", (req, res) => new UserController(req, res).getTransactions());
+router.get("/user/transaction", (req, res) => new UserController(req, res).getTransactions());
 
 /** Get user's subscription */
 router.get("/user/subscription", (req, res) => new UserController(req, res).getSubscription());
 
 /** Get application's templates */
-router.get("/templates", (req, res) => new TemplateController(req, res).getTemplates());
-
+router.get("/template", (req, res) => new TemplateController(req, res).getTemplates());
+ 
 /** Add template as favorite */
 router.post("/user/favorite", (req, res) => new TemplateController(req, res).markTemplateFavorite());
 
+/** Remove template as favorite */
+router.delete("/user/favorite", (req, res) => new TemplateController(req, res).removeTemplateFavorite());
+
 /** Get user's favorite templates */
-router.get("/user/favorites", (req, res) => new UserController(req, res).getFavoriteTemplates());
+router.get("/user/favorite", (req, res) => new UserController(req, res).getFavoriteTemplates());
+
+/** Upload profile picture */
+router.post("/user/profile_picture", UserMediaController.profilePictureStorage(), (req, res) => new UserMediaController(req, res).updateProfilePicture());
+
+/** Get application subscription plan */
+router.get("/subscription", (req, res) => new SubscriptionPlanController(req, res).getSubscriptionPlan());
+
+/** Cancel user's subscription */
+router.delete("/user/subscription", (req, res) => new UserController(req, res).cancelSubscription());
 
 /** Update the resume */
 router.post("/update_resume", async (req, res) => {
@@ -1594,98 +1611,6 @@ router.post("/generate_order", async (req, res) => {
 /**
  *
  *
- * Create subscription
- */
-router.post("/create_subscription", async (req, res) => {
-  if (!("planName" in req.body && req.body.planName)) {
-    res.status(400).json({ message: "planName field is missing" });
-    return;
-  }
-
-  const email = res.locals.email;
-  const planName = req.body.planName;
-  const prisma = PrismaClientSingleton.prisma;
-  const razorpayKeyID = process.env.RAZORPAY_KEY_ID;
-  const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET;
-  const Razorpay = require("razorpay");
-  const instance = new Razorpay({ key_id: razorpayKeyID, key_secret: razorpayKeySecret });
-
-  // if already created then just return the link
-  const oldSubscription = await prisma.user.findUnique({
-    where: {
-      email: email,
-    },
-    select: {
-      subscription: true,
-    },
-  });
-
-  if (oldSubscription && oldSubscription.subscription) {
-    res.json(oldSubscription.subscription.subscriptionLink);
-    return;
-  }
-
-  const targetPlan = await prisma.admin.findUnique({
-    where: {
-      email: process.env.ADMIN_EMAIL || "",
-    },
-    select: {
-      premiumTemplatePlans: {
-        where: {
-          name: planName,
-        },
-      },
-    },
-  });
-
-  if (!(targetPlan && targetPlan.premiumTemplatePlans.length !== 0)) {
-    res.status(500).json({ message: "plan not found" });
-    return;
-  }
-
-  const choosenPlan = targetPlan.premiumTemplatePlans[0];
-
-  const subscriptionCreated: Subscription = await instance.subscriptions.create({
-    plan_id: choosenPlan.planID,
-    customer_notify: 1,
-    quantity: 1,
-    total_count: 12,
-    addons: [],
-    notes: {
-      email: email,
-      planId: choosenPlan.planID,
-      planName: planName,
-    },
-  });
-
-  // add to the database
-  await prisma.user.update({
-    where: {
-      email: email,
-    },
-    data: {
-      subscription: {
-        create: {
-          activatedOn: new Date(),
-          basePrice: +choosenPlan.price, // in paisa
-          cycle: "MONTHLY",
-          discount: 0,
-          expireOn: new Date(),
-          isActive: false,
-          planName: planName,
-          subscriptionID: subscriptionCreated.id,
-          subscriptionLink: subscriptionCreated.short_url,
-        },
-      },
-    },
-  });
-
-  res.json(subscriptionCreated.short_url);
-});
-
-/**
- *
- *
  * Get templates for marketplace
  */
 router.post("/get_marketplace_templates", async (req, res) => {
@@ -1879,33 +1804,5 @@ router.get("/template/:name", async (req, res) => {
   res.set("Content-Type", "text/html");
   res.send(buyTemplate(marketPlaceTemplate.previewImgUrl, order.amount, order.id, user.fullName, "", user.email, hostName));
 });
-
-/** Get single the premium plan */
-router.post("/get_premium_plan", async (req, res) => {
-  const email = res.locals.email;
-  const prisma = PrismaClientSingleton.prisma;
-
-  const targetPlan = await prisma.admin.findUnique({
-    where: {
-      email: process.env.ADMIN_EMAIL || "",
-    },
-    select: {
-      premiumTemplatePlans: true,
-    },
-  });
-
-  if (!(targetPlan && targetPlan.premiumTemplatePlans.length !== 0)) {
-    res.status(500).json({ message: "plan not found" });
-    return;
-  }
-
-  res.json(targetPlan.premiumTemplatePlans[0]);
-});
-
-/**
- *
- * Delete user
- */
-router.post("/delete_user", async (req, res) => new UserController(req, res).delete());
 
 export default router;

@@ -19,7 +19,7 @@ model Admin {
   profilePicture       String?
   password             String
   reference            String
-  premiumTemplatePlans PremiumTemplatePlans[]
+  premiumTemplatePlans PremiumTemplatePlans?
   createdAt            DateTime               @default(now())
   updatedAt            DateTime               @default(now())
   isDeleted            Boolean                @default(false)
@@ -36,7 +36,7 @@ model PremiumTemplatePlans {
   currency    String
   description String
   admin       Admin             @relation(fields: [adminId], references: [id])
-  adminId     Int
+  adminId     Int @unique
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @default(now())
 }
@@ -49,16 +49,18 @@ model User {
   profilePicture  String?
   password        String?
   timeZone        String  @default("IST")
-  reference       String  @unique
+  reference       String  @unique // This is unique for every user
   userName        String?
   isEmailVerified Boolean @default(false)
 
   subscription        Subscription?
+  
   personalDetails     PersonalDetails?
   hobby               Hobby?
   professionalSummary ProfessionalSummary?
 
   resumes             Resumes[]
+
   skills              Skills[]
   languages           Languages[]
   courses             Courses[]
@@ -78,7 +80,7 @@ model User {
 // subscription 
 model Subscription {
   id               Int                       @id @default(autoincrement())
-  subscriptionID   String
+  subscriptionID   String  // This is unique for every subscription
   subscriptionLink String
   planName         String
   isActive         Boolean
@@ -98,7 +100,7 @@ model SubscriptionTransaction {
   id             Int                      @id @default(autoincrement())
   amount         Float
   method         PaymentMethod
-  eventID        String                   @unique
+  eventID        String                   @unique // This is unique for every transaction
   card           CardPaymentSubscription?
   upi            UPIPaymentSubscription?
   subscription   Subscription             @relation(fields: [subscriptionId], references: [id])
@@ -137,7 +139,7 @@ enum SubscriptionCycle {
 
 // for the resume
 model Resumes {
-  id           Int      @id @default(autoincrement())
+  id           Int      @id @default(autoincrement()) // Mutation can happen only on server , use this as unique key
   resume       Json
   imageUrl     String
   pdfUrl       String
@@ -150,7 +152,7 @@ model Resumes {
 
 // for the user personal details
 model PersonalDetails {
-  id             Int      @id @default(autoincrement())
+  id             Int      @id @default(autoincrement()) // One to one relation , use this as unique key
   profession     String
   name           String
   email          String
@@ -171,7 +173,7 @@ model PersonalDetails {
 
 // for the user hobbies
 model Hobby {
-  id        Int      @id @default(autoincrement())
+  id        Int      @id @default(autoincrement()) // One to one relation , use this as unique key
   hobby     String
   user      User     @relation(fields: [userId], references: [id])
   userId    Int      @unique
@@ -182,6 +184,7 @@ model Hobby {
 // for the user skills 
 model Skills {
   id        Int      @id @default(autoincrement())
+  identifier String   @unique @db.VarChar(255)
   skill     String
   level     Float // in the percentage
   user      User     @relation(fields: [userId], references: [id])
@@ -193,6 +196,7 @@ model Skills {
 // for the user lan
 model Languages {
   id        Int      @id @default(autoincrement())
+  identifier String   @unique @db.VarChar(255)
   language  String
   level     Float
   user      User     @relation(fields: [userId], references: [id])
@@ -204,6 +208,7 @@ model Languages {
 // for the user courses
 model Courses {
   id          Int      @id @default(autoincrement())
+  identifier String   @unique @db.VarChar(255)
   course      String
   institution String
   startDate   DateTime
@@ -217,6 +222,7 @@ model Courses {
 // for the user educations
 model Educations {
   id          Int      @id @default(autoincrement())
+  identifier  String   @unique @db.VarChar(255)
   school      String
   startDate   DateTime
   endDate     DateTime
@@ -232,6 +238,7 @@ model Educations {
 // for the user employment history
 model EmploymentHistories {
   id          Int      @id @default(autoincrement())
+  identifier  String   @unique @db.VarChar(255)
   job         String
   employer    String
   startDate   DateTime
@@ -247,6 +254,7 @@ model EmploymentHistories {
 // for the list of internships 
 model Internships {
   id          Int      @id @default(autoincrement())
+  identifier  String   @unique @db.VarChar(255)
   job         String
   employer    String
   startDate   DateTime
@@ -261,7 +269,7 @@ model Internships {
 
 // for the professional summery
 model ProfessionalSummary {
-  id        Int      @id @default(autoincrement())
+  id        Int      @id @default(autoincrement()) // One to one relation , use this as unique key
   profile   String
   user      User     @relation(fields: [userId], references: [id])
   userId    Int      @unique
@@ -272,6 +280,7 @@ model ProfessionalSummary {
 // for the list of user links
 model Links {
   id        Int      @id @default(autoincrement())
+  identifier String   @unique @db.VarChar(255)
   title     String
   url       String
   user      User     @relation(fields: [userId], references: [id])
@@ -317,7 +326,7 @@ model TemplateBuy {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @default(now())
   transaction Transaction?
-  eventID     String       @unique
+  eventID     String       @unique // This is unique for every template buy
 }
 
 // for the transaction depend on the template buy
@@ -326,7 +335,7 @@ model Transaction {
   template        TemplateBuy        @relation(fields: [templateId], references: [id])
   templateId      Int                @unique
   orderId         String
-  amount          Int
+  amount          Int // In paise
   amountPaid      Int
   amountDue       Int
   currency        String

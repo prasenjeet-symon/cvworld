@@ -1,5 +1,8 @@
+import 'package:cvworld/client/datasource/schema.dart';
+import 'package:cvworld/client/pages/dashboard/market-place/market-place.dart';
 import 'package:cvworld/client/pages/dashboard/transaction-page/transaction-page.mobile.dart';
 import 'package:cvworld/client/pages/dashboard/transaction-page/transaction-page.web.dart';
+import 'package:cvworld/client/pages/make-cv-pages/text-input.dart';
 import 'package:cvworld/client/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -25,7 +28,9 @@ class TransactionPage extends StatelessWidget {
 ///
 /// Transaction list item
 class TransactionListItem extends StatelessWidget {
-  const TransactionListItem({super.key});
+  final UserTransaction transaction;
+
+  const TransactionListItem({super.key, required this.transaction});
 
   @override
   Widget build(BuildContext context) {
@@ -49,17 +54,17 @@ class TransactionListItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text('Template One 123', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text(transaction.templateName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 5),
                   RichText(
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: 'Transaction Id: ',
+                          text: 'Order Id: ',
                           style: TextStyle(fontSize: 15, color: Colors.grey.shade700),
                         ),
                         TextSpan(
-                          text: 'hsdfghsdfghsdf',
+                          text: transaction.orderId,
                           style: TextStyle(fontSize: 15, color: Colors.grey.shade700, fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -67,11 +72,11 @@ class TransactionListItem extends StatelessWidget {
                   ),
                 ],
               ),
-              Expanded(child: SizedBox()),
+              const Expanded(child: SizedBox()),
               Column(children: [
-                TextButton(onPressed: () {}, child: Text('₹ 100.00', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green))),
+                TextButton(onPressed: () {}, child: Text(formatAsIndianRupee(double.parse(transaction.amountPaid.toString())), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green))),
                 const SizedBox(height: 5),
-                Text('10/10/2022', style: TextStyle(fontSize: 13, color: Colors.grey.shade700)),
+                Text(formatDateTime(transaction.createdAt), style: TextStyle(fontSize: 13, color: Colors.grey.shade700)),
               ]),
             ],
           ),
@@ -86,7 +91,9 @@ class TransactionListItem extends StatelessWidget {
 ///
 /// List all the transactions
 class TransactionList extends StatelessWidget {
-  const TransactionList({super.key});
+  final List<UserTransaction> transactions;
+
+  const TransactionList({super.key, required this.transactions});
 
   @override
   Widget build(BuildContext context) {
@@ -95,10 +102,7 @@ class TransactionList extends StatelessWidget {
       width: double.infinity,
       child: Column(
         children: [
-          TransactionListItem(),
-          TransactionListItem(),
-          TransactionListItem(),
-          TransactionListItem(),
+          ...transactions.map((transaction) => TransactionListItem(key: ValueKey(transaction.orderId), transaction: transaction)),
         ],
       ),
     );

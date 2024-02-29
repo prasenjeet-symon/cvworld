@@ -7,6 +7,7 @@ import 'package:cvworld/client/datasource/schema.dart';
 import 'package:cvworld/client/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
 import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
@@ -130,6 +131,7 @@ class NotificationManager {
       content: Text(message, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white)),
       action: SnackBarAction(
         label: 'OK',
+        textColor: Colors.white,
         onPressed: () {
           ScaffoldMessenger.of(ctx).hideCurrentSnackBar();
         },
@@ -149,6 +151,7 @@ class NotificationManager {
         content: Text(message, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white)),
         action: SnackBarAction(
             label: 'OK',
+            textColor: Colors.white,
             onPressed: () {
               ScaffoldMessenger.of(ctx).hideCurrentSnackBar();
             }),

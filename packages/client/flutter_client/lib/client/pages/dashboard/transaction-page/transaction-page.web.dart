@@ -1,11 +1,52 @@
+import 'dart:async';
+
+import 'package:cvworld/client/datasource/schema.dart';
+import 'package:cvworld/client/pages/dashboard/transaction-page/transaction-page.controller.dart';
 import 'package:cvworld/client/pages/dashboard/transaction-page/transaction-page.dart';
 import 'package:cvworld/client/shared/empty-data/empty-data.dart';
 import 'package:cvworld/client/utils.dart';
 import 'package:cvworld/config.dart';
 import 'package:flutter/material.dart';
 
-class TransactionPageWeb extends StatelessWidget {
+class TransactionPageWeb extends StatefulWidget {
   const TransactionPageWeb({super.key});
+
+  @override
+  State<TransactionPageWeb> createState() => _TransactionPageWebState();
+}
+
+class _TransactionPageWebState extends State<TransactionPageWeb> {
+  TransactionPageController controller = TransactionPageController();
+
+  List<UserTransaction> transactions = [];
+  StreamSubscription? _subscription;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _subscription = controller.getTransactions().listen((event) {
+      if (mounted) {
+        setState(() {
+          transactions = event.data;
+          isLoading = event.status == ModelStoreStatus.ready ? false : true;
+        });
+      }
+    });
+  }
+
+  // Refresh
+  void refresh() {
+    controller.refresh();
+  }
+
+  // Dispose
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +71,7 @@ class TransactionPageWeb extends StatelessWidget {
                     Container(
                       margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
                       width: double.infinity,
-                      child: Text('Transactions', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold), textAlign: TextAlign.start),
+                      child: const Text('Transactions', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold), textAlign: TextAlign.start),
                     ),
                     // Sub heading
                     Container(
@@ -42,13 +83,15 @@ class TransactionPageWeb extends StatelessWidget {
                     // Search and refresh holder
                     Row(
                       children: [
-                        Expanded(child: SizedBox()),
+                        const Expanded(child: SizedBox()),
                         // Refresh
                         Container(
                           margin: const EdgeInsets.fromLTRB(0, 5, 0, 10),
                           child: IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.refresh),
+                            onPressed: () {
+                              refresh();
+                            },
+                            icon: const Icon(Icons.refresh),
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -61,8 +104,7 @@ class TransactionPageWeb extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 10),
-                    // TransactionList()
-                    EmptyData(title: 'No Transactions', description: 'Look like you have no transactions yet. Buy some templates', image: 'transaction.png')
+                    transactions.isEmpty && !isLoading ? const EmptyData(title: 'No Transactions', description: 'Look like you have no transactions yet. Buy some templates', image: 'transaction.png') : TransactionList(transactions: transactions),
                   ],
                 ),
               ),

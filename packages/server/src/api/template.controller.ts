@@ -45,6 +45,39 @@ export class TemplateController {
     return;
   }
 
+  /** 
+   * 
+   * Remove template favorite
+   */
+  public async removeTemplateFavorite() {
+    const validator = new TemplateControllerValidators(this.req, this.res);
+    if (!validator.validateRemoveTemplateFavorite()) {
+      Logger.getInstance().logError("removeTemplateFavorite:: Error validating method removeTemplateFavorite");
+      return;
+    }
+
+    const email = this.res.locals.email;
+    const prisma = PrismaClientSingleton.prisma;
+    const { templateName } = this.req.body;
+
+    await prisma.user.update({
+      where: {
+        email: email,
+      },
+      data: {
+        favouriteTemplates: {
+          disconnect: {
+            name: templateName,
+          }
+        }
+      }
+    });
+
+    this.res.status(200).json({ message: "Template removed from favorite successfully" });
+    Logger.getInstance().logSuccess("removeTemplateFavorite:: removeTemplateFavorite success");
+    return;
+  }
+
   /**
    *
    * Get application's templates
@@ -62,7 +95,7 @@ export class TemplateController {
     const templates = await prisma.resumeTemplateMarketplace.findMany();
 
     if (templates.length === 0) {
-      this.res.status(404).json({ message: "Templates not found" });
+      this.res.status(404).json({ error: "Templates not found" });
       Logger.getInstance().logError("getTemplates:: Templates not found");
       return;
     }
@@ -111,6 +144,28 @@ class TemplateControllerValidators {
     if (!isDefined(templateName)) {
       this.res.status(400).json({ error: "templateName field is missing" });
       Logger.getInstance().logError("validateMarkTemplateFavorite:: templateName field is missing");
+      return false;
+    }
+
+    return true;
+  }
+
+  /** 
+   * 
+   * Validate remove template favorite
+   */
+  public validateRemoveTemplateFavorite() {
+    const { templateName } = this.req.body;
+
+    if (templateName === undefined) {
+      this.res.status(400).json({ error: "templateName field is missing" });
+      Logger.getInstance().logError("validateRemoveTemplateFavorite:: templateName field is missing");
+      return false;
+    }
+
+    if (!isDefined(templateName)) {
+      this.res.status(400).json({ error: "templateName field is missing" });
+      Logger.getInstance().logError("validateRemoveTemplateFavorite:: templateName field is missing");
       return false;
     }
 

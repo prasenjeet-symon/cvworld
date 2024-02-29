@@ -4,7 +4,6 @@ import { v4, validate } from "uuid";
 import router from "./api";
 import routerAdmin from "./api-admin/index";
 import routerPublic from "./api-public";
-import routerMedia from "./api/media";
 import routerAuth from "./auth";
 import { Resend } from 'resend';
 /** 
@@ -1336,7 +1335,6 @@ export function createServer() {
   app.use("/server/auth", routerAuth);
   app.use("/server/api_public", routerPublic);
   app.use("/server/api", authenticateUser, router);
-  app.use("/server/api/media", authenticateUser, routerMedia);
   app.use("/server/api_admin", authenticateUser, authenticateAdmin, routerAdmin);
 
   app.get("/server/", (req, res) => {
@@ -2135,98 +2133,6 @@ export function razorpayPrice(price: number) {
   return +(+price * 100).toFixed(0);
 }
 
-/**
- *
- * Create new premium resume template
- */
-export async function createPremiumTemplatePlan() {
-  try {
-    const nameOfPlan = "Premium";
-    const price = razorpayPrice(499.0); // 10 Dollar
-    const Razorpay = require("razorpay");
-    const razorpayKeyID = process.env.RAZORPAY_KEY_ID;
-    const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET;
-    const adminEmail = process.env.ADMIN_EMAIL;
-    const instance = new Razorpay({ key_id: razorpayKeyID, key_secret: razorpayKeySecret });
-    const prisma = PrismaClientSingleton.prisma;
-
-    // Check if some plain is already created in the database
-    // If yes then just return
-    const oldPlan = await prisma.admin.findUnique({
-      where: {
-        email: adminEmail,
-      },
-      include: {
-        premiumTemplatePlans: true,
-      },
-    });
-
-    if (oldPlan && oldPlan.premiumTemplatePlans.length !== 0) {
-      // There is plan in database just return
-      return true;
-    }
-
-    // Is already created on razorpay
-    const allCreatedPlans = (await instance.plans.all()) as templatePlans;
-    const activePlan = allCreatedPlans.items.find((p) => p.item.name.toLowerCase().trim() === nameOfPlan.toLowerCase().trim());
-
-    let createdPlanID = activePlan ? activePlan.id : null;
-
-    if (createdPlanID === null) {
-      // There is no plan in razorpay
-      // We need to create new plan in Razorpay
-      const createdPlan = (await instance.plans.create({
-        period: "monthly",
-        interval: 1,
-        item: {
-          name: nameOfPlan,
-          amount: price,
-          currency: "INR",
-          description: "Access all the premium templates",
-        },
-      })) as PremiumTemplatePlan;
-
-      createdPlanID = createdPlan.id;
-    }
-
-    await prisma.admin.update({
-      where: {
-        email: adminEmail,
-      },
-      data: {
-        premiumTemplatePlans: {
-          upsert: {
-            where: { planID: createdPlanID },
-            create: {
-              currency: "INR",
-              description: "Access all the premium templates",
-              interval: 1,
-              name: nameOfPlan,
-              period: "MONTHLY",
-              planID: createdPlanID,
-              price: price,
-            },
-            update: {
-              currency: "INR",
-              description: "Access all the premium templates",
-              interval: 1,
-              name: nameOfPlan,
-              period: "MONTHLY",
-              planID: createdPlanID,
-              price: price,
-            },
-          },
-        },
-      },
-    });
-
-    return;
-  } catch (error) {
-    console.error(error);
-    console.error("Something went wrong while creating razorpay subscription plan");
-    return;
-  }
-}
 
 /**
  * Create localtunnel for the testing webhook

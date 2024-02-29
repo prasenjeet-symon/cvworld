@@ -1117,13 +1117,15 @@ class User {
   );
 
   factory User.fromJson(Map<String, dynamic> json) {
+    print(json);
+
     return User(
       int.parse(json['id'].toString()),
       DateTime.parse(json['createdAt']),
       json['email'],
       json['fullName'],
       json['timeZone'],
-      DatabaseService().publicResource(json['profilePicture']),
+      DatabaseService().publicResource(json['profilePicture'] ?? ''),
       json['reference'],
       DateTime.parse(json['updatedAt']),
       json['subscription'] == null ? null : UserSubscription.fromJson(json['subscription']),
@@ -1439,7 +1441,7 @@ class JwtClient extends http.BaseClient {
 
   Future<String?> getToken() async {
     const storage = FlutterSecureStorage();
-    String? token = await storage.read(key: 'JWT');
+    String? token = await storage.read(key: 'token');
 
     if (token == null) {
       if (kDebugMode) {
@@ -1822,7 +1824,7 @@ class DatabaseService {
 
   Future<String?> getToken() async {
     const storage = FlutterSecureStorage();
-    String? token = await storage.read(key: 'JWT');
+    String? token = await storage.read(key: 'token');
     if (token == null) {
       if (kDebugMode) {
         print('No JWT found!');
@@ -1919,6 +1921,7 @@ class DatabaseService {
       return responseData;
     } else {
       if (kDebugMode) {
+        print(response.reasonPhrase);
         print('Something went wrong while generating resume');
       }
       client.dispose();
@@ -2592,6 +2595,7 @@ class DatabaseService {
     if (response.statusCode == 200) {
       client.dispose();
       var responseData = User.fromJson(json.decode(response.body));
+      print(responseData);
       return responseData;
     } else {
       if (kDebugMode) {
