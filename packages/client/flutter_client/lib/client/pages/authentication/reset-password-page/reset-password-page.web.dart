@@ -3,20 +3,23 @@ import 'package:cvworld/client/utils.dart';
 import 'package:flutter/material.dart';
 
 class ResetPasswordPageWeb extends StatelessWidget {
-  const ResetPasswordPageWeb({super.key});
+  final String token;
+  final String userId;
+
+  const ResetPasswordPageWeb({super.key, required this.token, required this.userId});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: Container(
+        child: SizedBox(
           width: double.infinity,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Center(
-                child: Container(
+                child: SizedBox(
                   width: 500,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -36,7 +39,7 @@ class ResetPasswordPageWeb extends StatelessWidget {
                               const ResetPasswordLogo(),
                               const ResetPasswordHeading(),
                               const ResetPasswordSubHeading(),
-                              ResetPasswordForm(onSubmit: (password) {}),
+                              ResetPasswordForm(token: token, userId: userId),
                             ],
                           ),
                         ),

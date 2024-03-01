@@ -35,7 +35,7 @@ class _SignUpPageWebState extends State<SignUpPageWeb> {
 
     _subscription = ApplicationToken.getInstance().observable.listen((event) {
       if (event != null) {
-        context.pushNamed(RouteNames.dashboard);
+        context.goNamed(RouteNames.dashboard);
       }
     });
 
@@ -52,56 +52,56 @@ class _SignUpPageWebState extends State<SignUpPageWeb> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: Container(
+        child: SizedBox(
           width: double.infinity,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
+              SizedBox(
                 width: double.infinity,
                 child: Row(
                   children: [
                     Expanded(
-                        child: Container(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Back button
-                              BackButton(),
-                              const SizedBox(height: 15),
-                              Center(
-                                child: Container(
-                                  margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                  width: MediaQuery.of(context).size.width * 0.35,
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      // Heading text and subheading text
-                                      const SignUpHeading(),
-                                      const SignUpSubHeading(),
-                                      const SizedBox(height: 20),
-                                      SignUpForm(onSubmit: signup, forgotPassword: () {}),
-                                      const SizedBox(height: 10),
-                                      // Sign up with google
-                                      ContinueWithGoogle(
-                                        buttonText: 'Sign up with Google',
-                                        icon: FontAwesomeIcons.google,
-                                        onPressed: () {},
-                                      ),
-                                      const SizedBox(height: 30),
-                                      AlreadyHaveAnAccount()
-                                    ],
-                                  ),
+                        flex: 1,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Back button
+                            const BackButton(),
+                            const SizedBox(height: 15),
+                            Center(
+                              child: Container(
+                                margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                width: MediaQuery.of(context).size.width * 0.35,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    // Heading text and subheading text
+                                    const SignUpHeading(),
+                                    const SignUpSubHeading(),
+                                    const SizedBox(height: 20),
+                                    SignUpForm(onSubmit: signup, forgotPassword: () {}),
+                                    const SizedBox(height: 10),
+                                    // Sign up with google
+                                    ContinueWithGoogle(
+                                      buttonText: 'Sign up with Google',
+                                      icon: FontAwesomeIcons.google,
+                                      onPressed: () {
+                                        controller.signupWithGoogle();
+                                      },
+                                    ),
+                                    const SizedBox(height: 30),
+                                    const AlreadyHaveAnAccount()
+                                  ],
                                 ),
-                              )
-                            ],
-                          ),
-                        ),
-                        flex: 1),
-                    Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(0), child: Container(margin: const EdgeInsets.fromLTRB(0, 30, 10, 0), child: Image.asset('signup_cover.webp'))), flex: 1),
+                              ),
+                            )
+                          ],
+                        )),
+                    Expanded(flex: 1, child: ClipRRect(borderRadius: BorderRadius.circular(0), child: Container(margin: const EdgeInsets.fromLTRB(0, 30, 10, 0), child: Image.asset('signup_cover.webp')))),
                   ],
                 ),
               ),

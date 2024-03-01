@@ -1,26 +1,41 @@
+import 'dart:async';
+
 import 'package:cvworld/client/datasource/http/error.manager.dart';
+import 'package:cvworld/client/datasource/http/http.manager.dart';
+import 'package:cvworld/client/pages/authentication/reset-password-page/reset-password-page.controller.dart';
 import 'package:cvworld/client/pages/authentication/reset-password-page/reset-password-page.mobile.dart';
 import 'package:cvworld/client/pages/authentication/reset-password-page/reset-password-page.web.dart';
 import 'package:cvworld/client/shared/continue-with-email/continue-with-email.dart';
 import 'package:cvworld/client/shared/validators/password.validator.dart';
 import 'package:cvworld/client/utils.dart';
+import 'package:cvworld/routes/router.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 
 class ResetPasswordPage extends StatelessWidget {
-  const ResetPasswordPage({super.key});
+  final String token;
+  final String userId;
+
+  const ResetPasswordPage({super.key, required this.token, required this.userId});
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
-      if (constraints.maxWidth < Constants.breakPoint) {
-        // Mobile
-        return const ResetPasswordPageMobile();
-      } else {
-        // Desktop
-        return const ResetPasswordPageWeb();
-      }
-    });
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        if (constraints.maxWidth < Constants.breakPoint) {
+          return ResetPasswordPageMobile(
+            token: token,
+            userId: userId,
+          );
+        } else {
+          return ResetPasswordPageWeb(
+            token: token,
+            userId: userId,
+          );
+        }
+      },
+    );
   }
 }
 
@@ -78,9 +93,10 @@ class ResetPasswordSubHeading extends StatelessWidget {
 ///
 /// Reset password form
 class ResetPasswordForm extends StatefulWidget {
-  final Function(String password) onSubmit;
+  final String token;
+  final String userId;
 
-  const ResetPasswordForm({super.key, required this.onSubmit});
+  const ResetPasswordForm({super.key, required this.token, required this.userId});
 
   @override
   State<ResetPasswordForm> createState() => _ResetPasswordFormState();
@@ -90,6 +106,25 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
+  final ResetPasswordPageController _controller = ResetPasswordPageController();
+  StreamSubscription? _subscription;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _subscription = ApplicationToken.getInstance().observable.listen((event) {
+      if (event != null) {
+        context.goNamed(RouteNames.dashboard);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -135,11 +170,12 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
             ContinueWithEmail(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
-                  if (_passwordController.text != _confirmPasswordController.text) {
+                  if (_passwordController.text.trim() != _confirmPasswordController.text.trim()) {
                     ErrorManager.getInstance().dispatch('Password does not match');
+                    return;
                   }
 
-                  widget.onSubmit(_passwordController.text);
+                  _controller.resetPassword(widget.userId, _passwordController.text, widget.token);
                 }
               },
               buttonText: 'Reset Password',

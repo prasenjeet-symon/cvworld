@@ -92,19 +92,22 @@ class TransactionModel {
   ///
   ///
   /// Get searched transactions
-  Stream<ModelStore<List<UserTransaction>>> getTransactions(String query) {
+  Stream<ModelStore<List<UserTransaction>>> getTransactions() {
     return _searchSource.switchMap((value) {
       if (value == null || value.isEmpty || value.trim().isEmpty) {
         return _source.stream;
       } else {
-        return _source.map((event) {
-          // Search with regex
-          return ModelStore(
+        return _source.map(
+          (event) {
+            return ModelStore(
               status: event.status,
               data: event.data
-                  .where((element) => RegExp(query, caseSensitive: false, multiLine: true).hasMatch('${element.orderId} ${element.amount} ${element.method} ${element.templateName} ${element.status} ${formatDateTime(element.createdAt)}'))
-                  .toList());
-        });
+                  .where(
+                      (element) => RegExp(value, caseSensitive: false, multiLine: true, dotAll: true).hasMatch('${element.orderId} ${element.amount} ${element.method} ${element.templateName} ${element.status} ${formatDateTime(element.createdAt)}'))
+                  .toList(),
+            );
+          },
+        );
       }
     });
   }

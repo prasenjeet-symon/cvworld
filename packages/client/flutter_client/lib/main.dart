@@ -1,8 +1,4 @@
-import 'dart:async';
-
-import 'package:cvworld/client/datasource/http/error.manager.dart';
 import 'package:cvworld/client/datasource/http/http.manager.dart';
-import 'package:cvworld/client/datasource/http/success.manager.dart';
 import 'package:cvworld/client/utils.dart';
 import 'package:cvworld/routes/router.dart';
 import 'package:firebase_core/firebase_core.dart';

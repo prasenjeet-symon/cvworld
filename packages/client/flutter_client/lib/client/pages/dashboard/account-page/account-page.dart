@@ -51,8 +51,9 @@ class _AccountPageProfileState extends State<AccountPageProfile> {
   Uint8List? attachment;
   String? attachmentName;
   StreamSubscription? _subscription;
-  bool isSubscribed = false;
   StreamSubscription? _subscription2;
+  StreamSubscription? _subscription3;
+  bool isSubscribed = false;
 
   @override
   void initState() {
@@ -72,6 +73,12 @@ class _AccountPageProfileState extends State<AccountPageProfile> {
         setState(() {
           isSubscribed = event;
         });
+      }
+    });
+
+    _subscription3 = ApplicationToken.getInstance().observable.listen((event) {
+      if (event == null) {
+        context.goNamed(RouteNames.signin);
       }
     });
   }
@@ -115,15 +122,35 @@ class _AccountPageProfileState extends State<AccountPageProfile> {
     }
   }
 
+  _signOut() {
+    showDialog(
+      context: context,
+      builder: (context) => ConfirmationDialog(
+        title: "Are you sure?",
+        message: "Are you sure you want to sign out?",
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        onConfirm: () {
+          ApplicationToken.getInstance().deleteToken();
+        },
+        onCancel: () {},
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _subscription?.cancel();
     _subscription2?.cancel();
+    _subscription3?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // is Mobile
+    bool isMobile = MediaQuery.of(context).size.width < Constants.breakPoint;
+
     if (isLoading) {
       return const Padding(padding: EdgeInsets.all(20), child: Center(child: CircularProgressIndicator()));
     }
@@ -136,7 +163,7 @@ class _AccountPageProfileState extends State<AccountPageProfile> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
-            flex: 1,
+            flex: isMobile ? 2 : 1,
             child: GestureDetector(
               onTap: () {
                 pickAttachment();
@@ -145,8 +172,8 @@ class _AccountPageProfileState extends State<AccountPageProfile> {
                 cursor: SystemMouseCursors.click,
                 child: CircleAvatar(
                   backgroundImage: NetworkImage(NetworkApi.publicResource(user?.profilePicture ?? 'https://picsum.photos/200')),
-                  minRadius: 70,
-                  maxRadius: 70,
+                  minRadius: isMobile ? 50 : 70,
+                  maxRadius: isMobile ? 50 : 70,
                   child: user?.fileUploadProgress == 0.00 || user?.fileUploadProgress == 100.00 ? const Icon(Icons.edit) : const CircularProgressIndicator(),
                 ),
               ),
@@ -165,33 +192,45 @@ class _AccountPageProfileState extends State<AccountPageProfile> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(user?.fullName ?? '', style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-                      Container(
-                        margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                        child: isSubscribed ? const Chip(label: Text('Premium'), backgroundColor: Colors.green, labelStyle: TextStyle(color: Colors.white)) : null,
-                      ),
+                      Text(user?.fullName ?? '', style: TextStyle(fontSize: isMobile ? 25 : 30, fontWeight: FontWeight.bold)),
+                      !isMobile
+                          ? Container(
+                              margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                              child: isSubscribed ? const Chip(label: Text('Premium'), backgroundColor: Colors.green, labelStyle: TextStyle(color: Colors.white)) : null,
+                            )
+                          : const SizedBox(),
                     ],
                   ),
                   const SizedBox(height: 7),
-                  Text(user?.email ?? '', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.normal)),
+                  Text(user?.email ?? '', style: TextStyle(fontSize: isMobile ? 15 : 17, fontWeight: FontWeight.normal)),
+                  isMobile
+                      ? Container(
+                          margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                          child: isSubscribed ? const Chip(label: Text('Premium'), backgroundColor: Colors.green, labelStyle: TextStyle(color: Colors.white)) : null,
+                        )
+                      : const SizedBox(),
                 ],
               ),
             ),
           ),
-          Expanded(
-            flex: 1,
-            child: SizedBox(
-              height: 40,
-              width: 50,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                ),
-                onPressed: () {},
-                child: const Text('Sign Out'),
-              ),
-            ),
-          ),
+          !isMobile
+              ? Expanded(
+                  flex: 1,
+                  child: SizedBox(
+                    height: 40,
+                    width: 50,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                      ),
+                      onPressed: () {
+                        _signOut();
+                      },
+                      child: const Text('Sign Out'),
+                    ),
+                  ),
+                )
+              : const SizedBox(),
         ],
       ),
     );
@@ -401,9 +440,7 @@ class _AccountPagePaymentState extends State<AccountPagePayment> {
           onConfirm: () {
             controller.cancelSubscription();
           },
-          onCancel: () {
-            Navigator.of(context).pop();
-          },
+          onCancel: () {},
         );
       },
     );
@@ -411,6 +448,8 @@ class _AccountPagePaymentState extends State<AccountPagePayment> {
 
   @override
   Widget build(BuildContext context) {
+    bool isMobile = MediaQuery.of(context).size.width < Constants.breakPoint;
+
     if (isLoading) {
       return const Padding(padding: EdgeInsets.all(20), child: Center(child: CircularProgressIndicator()));
     }
@@ -449,22 +488,37 @@ class _AccountPagePaymentState extends State<AccountPagePayment> {
                       ),
                     ),
                   ),
-                  isSubscribed
-                      ? TextButton(
-                          onPressed: () {
-                            _cancelSubscription();
-                          },
-                          child: const Text('Cancel'))
-                      : ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                          onPressed: () {
-                            _subscribe();
-                          },
-                          child: const Text('Upgrade', style: TextStyle(fontSize: 15, color: Colors.white)),
-                        )
+                  if (!isMobile)
+                    isSubscribed
+                        ? TextButton(
+                            onPressed: () {
+                              _cancelSubscription();
+                            },
+                            child: const Text('Cancel'))
+                        : ElevatedButton(
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                            onPressed: () {
+                              _subscribe();
+                            },
+                            child: const Text('Upgrade', style: TextStyle(fontSize: 15, color: Colors.white)),
+                          )
                 ],
               ),
-            )
+            ),
+            if (isMobile)
+              isSubscribed
+                  ? TextButton(
+                      onPressed: () {
+                        _cancelSubscription();
+                      },
+                      child: const Text('Cancel'))
+                  : ElevatedButton(
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                      onPressed: () {
+                        _subscribe();
+                      },
+                      child: const Text('Upgrade', style: TextStyle(fontSize: 15, color: Colors.white)),
+                    )
           ],
         ),
       ),
@@ -489,13 +543,6 @@ class _AccountPageDeleteState extends State<AccountPageDelete> {
   @override
   void initState() {
     super.initState();
-
-    // Listen for the route change
-    ApplicationToken.getInstance().observable.listen((event) {
-      if (event == null) {
-        context.pushNamed(RouteNames.signin);
-      }
-    });
   }
 
   // Delete user
@@ -511,9 +558,7 @@ class _AccountPageDeleteState extends State<AccountPageDelete> {
           onConfirm: () {
             controller.deleteUser();
           },
-          onCancel: () {
-            Navigator.of(context).pop();
-          },
+          onCancel: () {},
         );
       },
     );
@@ -521,6 +566,8 @@ class _AccountPageDeleteState extends State<AccountPageDelete> {
 
   @override
   Widget build(BuildContext context) {
+    var isMobile = MediaQuery.of(context).size.width < Constants.breakPoint;
+
     return Card(
       child: Container(
         color: Colors.red.shade50,
@@ -556,16 +603,27 @@ class _AccountPageDeleteState extends State<AccountPageDelete> {
                       ),
                     ),
                   ),
-                  ElevatedButton(
+                  !isMobile
+                      ? ElevatedButton(
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                          onPressed: () {
+                            _deleteUser();
+                          },
+                          child: const Text('Delete', style: TextStyle(fontSize: 15, color: Colors.white)),
+                        )
+                      : Container()
+                ],
+              ),
+            ),
+            isMobile
+                ? ElevatedButton(
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                     onPressed: () {
                       _deleteUser();
                     },
                     child: const Text('Delete', style: TextStyle(fontSize: 15, color: Colors.white)),
                   )
-                ],
-              ),
-            )
+                : Container()
           ],
         ),
       ),

@@ -1,12 +1,16 @@
 import 'dart:async';
 
-import 'package:cvworld/client/datasource.dart';
+import 'package:cvworld/client/datasource/http/http.manager.dart';
+import 'package:cvworld/client/datasource/network.api.dart';
+import 'package:cvworld/client/datasource/schema.dart';
+import 'package:cvworld/client/pages/dashboard/dashboard/dashbaord.controller.dart';
 import 'package:cvworld/client/pages/dashboard/dashboard/dashboard-body.dart';
-import 'package:cvworld/client/utils.dart';
+import 'package:cvworld/client/shared/confirmation-dialog/confirmation-dialog.dart';
 import 'package:cvworld/config.dart';
 import 'package:cvworld/routes/router.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
 class DashboardMobile extends StatefulWidget {
@@ -17,25 +21,9 @@ class DashboardMobile extends StatefulWidget {
 }
 
 class _DashboardMobileState extends State<DashboardMobile> {
-  late AppDrawerLogic logic;
-
-  setStateCallback() {
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
   @override
   initState() {
     super.initState();
-    logic = AppDrawerLogic(setStateCallback);
-    logic.init();
-
-    MySubjectSingleton.instance.dashboardHeaderSubject.listen((value) {
-      if (mounted) {
-        logic.init(canShowLoading: false);
-      }
-    });
   }
 
   @override
@@ -49,99 +37,174 @@ class _DashboardMobileState extends State<DashboardMobile> {
       appBar: AppBar(
         title: const Text('Dashboard'),
       ),
-      drawer: DashboardDrawer(logic: logic),
+      drawer: const DashboardDrawer(),
       body: const SingleChildScrollView(
-        child: Padding(
-            padding: EdgeInsets.all(10),
-            child: Column(
-              children: [
-                DashboardBodyContent(resumeWidth: 200),
-              ],
-            )),
+        child: Padding(padding: EdgeInsets.all(10), child: DashboardBodyContent(resumeWidth: 200)),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Add your action here
-          // Nav to the marketplace page
-          context.pushNamed(RouteNames.chooseTemplate);
-        },
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: const FabWithMiniButtons(),
+    );
+  }
+}
+
+class FabWithMiniButtons extends StatelessWidget {
+  const FabWithMiniButtons({super.key});
+
+  void quickResume(BuildContext context) async {
+    FlutterSecureStorage storage = const FlutterSecureStorage();
+    String? templateName = await storage.read(key: 'DefaultTemplate');
+    // ignore: use_build_context_synchronously
+    templateName == null ? context.pushNamed(RouteNames.dashboardTemplates) : context.pushNamed(RouteNames.cvMaker, pathParameters: {"templateName": templateName, "resumeID": "0"});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () {
+        showModalBottomSheet(
+          context: context,
+          builder: (BuildContext context) {
+            return Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  ListTile(
+                    leading: const Icon(Icons.quickreply),
+                    title: const Text('Quick Add'),
+                    onTap: () {
+                      quickResume(context);
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.add),
+                    title: const Text('Add'),
+                    onTap: () {
+                      context.pushNamed(RouteNames.dashboardTemplates);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+      child: const Icon(Icons.add),
     );
   }
 }
 
 class DashboardDrawer extends StatefulWidget {
-  final AppDrawerLogic logic;
-
-  const DashboardDrawer({super.key, required this.logic});
+  const DashboardDrawer({super.key});
 
   @override
   State<DashboardDrawer> createState() => _DashboardDrawerState();
 }
 
 class _DashboardDrawerState extends State<DashboardDrawer> {
+  DashboardController controller = DashboardController();
+
+  bool isLoading = true;
+  bool isSubscriber = false;
+  User? user;
+  StreamSubscription? _subscription;
+  StreamSubscription? _userSubscription;
+  StreamSubscription? _subscription2;
+
   @override
   void initState() {
     super.initState();
+
+    _userSubscription = controller.getUser().listen((event) {
+      if (mounted) {
+        setState(() {
+          user = event.data.isNotEmpty ? event.data[0] : null;
+          isLoading = event.status == ModelStoreStatus.ready ? false : true;
+        });
+      }
+    });
+
+    _subscription = controller.isSubscribed().listen((event) {
+      if (mounted) {
+        setState(() {
+          isSubscriber = event;
+        });
+      }
+    });
+
+    _subscription2 = ApplicationToken.getInstance().observable.listen((event) {
+      if (event == null) {
+        context.goNamed(RouteNames.signin);
+      }
+    });
   }
 
-  void showLogoutConfirmationDialog(BuildContext context) async {
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirm Logout'),
-          content: const Text('Are you sure you want to log out?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-              child: const Text('Yes'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-              child: const Text('No'),
-            ),
-          ],
-        );
-      },
-    );
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    _userSubscription?.cancel();
+    _subscription2?.cancel();
+    super.dispose();
+  }
 
-    if (result != null && result == true) {
-      // Perform the logout action
-      DatabaseService().logout().then((value) {
-        context.goNamed(RouteNames.signin);
-      });
-    }
+  _signOut() {
+    showDialog(
+      context: context,
+      builder: (context) => ConfirmationDialog(
+        title: "Are you sure?",
+        message: "Are you sure you want to sign out?",
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        onConfirm: () {
+          ApplicationToken.getInstance().deleteToken();
+        },
+        onCancel: () {},
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // Check if the user is a subscriber
-    bool isSubscriber = widget.logic.user?.subscription?.isActive ?? false;
-
     return Drawer(
-      child: widget.logic.isLoading
+      child: isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
               padding: EdgeInsets.zero,
               children: <Widget>[
                 DrawerHeader(
                   decoration: const BoxDecoration(color: Colors.blue),
-                  child: ProfileWidget(fullName: widget.logic.user?.fullName ?? '', imageUrl: widget.logic.user?.profilePicture ?? Constants.dummyProfilePic, isPremium: isSubscriber),
+                  child: ProfileWidget(fullName: user?.fullName ?? '', imageUrl: user?.profilePicture != null ? NetworkApi.publicResource(user!.profilePicture!) : 'https://picsum.photos/200', isPremium: isSubscriber),
                 ),
                 DrawerMenuItem(
                   icon: Icons.settings,
                   title: 'Account Settings',
                   onTap: () {
+                    context.pushNamed(RouteNames.dashboardAccount);
+                  },
+                ),
+                // My Data
+                DrawerMenuItem(
+                  icon: Icons.person,
+                  title: 'My Data',
+                  onTap: () {
                     context.pushNamed(RouteNames.dashboardAccountSetting);
                   },
                 ),
-                const Divider(), // Add a divider between menu items and app info
+                // Transactions
+                DrawerMenuItem(
+                    icon: Icons.monetization_on,
+                    title: 'Transactions',
+                    onTap: () {
+                      context.pushNamed(RouteNames.dashboardTransactions);
+                    }),
+                // Templates
+                DrawerMenuItem(
+                    icon: Icons.description,
+                    title: 'Templates',
+                    onTap: () {
+                      context.pushNamed(RouteNames.dashboardTemplates);
+                    }),
+                const Divider(),
                 DrawerMenuItem(
                   icon: Icons.mail,
                   title: 'Contact Us',
@@ -153,14 +216,14 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
                   icon: Icons.logout,
                   title: 'Logout',
                   onTap: () {
-                    showLogoutConfirmationDialog(context);
+                    _signOut();
                   },
                 ),
                 const SizedBox(height: 20),
                 const Divider(),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text('App Version: ${widget.logic.appVersion}', textAlign: TextAlign.center, style: const TextStyle(color: Colors.grey)),
+                const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text('App Version: ${ApplicationConfiguration.appVersion}', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey)),
                 )
               ],
             ),
@@ -235,39 +298,5 @@ class ProfileWidget extends StatelessWidget {
               ),
       ],
     );
-  }
-}
-
-class AppDrawerLogic {
-  String appVersion = ApplicationConfiguration.appVersion;
-  User? user;
-  bool isLoading = false;
-  final Function updateState;
-
-  AppDrawerLogic(this.updateState);
-
-  // get application version
-  Future<void> getAppVersion() async {
-    appVersion = ApplicationConfiguration.appVersion;
-  }
-
-  Future<void> init({bool canShowLoading = true}) async {
-    getAppVersion();
-    await getUser(canShowLoading: canShowLoading);
-  }
-
-  Future<void> getUser({bool canShowLoading = true}) async {
-    try {
-      isLoading = canShowLoading;
-      updateState();
-      user = await DatabaseService().fetchUser();
-    } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
-    } finally {
-      isLoading = false;
-      updateState();
-    }
   }
 }

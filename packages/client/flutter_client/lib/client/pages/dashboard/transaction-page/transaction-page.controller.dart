@@ -9,7 +9,7 @@ class TransactionPageController {
   /// Get all transactions
   Stream<ModelStore<List<UserTransaction>>> getTransactions() {
     RootToTransactionMapping mapper = RootToTransactionMapping.getInstance();
-    return mapper.get(Constants.rootNodeId).transactions;
+    return mapper.get(Constants.rootNodeId).getTransactions();
   }
 
   ///
@@ -17,5 +17,13 @@ class TransactionPageController {
   /// Refresh
   void refresh() {
     ApplicationMutation.getInstance().dispatch(ApplicationMutationData(ApplicationMutationIdentifier.REFRESH_TRANSACTION, null));
+  }
+
+  ///
+  ///
+  /// Search
+  void search(String query) {
+    RootToTransactionMapping mapper = RootToTransactionMapping.getInstance();
+    mapper.get(Constants.rootNodeId).search(query);
   }
 }

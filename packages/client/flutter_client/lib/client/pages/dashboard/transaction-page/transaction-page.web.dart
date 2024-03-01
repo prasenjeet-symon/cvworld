@@ -21,6 +21,7 @@ class _TransactionPageWebState extends State<TransactionPageWeb> {
   List<UserTransaction> transactions = [];
   StreamSubscription? _subscription;
   bool isLoading = true;
+  TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
@@ -34,11 +35,20 @@ class _TransactionPageWebState extends State<TransactionPageWeb> {
         });
       }
     });
+
+    searchController.addListener(() {
+      search(searchController.text);
+    });
   }
 
   // Refresh
   void refresh() {
     controller.refresh();
+  }
+
+  // Search
+  void search(String query) {
+    controller.search(query);
   }
 
   // Dispose
@@ -99,7 +109,7 @@ class _TransactionPageWebState extends State<TransactionPageWeb> {
                         Container(
                           margin: const EdgeInsets.fromLTRB(0, 5, 0, 10),
                           width: 300,
-                          child: TextField(decoration: InputDecoration(border: OutlineInputBorder(), labelText: 'Search...')),
+                          child: TextField(controller: searchController, decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Search...')),
                         ),
                       ],
                     ),

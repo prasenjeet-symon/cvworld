@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:cvworld/client/datasource/network.api.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:rxdart/rxdart.dart';
@@ -43,6 +45,7 @@ class ApplicationToken {
     _userIdSubject.add(null);
     await _storage.delete(key: 'token');
     await _storage.delete(key: 'userId');
+    await _storage.deleteAll();
   }
 
   Future<void> bootUp() async {
@@ -50,6 +53,18 @@ class ApplicationToken {
     _userId = await _storage.read(key: 'userId');
     _tokenSubject.add(_token);
     _userIdSubject.add(_userId);
+
+    try {
+      ApiResponse response = await singleCall(NetworkApi().isTokenActive());
+      if (response.statusCode != 200) {
+        deleteToken();
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("bootUp :: Error while checking if token is active");
+        print(e);
+      }
+    }
   }
 }
 

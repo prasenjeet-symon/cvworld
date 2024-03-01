@@ -98,7 +98,7 @@ export class EmailPasswordSignInController {
     }
 
     const token = await createJwt(user.reference, user.email, false, JWT_PASSWORD_RESET_TOKEN_EXPIRES_IN, user.timeZone);
-    const link = `${PASSWORD_RESET_BASE_LINK}/?token=${token}&userId=${user.reference}`;
+    const link = `${PASSWORD_RESET_BASE_LINK}reset-password?token=${token}&userId=${user.reference}`;
 
     ApiEvent.getInstance().dispatch(ApiEventNames.SEND_PASSWORD_RESET_LINK_EMAIL, { email: email, link: link });
     

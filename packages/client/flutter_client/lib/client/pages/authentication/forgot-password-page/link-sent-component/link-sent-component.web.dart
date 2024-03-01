@@ -17,7 +17,13 @@ class LinkSentComponentWeb extends StatelessWidget {
             const LinkSentComponentHeading(),
             const LinkSentComponentSubHeading(),
             const SizedBox(height: 10),
-            ContinueWithEmail(onPressed: () {}, buttonText: 'Back to Login', icon: FontAwesomeIcons.arrowRotateLeft),
+            ContinueWithEmail(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              buttonText: 'Back to Login',
+              icon: FontAwesomeIcons.arrowRotateLeft,
+            ),
           ],
         ),
       ),

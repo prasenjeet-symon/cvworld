@@ -13,16 +13,13 @@ class DashboardDesktop extends StatefulWidget {
 class _DashboardDesktopState extends State<DashboardDesktop> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: [
             M.DashboardHeader(),
-            Padding(
-              padding: EdgeInsets.fromLTRB(100, 10, 100, 10),
-              child: DashboardHeaderSecondary(),
-            ),
-            DashboardBodyContent(resumeWidth: 200)
+            Padding(padding: EdgeInsets.fromLTRB(100, 10, 100, 10), child: DashboardHeaderSecondary()),
+            DashboardBodyContent(resumeWidth: 200),
           ],
         ),
       ),

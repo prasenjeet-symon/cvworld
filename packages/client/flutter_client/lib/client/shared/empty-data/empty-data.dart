@@ -14,7 +14,7 @@ class EmptyData extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(0, 100, 0, 20),
       width: double.infinity,
       child: Center(
-        child: Container(
+        child: SizedBox(
           width: MediaQuery.of(context).size.width > Constants.breakPoint ? 700 : double.infinity,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -22,13 +22,17 @@ class EmptyData extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               // Image
-              Image.asset('assets/${image}', width: 180, height: 180, fit: BoxFit.cover),
+              Image.asset('assets/$image', width: 180, height: 180, fit: BoxFit.cover),
               const SizedBox(height: 20),
               // Heading
-              Text(title, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+              Text(title, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
               const SizedBox(height: 10),
               // Description
-              Text(description, style: TextStyle(fontSize: 15, color: Colors.grey.shade700)),
+              Text(
+                description,
+                style: TextStyle(fontSize: 15, color: Colors.grey.shade700),
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 20),
             ],
           ),

@@ -205,7 +205,12 @@ final goRouter = GoRouter(
     // Reset Password
     GoRoute(
       path: '/reset-password',
-      builder: (context, state) => const ResetPasswordPage(),
+      builder: (context, state) {
+        final queryParams = state.uri.queryParameters;
+        final userId = queryParams['userId'];
+        final token = queryParams['token'];
+        return ResetPasswordPage(token: token ?? '', userId: userId ?? '');
+      },
       name: RouteNames.resetPassword,
     ),
 

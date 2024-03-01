@@ -5,7 +5,9 @@ import 'package:cvworld/client/pages/dashboard/templates-page/templates-page.con
 import 'package:cvworld/client/pages/dashboard/templates-page/templates-page.mobile.dart';
 import 'package:cvworld/client/pages/dashboard/templates-page/templates-page.web.dart';
 import 'package:cvworld/client/utils.dart';
+import 'package:cvworld/routes/router.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class TemplatesPage extends StatelessWidget {
   const TemplatesPage({super.key});
@@ -39,6 +41,11 @@ class TemplateItem extends StatefulWidget {
 
 class _TemplateItemState extends State<TemplateItem> {
   TemplatePageController controller = TemplatePageController();
+
+  /// Nav to make resume
+  _navToMakeResume(String templateName) {
+    context.pushNamed(RouteNames.cvMaker, pathParameters: {"templateName": templateName, "resumeID": "0"});
+  }
 
   // Open sample image in browser
   _openSample() {
@@ -76,11 +83,14 @@ class _TemplateItemState extends State<TemplateItem> {
           children: [
             Stack(
               children: [
-                Container(
-                  height: 245,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    image: DecorationImage(image: NetworkImage(NetworkApi.publicResource(widget.template.previewImgUrl)), fit: BoxFit.cover),
+                GestureDetector(
+                  onTap: () => _navToMakeResume(widget.template.name),
+                  child: Container(
+                    height: 235,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      image: DecorationImage(image: NetworkImage(NetworkApi.publicResource(widget.template.previewImgUrl)), fit: BoxFit.cover),
+                    ),
                   ),
                 ),
                 formatAsIndianRupee(widget.template.price) != formatAsIndianRupee(0.00)

@@ -44,8 +44,8 @@ class TransactionListItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              CircleAvatar(
-                backgroundImage: NetworkImage('https://picsum.photos/200'),
+              const CircleAvatar(
+                backgroundImage: AssetImage('assets/transaction-item.png'),
                 minRadius: 30,
                 maxRadius: 30,
               ),
@@ -61,11 +61,11 @@ class TransactionListItem extends StatelessWidget {
                       children: [
                         TextSpan(
                           text: 'Order Id: ',
-                          style: TextStyle(fontSize: 15, color: Colors.grey.shade700),
+                          style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
                         ),
                         TextSpan(
                           text: transaction.orderId,
-                          style: TextStyle(fontSize: 15, color: Colors.grey.shade700, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 14, color: Colors.grey.shade700, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),

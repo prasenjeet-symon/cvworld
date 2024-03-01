@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { v4 } from "uuid";
 import { IGoogleAuthTokenResponse } from "../schema";
 import { Logger, PrismaClientSingleton, createJwt, generateUniqueUsername, isDefined } from "../utils";
+import { ApiEvent, ApiEventNames } from "../events";
 
 export class GoogleController {
   private req: Request;
@@ -77,7 +78,7 @@ export class GoogleController {
       userName: newUser.userName,
     });
 
-    //TODO : Send greeting email to the user
+    ApiEvent.getInstance().dispatch(ApiEventNames.SEND_GREETING_EMAIL, { email: newUser.email });
     Logger.getInstance().logSuccess("signupWithGoogle :: Login successful");
     return;
   }
@@ -94,6 +95,7 @@ export class GoogleController {
     }
 
     const { token } = this.req.body;
+    
     const googleAuthTokenResponse = await this.verifyGoogleAuthToken(token);
     if (!googleAuthTokenResponse) {
       this.res.status(400).json({ error: "Invalid google auth token" });

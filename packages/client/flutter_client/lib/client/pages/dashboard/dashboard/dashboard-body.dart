@@ -1,6 +1,7 @@
 // ignore: file_names
 import 'dart:async';
 
+import 'package:cvworld/client/shared/empty-data/empty-data.dart';
 import 'package:cvworld/client/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -54,7 +55,7 @@ class _DashboardBodyContentState extends State<DashboardBodyContent> {
     }
 
     if (logic.resumes.isEmpty) {
-      return const ShiningImageSection();
+      return EmptyData(title: 'No Created Resume', description: 'You have not created any resume. Please create one', image: 'no-resume.png');
     }
 
     return Container(

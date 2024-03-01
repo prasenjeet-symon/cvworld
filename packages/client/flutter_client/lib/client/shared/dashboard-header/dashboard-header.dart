@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cvworld/client/datasource/http/http.manager.dart';
 import 'package:cvworld/client/datasource/network.api.dart';
 import 'package:cvworld/client/datasource/schema.dart';
 import 'package:cvworld/client/shared/dashboard-header/dashboard-header.controller.dart';
@@ -20,6 +21,7 @@ class _DashboardHeaderState extends State<DashboardHeader> {
   User? user;
   StreamSubscription? _subscription;
   bool isLoading = true;
+  StreamSubscription? _subscription2;
 
   @override
   void initState() {
@@ -33,12 +35,19 @@ class _DashboardHeaderState extends State<DashboardHeader> {
         });
       }
     });
+
+    _subscription2 = ApplicationToken.getInstance().observable.listen((event) {
+      if (event == null) {
+        context.goNamed(RouteNames.signin);
+      }
+    });
   }
 
   // Dispose
   @override
   void dispose() {
     _subscription?.cancel();
+    _subscription2?.cancel();
     super.dispose();
   }
 
@@ -48,6 +57,7 @@ class _DashboardHeaderState extends State<DashboardHeader> {
       color: Colors.blue,
       width: double.infinity,
       padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.all(0),
       child: Row(
         children: [
           // Logo here

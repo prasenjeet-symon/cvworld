@@ -28,7 +28,7 @@ class _SigninPageWebState extends State<SigninPageWeb> {
 
     _subscription = ApplicationToken.getInstance().observable.listen((event) {
       if (event != null) {
-        context.pushNamed(RouteNames.dashboard);
+        context.goNamed(RouteNames.dashboard);
       }
     });
 
@@ -62,47 +62,48 @@ class _SigninPageWebState extends State<SigninPageWeb> {
                 child: Row(
                   children: [
                     Expanded(
-                      child: Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            // Back button
-                            BackButton(),
-                            const SizedBox(height: 15),
-                            Center(
-                              child: Container(
-                                margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                width: MediaQuery.of(context).size.width * 0.35,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    // Heading text and subheading text
-                                    const SigninHeading(),
-                                    const SigninSubHeading(),
-                                    const SizedBox(height: 20),
-                                    SigninForm(onSubmit: signin),
-                                    const SizedBox(height: 10),
-                                    // Sign up with google
-                                    ContinueWithGoogle(
-                                      buttonText: 'Sign in with Google',
-                                      icon: FontAwesomeIcons.google,
-                                      onPressed: () {},
-                                    ),
-                                    const SizedBox(height: 30),
-                                    DoNotHaveAnAccount()
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
                       flex: 1,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Back button
+                          const BackButton(),
+                          const SizedBox(height: 15),
+                          Center(
+                            child: Container(
+                              margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                              width: MediaQuery.of(context).size.width * 0.35,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  // Heading text and subheading text
+                                  const SigninHeading(),
+                                  const SigninSubHeading(),
+                                  const SizedBox(height: 20),
+                                  SigninForm(onSubmit: signin),
+                                  const SizedBox(height: 10),
+                                  // Sign up with google
+                                  ContinueWithGoogle(
+                                    buttonText: 'Sign in with Google',
+                                    icon: FontAwesomeIcons.google,
+                                    onPressed: () {
+                                      controller.signinWithGoogle();
+                                    },
+                                  ),
+                                  const SizedBox(height: 30),
+                                  const DoNotHaveAnAccount()
+                                ],
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                     Expanded(
+                      flex: 1,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(0),
                         child: Container(
@@ -111,7 +112,6 @@ class _SigninPageWebState extends State<SigninPageWeb> {
                           child: Image.asset('assets/signin_cover.jpg', fit: BoxFit.cover, height: double.infinity),
                         ),
                       ),
-                      flex: 1,
                     ),
                   ],
                 ),

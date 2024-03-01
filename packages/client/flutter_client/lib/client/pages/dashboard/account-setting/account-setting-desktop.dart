@@ -1,5 +1,4 @@
 import 'package:cvworld/client/pages/dashboard/account-setting/account-setting.dart';
-import 'package:cvworld/client/pages/dashboard/components/header.dart';
 import 'package:flutter/material.dart';
 
 class AccountSettingDesktop extends StatefulWidget {
@@ -16,7 +15,7 @@ class _AccountSettingDesktopState extends State<AccountSettingDesktop> {
       body: Padding(
         padding: EdgeInsets.all(10),
         child: SingleChildScrollView(
-          child: Column(children: [DashboardHeader(), AccountSettingBody()]),
+          child: Column(children: [AccountSettingBody()]),
         ),
       ),
     );
