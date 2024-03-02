@@ -260,7 +260,7 @@ class NetworkApi {
     }).doOnData((event) {
       if (event.statusCode == 200) {
         ApiMutationSuccess data = event.data;
-        SuccessManager.getInstance().dispatch(data.message);
+        //SuccessManager.getInstance().dispatch(data.message);
       } else {
         ApiMutationError data = event.data;
         ErrorManager.getInstance().dispatch(data.error);
@@ -347,7 +347,7 @@ class NetworkApi {
       }
     }).doOnData((event) {
       if (event.statusCode == 200) {
-        SuccessManager.getInstance().dispatch('User fetched successfully.');
+        // SuccessManager.getInstance().dispatch('User fetched successfully.');
       } else {
         ApiMutationError data = event.data;
         ErrorManager.getInstance().dispatch(data.error);
@@ -431,7 +431,7 @@ class NetworkApi {
       }
     }).doOnData((event) {
       if (event.statusCode == 200) {
-        SuccessManager.getInstance().dispatch('User transactions fetched successfully.');
+        // SuccessManager.getInstance().dispatch('User transactions fetched successfully.');
       } else {
         ApiMutationError data = event.data;
         ErrorManager.getInstance().dispatch(data.error);
@@ -459,7 +459,7 @@ class NetworkApi {
       }
     }).doOnData((event) {
       if (event.statusCode == 200) {
-        SuccessManager.getInstance().dispatch('User subscription fetched successfully.');
+        // SuccessManager.getInstance().dispatch('User subscription fetched successfully.');
       } else {
         ApiMutationError data = event.data;
         ErrorManager.getInstance().dispatch(data.error);
@@ -487,7 +487,7 @@ class NetworkApi {
       }
     }).doOnData((event) {
       if (event.statusCode == 200) {
-        SuccessManager.getInstance().dispatch('Templates fetched successfully.');
+        // SuccessManager.getInstance().dispatch('Templates fetched successfully.');
       } else {
         ApiMutationError data = event.data;
         ErrorManager.getInstance().dispatch(data.error);
@@ -569,7 +569,7 @@ class NetworkApi {
       }
     }).doOnData((event) {
       if (event.statusCode == 200) {
-        SuccessManager.getInstance().dispatch('User favorite templates fetched successfully.');
+        // SuccessManager.getInstance().dispatch('User favorite templates fetched successfully.');
       } else {
         ApiMutationError data = event.data;
         ErrorManager.getInstance().dispatch(data.error);
@@ -597,7 +597,7 @@ class NetworkApi {
       }
     }).doOnData((event) {
       if (event.statusCode == 200) {
-        SuccessManager.getInstance().dispatch('Subscription plan fetched successfully.');
+        // SuccessManager.getInstance().dispatch('Subscription plan fetched successfully.');
       } else {
         ApiMutationError data = event.data;
         ErrorManager.getInstance().dispatch(data.error);
