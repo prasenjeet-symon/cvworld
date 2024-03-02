@@ -8,7 +8,7 @@
 | MYSQL_PASSWORD                         | Password for MySQL database access.                      | cvworld                                                  |
 | MYSQL_PORT                             | Port number for the MySQL server.                        | 3306                                                     |
 | MYSQL_HOST                             | Hostname or IP address of the MySQL server.              | localhost                                                |
-| DATABASE_URL                           | URL for connecting to the MySQL database.                | mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE} |
+ |
 | ADMIN_EMAIL                            | Email address of the administrator.                     | prasenjeetsymon@gmail.com                               |
 | ADMIN_PASSWORD                         | Password for the administrator account.                 | spiderman@134$                                           |
 | ADMIN_NAME                             | Name of the administrator.                               | Prasenjeet Kumar                                         |
