@@ -64,9 +64,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       BackButtonApp(onPressed: () => {Navigator.pop(context)}),
                       const SizedBox(height: 50),
                       Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
-                        CircleAvatar(backgroundImage: NetworkImage(userProfileLogic.user?.profilePicture ?? ''), radius: 80),
+                        CircleAvatar(backgroundImage: NetworkImage(userProfileLogic.user?.profilePicture ?? 'https://picsum.photos/200'), radius: 80),
                         const SizedBox(height: 10),
-                        Text(userProfileLogic.user!.fullName, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+                        Text(userProfileLogic.user?.fullName ?? '', style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 12),
                         Container(
                           decoration: BoxDecoration(

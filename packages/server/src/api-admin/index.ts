@@ -37,9 +37,12 @@ router.get("/users", async (req, res) => {
       subscription: true,
       boughtTemplate: true,
     },
+    where:{
+      isDeleted: false
+    }
   });
 
-  const activeUsers = users.filter((user) => isValidEmail(user.email));
+  const activeUsers = users;
   res.json(activeUsers);
 });
 

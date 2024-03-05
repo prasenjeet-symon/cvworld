@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cvworld/dashboard/datasource/http/http.manager.admin.dart';
 import 'package:cvworld/dashboard/datasource_dashboard.dart';
 import 'package:cvworld/routes/router.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +15,7 @@ class AdminHomePage extends StatefulWidget {
 
 class _AdminHomePageState extends State<AdminHomePage> {
   AdminHomePageLogic adminHomePageLogic = AdminHomePageLogic();
+  StreamSubscription? _subscription;
 
   Future<void> confirmLogout(BuildContext ctx) async {
     // Show a confirmation dialog
@@ -42,9 +46,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
 
     // If the user confirms, proceed with logout
     if (confirm) {
-      await logoutAdmin();
-      // ignore: use_build_context_synchronously
-      ctx.pushNamed(RouteNames.adminSignin);
+      ApplicationToken.getInstance().deleteToken();
     }
   }
 
@@ -52,6 +54,18 @@ class _AdminHomePageState extends State<AdminHomePage> {
   void initState() {
     super.initState();
     adminHomePageLogic.fetchAdminDetails(setState);
+
+    _subscription = ApplicationToken.getInstance().observable.listen((event) {
+      if (event == null) {
+        context.goNamed(RouteNames.adminSignin);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -112,7 +126,7 @@ class HoverCard extends StatefulWidget {
   final String title;
   final VoidCallback onTap;
 
-  HoverCard({required this.icon, required this.title, required this.onTap});
+  const HoverCard({super.key, required this.icon, required this.title, required this.onTap});
 
   @override
   _HoverCardState createState() => _HoverCardState();

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cvworld/client/datasource.dart';
 import 'package:cvworld/client/utils.dart';
+import 'package:cvworld/dashboard/datasource/http/http.manager.admin.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -149,13 +150,16 @@ class User {
   final String email;
   final String fullName;
   final String timeZone;
-  final String profilePicture;
+  final String? profilePicture;
   final String password;
   final String reference;
+  final String userName;
+  final bool isEmailVerified;
+  final bool isDeleted;
   final DateTime createdAt;
   final DateTime updatedAt;
   final Subscription? subscription;
-  final List<BoughtTemplate>? boughtTemplate; // Using the BoughtTemplate class
+  final List<BoughtTemplate>? boughtTemplate;
 
   User({
     required this.id,
@@ -165,23 +169,29 @@ class User {
     required this.profilePicture,
     required this.password,
     required this.reference,
+    required this.userName,
+    required this.isEmailVerified,
+    required this.isDeleted,
     required this.createdAt,
     required this.updatedAt,
-    this.subscription,
-    this.boughtTemplate,
+    required this.subscription,
+    required this.boughtTemplate,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: int.parse(json['id'].toString()),
-      email: json['email'] as String,
-      fullName: json['fullName'] as String,
-      timeZone: json['timeZone'] as String,
-      profilePicture: DatabaseService().publicResource(json['profilePicture'] as String),
-      password: json['password'],
-      reference: json['reference'] as String,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      email: json['email'].toString(),
+      fullName: json['fullName'].toString(),
+      timeZone: json['timeZone'].toString(),
+      profilePicture: json['profilePicture']?.toString(),
+      password: json['password'].toString(),
+      reference: json['reference'].toString(),
+      userName: json['userName'].toString(),
+      isEmailVerified: bool.parse(json['isEmailVerified'].toString()),
+      isDeleted: bool.parse(json['isDeleted'].toString()),
+      createdAt: DateTime.parse(json['createdAt'].toString()),
+      updatedAt: DateTime.parse(json['updatedAt'].toString()),
       subscription: json['subscription'] != null ? Subscription.fromJson(json['subscription']) : null,
       boughtTemplate: json['boughtTemplate'] != null ? (List.from(json['boughtTemplate'])).map((item) => BoughtTemplate.fromJson(item)).toList() : [],
     );
@@ -692,7 +702,7 @@ class JwtAdminClient extends http.BaseClient {
 
   Future<String?> getToken() async {
     const storage = FlutterSecureStorage();
-    String? token = await storage.read(key: 'JWT_ADMIN');
+    String? token = await ApplicationToken.getInstance().getToken;
 
     if (token == null) {
       if (kDebugMode) {

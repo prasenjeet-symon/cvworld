@@ -13,8 +13,6 @@ import 'package:cvworld/client/pages/dashboard/view-resume/view-resume.dart';
 import 'package:cvworld/client/pages/home-page/home-page.dart';
 import 'package:cvworld/client/pages/intro-slides/intro-slides.dart';
 import 'package:cvworld/client/pages/make-cv-pages/cv-maker-page.dart';
-import 'package:cvworld/client/pages/signin-page/signin-page.dart';
-import 'package:cvworld/client/pages/signup-page/signup-page.dart';
 import 'package:cvworld/dashboard/dashboard/change_password/change_password.dart';
 import 'package:cvworld/dashboard/dashboard/contact_us/contact_us_full_page.dart';
 import 'package:cvworld/dashboard/dashboard/contact_us/contact_us_page.dart';
@@ -25,13 +23,13 @@ import 'package:cvworld/dashboard/dashboard/templates/all_templates_page.dart';
 import 'package:cvworld/dashboard/dashboard/templates/update_template.dart';
 import 'package:cvworld/dashboard/dashboard/users/all_users_page.dart';
 import 'package:cvworld/dashboard/dashboard/users/user_profile_page.dart';
+import 'package:cvworld/dashboard/datasource/http/http.manager.admin.dart' as adminHttpManager;
 import 'package:cvworld/dashboard/sign_in_page/sign_in_page.dart';
 import 'package:go_router/go_router.dart';
 
 import '../client/pages/authentication/forgot-password-page/forgot-password-page.dart';
 import '../client/pages/authentication/signin-page/signin-page.dart';
 import '../client/utils.dart';
-import '../dashboard/utils.dart';
 
 class RouteNames {
   static const String home = '/';
@@ -72,18 +70,18 @@ final goRouter = GoRouter(
   debugLogDiagnostics: true,
   redirect: (context, state) async {
     if (state.fullPath?.startsWith('/admin') ?? false) {
-      bool isAuthenticated = await isAdminAuthenticated();
+      bool isDashboardAuthenticated = adminHttpManager.ApplicationToken.getInstance().getToken != null ? true : false;
 
       // check if login route
       if (state.fullPath!.startsWith('/admin/signin')) {
-        if (isAuthenticated) {
+        if (isDashboardAuthenticated) {
           return '/admin/dashboard';
         } else {
           return null;
         }
       }
 
-      if (!isAuthenticated) {
+      if (!isDashboardAuthenticated) {
         return '/admin/signin';
       } else {
         return null;

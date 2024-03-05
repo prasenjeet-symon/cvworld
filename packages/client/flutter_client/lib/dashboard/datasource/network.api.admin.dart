@@ -8,6 +8,8 @@ import 'package:cvworld/dashboard/datasource/http/success.manager.admin.dart';
 import 'package:rxdart/rxdart.dart';
 
 class NetworkApiAdmin {
+  // Authentication
+  final Uri _uriLogin = Uri.parse('${ApplicationConfiguration.apiUrl}/server/auth/admin_signin');
   final Uri _uriFeedback = Uri.parse('${ApplicationConfiguration.apiUrl}/server/api_public/feedback');
 
   ///
@@ -62,6 +64,38 @@ class NetworkApiAdmin {
       }
     }).doOnData((event) {
       if (event.statusCode != 200) {
+        ApiMutationError data = event.data;
+        ErrorManager.getInstance().dispatch(data.error);
+      }
+    });
+  }
+
+  ///
+  ///
+  ///
+  /// Signin as admin
+  Stream<ApiResponse> signInAsAdmin(String email, String password, String timeZone) {
+    var body = {"email": email, 'password': password, 'timeZone': timeZone};
+
+    return HttpManager.request(_uriLogin.toString(), 'POST', body).map((event) {
+      if (event.statusCode == 200) {
+        Authentication data = Authentication.fromJson(event.data);
+        return ApiResponse(event.statusCode, data, event.statusText);
+      } else {
+        return event;
+      }
+    }).map((event) {
+      if (event.statusCode != 200) {
+        ApiMutationError data = ApiMutationError.fromJson(event.data);
+        return ApiResponse(event.statusCode, data, event.statusText);
+      } else {
+        return event;
+      }
+    }).doOnData((event) async {
+      if (event.statusCode == 200) {
+        Authentication data = event.data;
+        await ApplicationToken.getInstance().saveToken(data.token, data.userId);
+      } else {
         ApiMutationError data = event.data;
         ErrorManager.getInstance().dispatch(data.error);
       }

@@ -74,7 +74,7 @@ class _AdminAllUsersPageState extends State<AdminAllUsersPage> {
                                   onTap: () => {
                                     context.pushNamed(RouteNames.adminUserProfile, pathParameters: {"userId": adminAllUsersLogic.users[index].reference})
                                   },
-                                  leading: CircleAvatar(backgroundImage: NetworkImage(adminAllUsersLogic.users[index].profilePicture)),
+                                  leading: CircleAvatar(backgroundImage: NetworkImage(adminAllUsersLogic.users[index].profilePicture ?? 'https://picsum.photos/id/237/200/300')),
                                   title: Text(adminAllUsersLogic.users[index].fullName),
                                   subtitle: Text(adminAllUsersLogic.users[index].subscription?.isActive ?? false ? 'Subscriber' : 'Not a Subscriber'),
                                 );

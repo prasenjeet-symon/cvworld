@@ -82,7 +82,7 @@ export class AdminController {
       return;
     }
 
-    const validPassword = hashPassword(password) === oldUser.password;
+    const validPassword = password.trim() === oldUser.password.trim();
 
     if (!validPassword) {
       this.res.status(400).json({ error: "Wrong password. Please try again" });
