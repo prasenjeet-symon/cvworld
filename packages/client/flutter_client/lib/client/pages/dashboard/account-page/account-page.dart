@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:cvworld/client/datasource/http/error.manager.dart';
 import 'package:cvworld/client/datasource/http/http.manager.dart';
 import 'package:cvworld/client/datasource/network.api.dart';
 import 'package:cvworld/client/datasource/schema.dart';
+import 'package:cvworld/client/datasource/utils.dart';
 import 'package:cvworld/client/pages/dashboard/account-page/account-page.mobile.dart';
 import 'package:cvworld/client/pages/dashboard/account-page/account-page.web.dart';
 import 'package:cvworld/client/shared/confirmation-dialog/confirmation-dialog.dart';
@@ -267,6 +269,76 @@ class _AccountPageDetailsState extends State<AccountPageDetails> {
         });
       }
     });
+
+    NotificationManager.getInstance(ctx: context);
+  }
+
+  ///
+  ///
+  /// Edit user name
+  _editUserName() async {
+    TextEditingController userNameController = TextEditingController();
+    userNameController.text = user?.userName ?? '';
+
+    String? inputUserName = await showDialog<String?>(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          child: Container(
+            width: 400,
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Edit User Name', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
+                Container(
+                  margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                  width: double.infinity,
+                  child: TextField(
+                    controller: userNameController,
+                    decoration: const InputDecoration(labelText: 'User Name', border: OutlineInputBorder()),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Cancel'),
+                  ),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, foregroundColor: Colors.white),
+                    onPressed: () {
+                      Navigator.of(context).pop(userNameController.text);
+                    },
+                    child: const Text('Save'),
+                  )
+                ])
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (inputUserName != null && user != null) {
+      // Check if user name is already taken
+      ApiResponse response = await controller.isUsernameAvailable(inputUserName);
+      if (response.statusCode == 200) {
+        // Not taken
+        user?.userName = inputUserName;
+        controller.updateUser(user!);
+        return;
+      } else {
+        // Taken
+        ErrorManager.getInstance().dispatch('Username is already taken');
+        return;
+      }
+    }
   }
 
   @override
@@ -321,8 +393,22 @@ class _AccountPageDetailsState extends State<AccountPageDetails> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Expanded(flex: 6, child: Text('Username', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
-                        Text(user?.userName ?? '', style: TextStyle(fontSize: 15, color: Colors.grey.shade700), textAlign: TextAlign.end),
+                        const Expanded(
+                          flex: 6,
+                          child: Text('Username', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                        ),
+                        Row(
+                          children: [
+                            Text(user?.userName ?? '', style: TextStyle(fontSize: 15, color: Colors.grey.shade700), textAlign: TextAlign.end),
+                            const SizedBox(width: 5),
+                            GestureDetector(
+                              onTap: () {
+                                _editUserName();
+                              },
+                              child: MouseRegion(cursor: SystemMouseCursors.click, child: Icon(Icons.edit, size: 15, color: Colors.grey.shade700)),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),

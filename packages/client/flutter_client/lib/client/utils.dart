@@ -11,6 +11,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:math';
 
 // SOME APPLICATION CONSTANTS
 class Constants {
@@ -29,6 +30,12 @@ double pageWidth(BuildContext context) {
 
 int flexNumber(BuildContext context) {
   return MediaQuery.of(context).size.width >= Constants.breakPoint ? 1 : 0;
+}
+
+String generateUserId({int length = 8}) {
+  const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  final random = Random();
+  return String.fromCharCodes(Iterable.generate(length, (_) => characters.codeUnitAt(random.nextInt(characters.length))));
 }
 
 Future<void> downloadFile(String url, String fileName) async {

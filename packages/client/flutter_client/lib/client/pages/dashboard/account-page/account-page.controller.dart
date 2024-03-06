@@ -3,6 +3,7 @@ import 'package:cvworld/client/datasource/mapping.dart';
 import 'package:cvworld/client/datasource/models/subscription.model.dart';
 import 'package:cvworld/client/datasource/models/user.model.dart';
 import 'package:cvworld/client/datasource/mutation.dart';
+import 'package:cvworld/client/datasource/network.api.dart';
 import 'package:cvworld/client/datasource/schema.dart';
 import 'package:cvworld/client/utils.dart';
 
@@ -49,6 +50,13 @@ class AccountPageController {
   Stream<ModelStore<List<Subscription>>> getSubscriptionPlan() {
     RootToSubscriptionPlanMapping mapper = RootToSubscriptionPlanMapping.getInstance();
     return mapper.get(Constants.rootNodeId).plans;
+  }
+
+  ///
+  ///
+  /// Is username available1
+  Future<ApiResponse> isUsernameAvailable(String username) async {
+    return await singleCall(NetworkApi().isUsernameTaken(username));
   }
 
   ///

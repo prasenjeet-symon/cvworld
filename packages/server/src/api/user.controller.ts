@@ -453,7 +453,7 @@ export class UserController {
       return false;
     }
 
-    if (!isDefined(profilePicture) || !isDefined(fullName) || !isDefined(userName)) {
+    if (!isDefined(fullName) || !isDefined(userName)) {
       this.res.status(400).json({ error: "profilePicture, fullName, userName are required fields" });
       Logger.getInstance().logError("validateUpdateUser:: profilePicture, fullName, userName are required fields");
       return false;

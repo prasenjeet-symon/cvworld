@@ -6,14 +6,12 @@ import 'package:cvworld/client/pages/authentication/signup-page/signup-page.web.
 import 'package:cvworld/client/shared/validators/email.validator.dart';
 import 'package:cvworld/client/shared/validators/name.validator.dart';
 import 'package:cvworld/client/shared/validators/password.validator.dart';
-import 'package:cvworld/client/shared/validators/user-name.validator.dart';
 import 'package:cvworld/client/utils.dart';
 import 'package:cvworld/config.dart';
 import 'package:cvworld/routes/router.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import 'package:rxdart/rxdart.dart';
 
 import '../../../shared/continue-with-email/continue-with-email.dart';
 
@@ -80,7 +78,6 @@ class _SignUpFormState extends State<SignUpForm> {
   final _userNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _userNameStream$ = PublishSubject<String?>();
 
   final SignUpPageController _signUpPageController = SignUpPageController();
   late StreamSubscription _subscription;
@@ -90,19 +87,7 @@ class _SignUpFormState extends State<SignUpForm> {
   void initState() {
     super.initState();
 
-    // Listen for the username change and detect if the username already exists
-    _userNameController.addListener(() {
-      _userNameStream$.add(_userNameController.text);
-    });
-
-    _subscription = _userNameStream$.debounceTime(const Duration(milliseconds: 500)).listen((event) async {
-      var isTaken = await _signUpPageController.isUsernameTaken(event);
-      if (mounted) {
-        setState(() {
-          isUserNameTaken = isTaken;
-        });
-      }
-    });
+    _userNameController.text = generateUserId();
   }
 
   @override
@@ -113,7 +98,7 @@ class _SignUpFormState extends State<SignUpForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       child: Form(
         key: _formKey,
@@ -129,17 +114,6 @@ class _SignUpFormState extends State<SignUpForm> {
                 controller: _fullNameController,
                 decoration: const InputDecoration(labelText: 'Full Name', border: OutlineInputBorder()),
                 autofocus: true,
-              ),
-            ),
-            // User Name
-            Container(
-              margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-              width: double.infinity,
-              child: TextFormField(
-                validator: isUserNameTaken ? (value) => 'Username already taken. Please choose another' : UsernameValidator.validate,
-                keyboardType: TextInputType.name,
-                controller: _userNameController,
-                decoration: const InputDecoration(labelText: 'User Name', border: OutlineInputBorder()),
               ),
             ),
             // Email
