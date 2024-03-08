@@ -153,3 +153,7 @@
 These step-by-step instructions will assist you in deploying your application efficiently in a production environment on a Linux machine.
 
 --- 
+
+## API Keys
+
+- `RESEND_API_KEY`, `RESEND_FROM`: You can extract these keys from the [Resend](https://resend.com/) dashboard.
