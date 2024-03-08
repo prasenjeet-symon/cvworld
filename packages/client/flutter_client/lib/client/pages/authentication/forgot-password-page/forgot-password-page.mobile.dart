@@ -1,6 +1,9 @@
+import 'dart:async';
+
+import 'package:cvworld/client/datasource/http/error.manager.dart';
+import 'package:cvworld/client/datasource/http/success.manager.dart';
 import 'package:cvworld/client/datasource/utils.dart';
 import 'package:cvworld/client/pages/authentication/forgot-password-page/forgot-password-page.controller.dart';
-import 'package:cvworld/client/pages/authentication/forgot-password-page/forgot-password-page.dart';
 import 'package:cvworld/client/pages/authentication/forgot-password-page/forgot-password-page.web.dart';
 import 'package:cvworld/client/pages/authentication/forgot-password-page/link-sent-component/link-sent-component.dart';
 import 'package:cvworld/client/utils.dart';
@@ -22,7 +25,6 @@ class _ForgotPasswordPageMobileState extends State<ForgotPasswordPageMobile> {
   @override
   void initState() {
     super.initState();
-
     NotificationManager.getInstance(ctx: context);
   }
 
@@ -35,12 +37,28 @@ class _ForgotPasswordPageMobileState extends State<ForgotPasswordPageMobile> {
       isSent = false;
     });
 
-    await controller.sendResetPasswordEmail(email);
-
-    setState(() {
-      isLoading = false;
-      isSent = true;
+    controller.sendResetPasswordEmail(email).then((value) {
+      if (value.statusCode == 200) {
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+            isSent = true;
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+            isSent = false;
+          });
+        }
+      }
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override

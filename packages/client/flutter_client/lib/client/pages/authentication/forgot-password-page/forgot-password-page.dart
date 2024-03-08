@@ -1,6 +1,7 @@
 import 'package:cvworld/client/pages/authentication/forgot-password-page/forgot-password-page.mobile.dart';
 import 'package:cvworld/client/pages/authentication/forgot-password-page/forgot-password-page.web.dart';
 import 'package:cvworld/client/shared/continue-with-email/continue-with-email.dart';
+import 'package:cvworld/client/shared/validators/email.validator.dart';
 import 'package:cvworld/client/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -101,10 +102,8 @@ class _ForgotPasswordFormState extends State<ForgotPasswordForm> {
               margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
               child: TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
-                ),
+                validator: EmailValidator.validate,
+                decoration: const InputDecoration(labelText: 'Email', border: OutlineInputBorder()),
               ),
             ),
             const SizedBox(height: 10),

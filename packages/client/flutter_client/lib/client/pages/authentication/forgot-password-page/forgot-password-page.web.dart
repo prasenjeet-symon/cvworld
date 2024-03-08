@@ -21,7 +21,6 @@ class _ForgotPasswordPageWebState extends State<ForgotPasswordPageWeb> {
   @override
   void initState() {
     super.initState();
-
     NotificationManager.getInstance(ctx: context);
   }
 
@@ -34,11 +33,22 @@ class _ForgotPasswordPageWebState extends State<ForgotPasswordPageWeb> {
       isSent = false;
     });
 
-    await controller.sendResetPasswordEmail(email);
-
-    setState(() {
-      isLoading = false;
-      isSent = true;
+    controller.sendResetPasswordEmail(email).then((value) {
+      if (value.statusCode == 200) {
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+            isSent = true;
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+            isSent = false;
+          });
+        }
+      }
     });
   }
 
@@ -102,9 +112,11 @@ class _ForgotPasswordWebContentState extends State<ForgotPasswordWebContent> {
             const ForgotPasswordLogo(),
             const ForgotPasswordHeading(),
             const ForgotPasswordSubHeading(),
-            ForgotPasswordForm(onSubmit: (email) {
-              widget.onSubmit(email);
-            }),
+            ForgotPasswordForm(
+              onSubmit: (email) {
+                widget.onSubmit(email);
+              },
+            ),
           ],
         ),
       ),
