@@ -8,6 +8,7 @@ CREATE TABLE `Admin` (
     `reference` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `isDeleted` BOOLEAN NOT NULL DEFAULT false,
 
     UNIQUE INDEX `Admin_email_key`(`email`),
     PRIMARY KEY (`id`)
@@ -28,7 +29,7 @@ CREATE TABLE `PremiumTemplatePlans` (
     `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     UNIQUE INDEX `PremiumTemplatePlans_planID_key`(`planID`),
-    UNIQUE INDEX `PremiumTemplatePlans_name_key`(`name`),
+    UNIQUE INDEX `PremiumTemplatePlans_adminId_key`(`adminId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -39,9 +40,13 @@ CREATE TABLE `User` (
     `fullName` VARCHAR(191) NOT NULL,
     `profilePicture` VARCHAR(191) NULL,
     `password` VARCHAR(191) NULL,
+    `timeZone` VARCHAR(191) NOT NULL DEFAULT 'IST',
     `reference` VARCHAR(191) NOT NULL,
+    `userName` VARCHAR(191) NULL,
+    `isEmailVerified` BOOLEAN NOT NULL DEFAULT false,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `isDeleted` BOOLEAN NOT NULL DEFAULT false,
 
     UNIQUE INDEX `User_email_key`(`email`),
     UNIQUE INDEX `User_reference_key`(`reference`),
@@ -162,30 +167,35 @@ CREATE TABLE `Hobby` (
 -- CreateTable
 CREATE TABLE `Skills` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `identifier` VARCHAR(255) NOT NULL,
     `skill` VARCHAR(191) NOT NULL,
     `level` DOUBLE NOT NULL,
     `userId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    UNIQUE INDEX `Skills_identifier_key`(`identifier`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `Languages` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `identifier` VARCHAR(255) NOT NULL,
     `language` VARCHAR(191) NOT NULL,
     `level` DOUBLE NOT NULL,
     `userId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    UNIQUE INDEX `Languages_identifier_key`(`identifier`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `Courses` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `identifier` VARCHAR(255) NOT NULL,
     `course` VARCHAR(191) NOT NULL,
     `institution` VARCHAR(191) NOT NULL,
     `startDate` DATETIME(3) NOT NULL,
@@ -194,12 +204,14 @@ CREATE TABLE `Courses` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    UNIQUE INDEX `Courses_identifier_key`(`identifier`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `Educations` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `identifier` VARCHAR(255) NOT NULL,
     `school` VARCHAR(191) NOT NULL,
     `startDate` DATETIME(3) NOT NULL,
     `endDate` DATETIME(3) NOT NULL,
@@ -210,12 +222,14 @@ CREATE TABLE `Educations` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    UNIQUE INDEX `Educations_identifier_key`(`identifier`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `EmploymentHistories` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `identifier` VARCHAR(255) NOT NULL,
     `job` VARCHAR(191) NOT NULL,
     `employer` VARCHAR(191) NOT NULL,
     `startDate` DATETIME(3) NOT NULL,
@@ -226,12 +240,14 @@ CREATE TABLE `EmploymentHistories` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    UNIQUE INDEX `EmploymentHistories_identifier_key`(`identifier`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `Internships` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `identifier` VARCHAR(255) NOT NULL,
     `job` VARCHAR(191) NOT NULL,
     `employer` VARCHAR(191) NOT NULL,
     `startDate` DATETIME(3) NOT NULL,
@@ -242,6 +258,7 @@ CREATE TABLE `Internships` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    UNIQUE INDEX `Internships_identifier_key`(`identifier`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -260,12 +277,14 @@ CREATE TABLE `ProfessionalSummary` (
 -- CreateTable
 CREATE TABLE `Links` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `identifier` VARCHAR(255) NOT NULL,
     `title` VARCHAR(191) NOT NULL,
     `url` VARCHAR(191) NOT NULL,
     `userId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    UNIQUE INDEX `Links_identifier_key`(`identifier`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -280,6 +299,24 @@ CREATE TABLE `ContactUs` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Feedback` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NOT NULL,
+    `email` VARCHAR(191) NOT NULL,
+    `title` VARCHAR(191) NOT NULL,
+    `description` LONGTEXT NOT NULL,
+    `department` VARCHAR(191) NOT NULL,
+    `isRegistered` BOOLEAN NOT NULL,
+    `identifier` VARCHAR(191) NOT NULL,
+    `attachment` VARCHAR(191) NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    UNIQUE INDEX `Feedback_identifier_key`(`identifier`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -389,6 +426,15 @@ CREATE TABLE `ResumeTemplateMarketplace` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `_ResumeTemplateMarketplaceToUser` (
+    `A` INTEGER NOT NULL,
+    `B` INTEGER NOT NULL,
+
+    UNIQUE INDEX `_ResumeTemplateMarketplaceToUser_AB_unique`(`A`, `B`),
+    INDEX `_ResumeTemplateMarketplaceToUser_B_index`(`B`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `PremiumTemplatePlans` ADD CONSTRAINT `PremiumTemplatePlans_adminId_fkey` FOREIGN KEY (`adminId`) REFERENCES `Admin`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -454,3 +500,9 @@ ALTER TABLE `WalletPayment` ADD CONSTRAINT `WalletPayment_transactionId_fkey` FO
 
 -- AddForeignKey
 ALTER TABLE `NetBankingPayment` ADD CONSTRAINT `NetBankingPayment_transactionId_fkey` FOREIGN KEY (`transactionId`) REFERENCES `Transaction`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `_ResumeTemplateMarketplaceToUser` ADD CONSTRAINT `_ResumeTemplateMarketplaceToUser_A_fkey` FOREIGN KEY (`A`) REFERENCES `ResumeTemplateMarketplace`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `_ResumeTemplateMarketplaceToUser` ADD CONSTRAINT `_ResumeTemplateMarketplaceToUser_B_fkey` FOREIGN KEY (`B`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

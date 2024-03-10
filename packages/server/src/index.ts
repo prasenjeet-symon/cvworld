@@ -1,12 +1,14 @@
-import { BrowserPuppeteer, addTemplate, createPremiumTemplatePlan, createServer, signUpAdmin } from "./utils";
+import { SubscriptionPlanController } from "./api/subscription-plan.controller";
+import { AdminController } from "./auth/admin.controller";
+import { BrowserPuppeteer, addTemplate, createServer } from "./utils";
 require("dotenv").config();
 
 const PORT = process.env.PORT ? +process.env.PORT : 8081;
 const app = createServer();
 
-signUpAdmin()
+AdminController.signupAsAdmin()
   .then(() => {
-    return createPremiumTemplatePlan();
+    return SubscriptionPlanController.createSubscriptionPlan();
   })
   .then(() => {
     return BrowserPuppeteer.browser();
@@ -30,7 +32,7 @@ signUpAdmin()
   })
   .catch((err) => console.log(err))
   .finally(() => {
-    app.listen(PORT, async () => {
+    app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
   });

@@ -11,9 +11,13 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:math';
 
 // SOME APPLICATION CONSTANTS
 class Constants {
+  static const String rootNodeId = 'root';
+  static const String databaseName = 'cvworld';
+  static const String applicationDirectory = 'cvworld';
   static const int debounceTime = 1000;
   static const int breakPoint = 600;
   static const refreshSeconds = 5;
@@ -26,6 +30,12 @@ double pageWidth(BuildContext context) {
 
 int flexNumber(BuildContext context) {
   return MediaQuery.of(context).size.width >= Constants.breakPoint ? 1 : 0;
+}
+
+String generateUserId({int length = 8}) {
+  const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  final random = Random();
+  return String.fromCharCodes(Iterable.generate(length, (_) => characters.codeUnitAt(random.nextInt(characters.length))));
 }
 
 Future<void> downloadFile(String url, String fileName) async {
@@ -245,35 +255,44 @@ class _ImageCardState extends State<ImageCard> {
       return const SizedBox.shrink();
     }
 
-    return Container(
-      color: Colors.black.withOpacity(0.03),
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-      margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 80,
-            child: isLoading ? const CircularProgressIndicator(strokeWidth: 2.0, color: Colors.black, backgroundColor: Colors.white) : CircleAvatar(backgroundImage: NetworkImage(user!.profilePicture), radius: 50),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Change your profile picture', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 16),
-                  ImagePickerWidget(
-                    onImageSelected: (List<PlatformFile> files) {
-                      _uploadProfile(files);
-                    },
-                  ),
-                ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: const EdgeInsets.fromLTRB(20, 10, 0, 10),
+          child: Text('PROFILE PICTURE', style: TextStyle(fontSize: 15, color: Colors.black.withOpacity(0.6), fontWeight: FontWeight.w500)),
+        ),
+        Container(
+          color: Colors.black.withOpacity(0.03),
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+          margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 50,
+                child: isLoading ? const CircularProgressIndicator(strokeWidth: 2.0, color: Colors.black, backgroundColor: Colors.white) : CircleAvatar(backgroundImage: NetworkImage(user!.profilePicture), radius: 50),
               ),
-            ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Change your profile picture', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 16),
+                      ImagePickerWidget(
+                        onImageSelected: (List<PlatformFile> files) {
+                          _uploadProfile(files);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

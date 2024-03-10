@@ -8,6 +8,9 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 String formatAsIndianRupee(double amount) {
+  // Convert paisa to rupee
+  amount = amount / 100;
+  // Convert the amount to Indian Rupee
   final format = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
   return format.format(amount);
 }

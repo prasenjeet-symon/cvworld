@@ -19,7 +19,7 @@ class _AccountSettingMobileState extends State<AccountSettingMobile> {
           },
           icon: const Icon(Icons.arrow_back),
         ),
-        title: const Text('Account Settings'),
+        title: const Text('My Data'),
       ),
       body: const Padding(
         padding: EdgeInsets.all(10),

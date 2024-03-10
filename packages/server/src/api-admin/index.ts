@@ -1,5 +1,5 @@
 import express from "express";
-import { PremiumTemplatePlan, PrismaClientSingleton, addTemplate, hashPassword, isWeakPassword } from "../utils";
+import { PremiumTemplatePlan, PrismaClientSingleton, addTemplate, hashPassword, isValidEmail } from "../utils";
 
 const router = express.Router();
 
@@ -28,6 +28,7 @@ router.post("/add_template", async (req, res) => {
 });
 
 /**
+ *
  * Get all the registered users
  */
 router.get("/users", async (req, res) => {
@@ -36,9 +37,13 @@ router.get("/users", async (req, res) => {
       subscription: true,
       boughtTemplate: true,
     },
+    where:{
+      isDeleted: false
+    }
   });
 
-  res.json(users);
+  const activeUsers = users;
+  res.json(activeUsers);
 });
 
 // reset the password of the user
@@ -357,24 +362,24 @@ router.post("/single_user", async (req, res) => {
     },
   });
 
-  // return the sigle user 
+  // return the sigle user
   res.json(user);
 });
 
-/** 
- * 
+/**
+ *
  * Get all the marketplace templates
- * 
+ *
  */
 router.get("/marketplace_templates", async (req, res) => {
   const templates = await PrismaClientSingleton.prisma.resumeTemplateMarketplace.findMany();
   res.json(templates);
-})
+});
 
-/** 
- * 
+/**
+ *
  * Update the marketplace template
- * 
+ *
  */
 router.post("/update_marketplace_template", async (req, res) => {
   // should have template id
@@ -382,15 +387,15 @@ router.post("/update_marketplace_template", async (req, res) => {
     res.status(400).json({ message: "id field is missing" });
     return;
   }
-  
-  // price 
-  if(!("price" in req.body)) {
+
+  // price
+  if (!("price" in req.body)) {
     res.status(400).json({ message: "price field is missing" });
     return;
   }
 
   // name
-  if(!("name" in req.body)) {
+  if (!("name" in req.body)) {
     res.status(400).json({ message: "name field is missing" });
     return;
   }
@@ -407,16 +412,16 @@ router.post("/update_marketplace_template", async (req, res) => {
       price: price,
       displayName: name,
       updatedAt: new Date(),
-    }
+    },
   });
 
   res.json({ message: "Template updated successfully" });
-})
+});
 
-/** 
- * 
+/**
+ *
  * Delete the marketplace template
- * 
+ *
  */
 router.post("/delete_marketplace_template", async (req, res) => {
   // should have template id
@@ -431,16 +436,15 @@ router.post("/delete_marketplace_template", async (req, res) => {
     where: {
       id: id,
     },
-
   });
 
   res.json({ message: "Template deleted successfully" });
-})
+});
 
-/** 
- * 
+/**
+ *
  * Get single marketplace template
- * 
+ *
  */
 router.post("/single_marketplace_template", async (req, res) => {
   // should have template id
@@ -455,16 +459,15 @@ router.post("/single_marketplace_template", async (req, res) => {
     where: {
       id: id,
     },
-
   });
 
   res.json(template);
 });
 
-/** 
- * 
+/**
+ *
  * Get single contact us message
- * 
+ *
  */
 router.post("/single_contact_us_message", async (req, res) => {
   // should have template id
@@ -484,10 +487,10 @@ router.post("/single_contact_us_message", async (req, res) => {
   res.json(message);
 });
 
-/** 
- * 
+/**
+ *
  * Get the admin details
- * 
+ *
  */
 router.post("/admin_details", async (req, res) => {
   const adminDetails = await PrismaClientSingleton.prisma.admin.findUnique({

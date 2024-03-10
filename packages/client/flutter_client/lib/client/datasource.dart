@@ -1117,13 +1117,15 @@ class User {
   );
 
   factory User.fromJson(Map<String, dynamic> json) {
+    print(json);
+
     return User(
       int.parse(json['id'].toString()),
       DateTime.parse(json['createdAt']),
       json['email'],
       json['fullName'],
       json['timeZone'],
-      DatabaseService().publicResource(json['profilePicture']),
+      DatabaseService().publicResource(json['profilePicture'] ?? ''),
       json['reference'],
       DateTime.parse(json['updatedAt']),
       json['subscription'] == null ? null : UserSubscription.fromJson(json['subscription']),
@@ -1439,7 +1441,7 @@ class JwtClient extends http.BaseClient {
 
   Future<String?> getToken() async {
     const storage = FlutterSecureStorage();
-    String? token = await storage.read(key: 'JWT');
+    String? token = await storage.read(key: 'token');
 
     if (token == null) {
       if (kDebugMode) {
@@ -1580,6 +1582,8 @@ class DatabaseService {
   late Uri getPremiumPlanRoute;
   // server/api/template/templt_p_1?token={{TOKEN}}
   late Uri getTemplateRoute;
+  // /delete_user
+  late Uri deleteUserRoute;
 
   DatabaseService() {
     // const apiBaseUrl = 'https://native-humorous-mule.ngrok-free.app';
@@ -1640,7 +1644,7 @@ class DatabaseService {
     createSubscriptionRoute = Uri.parse('$origin/server/api/create_subscription');
     cancelSubscriptionRoute = Uri.parse('$origin/server/api/cancel_subscription');
     getPremiumPlanRoute = Uri.parse('$origin/server/api/get_premium_plan');
-    // isTokenActiveRoute
+    deleteUserRoute = Uri.parse('$origin/server/api/delete_user');
   }
 
   publicResource(String path) {
@@ -1820,7 +1824,7 @@ class DatabaseService {
 
   Future<String?> getToken() async {
     const storage = FlutterSecureStorage();
-    String? token = await storage.read(key: 'JWT');
+    String? token = await storage.read(key: 'token');
     if (token == null) {
       if (kDebugMode) {
         print('No JWT found!');
@@ -1917,6 +1921,7 @@ class DatabaseService {
       return responseData;
     } else {
       if (kDebugMode) {
+        print(response.reasonPhrase);
         print('Something went wrong while generating resume');
       }
       client.dispose();
@@ -2590,6 +2595,7 @@ class DatabaseService {
     if (response.statusCode == 200) {
       client.dispose();
       var responseData = User.fromJson(json.decode(response.body));
+      print(responseData);
       return responseData;
     } else {
       if (kDebugMode) {
@@ -2835,6 +2841,23 @@ class DatabaseService {
       }
 
       return null;
+    }
+  }
+
+  // Delete user
+  Future<void> deleteUser() async {
+    var client = JwtClient();
+    var response = await client.post(deleteUserRoute);
+    if (response.statusCode == 200) {
+      client.dispose();
+      return;
+    } else {
+      client.dispose();
+      if (kDebugMode) {
+        print('Something went wrong while deleting user');
+      }
+
+      return;
     }
   }
 

@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cvworld/dashboard/datasource/http/http.manager.admin.dart';
 import 'package:cvworld/dashboard/datasource_dashboard.dart';
 import 'package:cvworld/routes/router.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +15,7 @@ class AdminHomePage extends StatefulWidget {
 
 class _AdminHomePageState extends State<AdminHomePage> {
   AdminHomePageLogic adminHomePageLogic = AdminHomePageLogic();
+  StreamSubscription? _subscription;
 
   Future<void> confirmLogout(BuildContext ctx) async {
     // Show a confirmation dialog
@@ -42,9 +46,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
 
     // If the user confirms, proceed with logout
     if (confirm) {
-      await logoutAdmin();
-      // ignore: use_build_context_synchronously
-      ctx.pushNamed(RouteNames.adminSignin);
+      ApplicationToken.getInstance().deleteToken();
     }
   }
 
@@ -52,45 +54,63 @@ class _AdminHomePageState extends State<AdminHomePage> {
   void initState() {
     super.initState();
     adminHomePageLogic.fetchAdminDetails(setState);
+
+    _subscription = ApplicationToken.getInstance().observable.listen((event) {
+      if (event == null) {
+        context.goNamed(RouteNames.adminSignin);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: adminHomePageLogic.isLoading
-            ? const Center(
-                child: Padding(
-                padding: EdgeInsets.all(50),
-                child: CircularProgressIndicator(),
-              ))
-            : Container(
-                margin: const EdgeInsets.only(top: 70),
-                width: 800,
-                child: Column(
-                  children: [
-                    Text('Welcome, ${adminHomePageLogic.admin!.fullName}!', style: const TextStyle(fontSize: 50, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 50),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        HoverCard(title: 'All Users', icon: Icons.people, onTap: () => context.pushNamed(RouteNames.adminAllUsers)),
-                        HoverCard(title: 'All Templates', icon: Icons.format_list_bulleted, onTap: () => {context.pushNamed(RouteNames.adminAllTemplates)}),
-                        HoverCard(title: 'Subscription Settings', icon: Icons.settings, onTap: () => context.pushNamed(RouteNames.adminSubscriptionSetting)),
-                      ],
-                    ),
-                    const SizedBox(height: 50),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        HoverCard(title: 'Update Password', icon: Icons.password, onTap: () => context.pushNamed(RouteNames.adminChangePassword)),
-                        HoverCard(title: 'Contact Us Messages', icon: Icons.message, onTap: () => context.pushNamed(RouteNames.adminContactUs)),
-                        HoverCard(title: 'Sign Out', icon: Icons.logout, onTap: () => confirmLogout(context)),
-                      ],
-                    )
-                  ],
+      body: SingleChildScrollView(
+        child: Center(
+          child: adminHomePageLogic.isLoading
+              ? const Center(child: Padding(padding: EdgeInsets.all(50), child: CircularProgressIndicator()))
+              : Container(
+                  margin: const EdgeInsets.only(top: 70),
+                  width: 800,
+                  child: Column(
+                    children: [
+                      Text('Welcome, ${adminHomePageLogic.admin!.fullName}!', style: const TextStyle(fontSize: 50, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 50),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          HoverCard(title: 'All Users', icon: Icons.people, onTap: () => context.pushNamed(RouteNames.adminAllUsers)),
+                          HoverCard(title: 'All Templates', icon: Icons.format_list_bulleted, onTap: () => {context.pushNamed(RouteNames.adminAllTemplates)}),
+                          HoverCard(title: 'Subscription Settings', icon: Icons.settings, onTap: () => context.pushNamed(RouteNames.adminSubscriptionSetting)),
+                        ],
+                      ),
+                      const SizedBox(height: 50),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          HoverCard(title: 'Update Password', icon: Icons.password, onTap: () => context.pushNamed(RouteNames.adminChangePassword)),
+                          HoverCard(title: 'Contact Us Messages', icon: Icons.message, onTap: () => context.pushNamed(RouteNames.adminContactUs)),
+                          HoverCard(title: 'Feedback', icon: Icons.feedback, onTap: () => context.pushNamed(RouteNames.adminFeedbackPage)),
+                        ],
+                      ),
+                      const SizedBox(height: 50),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          HoverCard(title: 'Sign Out', icon: Icons.logout, onTap: () => confirmLogout(context)),
+                        ],
+                      ),
+                      const SizedBox(height: 100),
+                    ],
+                  ),
                 ),
-              ),
+        ),
       ),
     );
   }
@@ -106,7 +126,7 @@ class HoverCard extends StatefulWidget {
   final String title;
   final VoidCallback onTap;
 
-  HoverCard({required this.icon, required this.title, required this.onTap});
+  const HoverCard({super.key, required this.icon, required this.title, required this.onTap});
 
   @override
   _HoverCardState createState() => _HoverCardState();

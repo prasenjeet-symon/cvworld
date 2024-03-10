@@ -1,9 +1,10 @@
 import 'package:cvworld/client/datasource.dart';
 import 'package:cvworld/client/pages/dashboard/components/profile.dart';
+import 'package:cvworld/client/utils.dart';
 import 'package:cvworld/routes/router.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
-import 'package:cvworld/client/utils.dart';
 
 class DashboardHeader extends StatefulWidget {
   const DashboardHeader({super.key});
@@ -110,6 +111,13 @@ class _DashboardHeaderState extends State<DashboardHeader> {
 class DashboardHeaderSecondary extends StatelessWidget {
   const DashboardHeaderSecondary({super.key});
 
+  void quickResume(BuildContext context) async {
+    FlutterSecureStorage storage = const FlutterSecureStorage();
+    String? templateName = await storage.read(key: 'DefaultTemplate');
+    // ignore: use_build_context_synchronously
+    templateName == null ? context.pushNamed(RouteNames.dashboardTemplates) : context.pushNamed(RouteNames.cvMaker, pathParameters: {"templateName": templateName, "resumeID": "0"});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -118,9 +126,20 @@ class DashboardHeaderSecondary extends StatelessWidget {
       child: Row(
         children: [
           const Expanded(child: Text('Resumes', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22))),
+          // Quick create button
           TextButton(
-            style: TextButton.styleFrom(padding: const EdgeInsets.fromLTRB(40, 20, 40, 20)),
-            onPressed: () => context.pushNamed(RouteNames.chooseTemplate),
+            style: TextButton.styleFrom(padding: const EdgeInsets.fromLTRB(20, 20, 20, 20)),
+            onPressed: () {
+              quickResume(context);
+            },
+            child: const Row(
+              children: [Icon(Icons.quickreply), Text('Quick Create')],
+            ),
+          ),
+          // Full create button
+          TextButton(
+            style: TextButton.styleFrom(padding: const EdgeInsets.fromLTRB(20, 20, 20, 20)),
+            onPressed: () => context.pushNamed(RouteNames.dashboardTemplates),
             child: const Row(
               children: [Icon(Icons.add), Text('Create')],
             ),

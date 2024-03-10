@@ -1,4 +1,3 @@
-import 'package:cvworld/client/pages/dashboard/components/header.dart';
 import 'package:cvworld/client/pages/dashboard/view-resume/view-resume.dart';
 import 'package:flutter/material.dart';
 
@@ -16,10 +15,7 @@ class _ViewResumeDesktopState extends State<ViewResumeDesktop> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
-          children: [
-            DashboardHeader(),
-            ResumeViewer(resumeID: widget.resumeID),
-          ],
+          children: [ResumeViewer(resumeID: widget.resumeID)],
         ),
       ),
     );

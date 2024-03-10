@@ -1,11 +1,24 @@
 import express from "express";
 import { PrismaClientSingleton } from "../utils";
 import { paymentSuccess } from "../views/payment-success";
+import { FeedbackFormController } from "./feedback-form.controller";
 import { WebhookController } from "./webhook.controller";
 
 const router = express.Router();
 
 router.get("/", (req, res) => res.send("Hello World!"));
+
+/** Add new feedback */
+router.post("/feedback", (req, res) => new FeedbackFormController(req, res).addFeedback());
+
+/** Upload feedback attachment */
+router.post("/upload_feedback_file", FeedbackFormController.attachmentStorage(), (req, res) => new FeedbackFormController(req, res).uploadFeedbackAttachment());
+
+/** Delete feedback */
+router.delete("/feedback", (req, res) => new FeedbackFormController(req, res).deleteFeedback());
+
+/** Get all feedback */
+router.get("/feedback", (req, res) => new FeedbackFormController(req, res).getAllFeedback());  
 
 // add contact us message
 router.post("/contact_us", async (req, res) => {

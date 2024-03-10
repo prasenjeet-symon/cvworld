@@ -74,7 +74,7 @@ class _AdminAllUsersPageState extends State<AdminAllUsersPage> {
                                   onTap: () => {
                                     context.pushNamed(RouteNames.adminUserProfile, pathParameters: {"userId": adminAllUsersLogic.users[index].reference})
                                   },
-                                  leading: CircleAvatar(backgroundImage: NetworkImage(adminAllUsersLogic.users[index].profilePicture)),
+                                  leading: CircleAvatar(backgroundImage: NetworkImage(adminAllUsersLogic.users[index].profilePicture ?? 'https://picsum.photos/id/237/200/300')),
                                   title: Text(adminAllUsersLogic.users[index].fullName),
                                   subtitle: Text(adminAllUsersLogic.users[index].subscription?.isActive ?? false ? 'Subscriber' : 'Not a Subscriber'),
                                 );
@@ -95,14 +95,11 @@ class AdminAllUsersLogic {
 
   Future<void> fetchAllUsers(void Function(void Function()) setState, {bool canShowLoading = true}) async {
     try {
-      debugPrint('Will fetch');
-
       setState(() {
         isLoading = canShowLoading;
       });
 
       List<User>? response = await DashboardDataService().getUsers();
-      debugPrint('Got response');
 
       if (response == null) {
         setState(() {
@@ -117,8 +114,6 @@ class AdminAllUsersLogic {
         isLoading = false;
         users = response;
       });
-
-      debugPrint('Fetched ${users.length} users');
     } catch (e) {
       // Handle any errors that occurred during the fetch operation
       if (kDebugMode) {

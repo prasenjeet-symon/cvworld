@@ -1,4 +1,5 @@
 import 'package:cvworld/client/pages/dashboard/components/header.dart';
+import 'package:cvworld/client/shared/dashboard-header/dashboard-header.dart' as M;
 import 'package:cvworld/client/pages/dashboard/dashboard/dashboard-body.dart';
 import 'package:flutter/material.dart';
 
@@ -16,12 +17,9 @@ class _DashboardDesktopState extends State<DashboardDesktop> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            DashboardHeader(),
-            Padding(
-              padding: EdgeInsets.fromLTRB(100, 10, 100, 10),
-              child: DashboardHeaderSecondary(),
-            ),
-            DashboardBodyContent(resumeWidth: 200)
+            M.DashboardHeader(),
+            Padding(padding: EdgeInsets.fromLTRB(100, 10, 100, 10), child: DashboardHeaderSecondary()),
+            DashboardBodyContent(resumeWidth: 200),
           ],
         ),
       ),

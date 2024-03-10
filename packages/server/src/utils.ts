@@ -1,11 +1,211 @@
 import { PrismaClient } from "@prisma/client";
 import express, { NextFunction, Request, Response } from "express";
-import { v4 } from "uuid";
+import { v4, validate } from "uuid";
 import router from "./api";
 import routerAdmin from "./api-admin/index";
 import routerPublic from "./api-public";
-import routerMedia from "./api/media";
 import routerAuth from "./auth";
+import { Resend } from 'resend';
+/** 
+ * 
+ * Send email using resend
+ */
+export async function sendEmail(data: EmailOptions): Promise<string | undefined> {
+  const from = process.env.RESEND_FROM || 'onboarding@resend.dev';
+  const API_KEY = process.env.RESEND_API_KEY || '';
+  const resend = new Resend(API_KEY);
+
+  try {
+      const sendResult = await resend.emails.send({
+          from: from,
+          to: data.to,
+          subject: data.subject,
+          html: data.html || '',
+      });
+
+      if (sendResult.error) throw sendResult.error;
+      return sendResult.data?.id;
+  } catch (error: any) {
+      Logger.getInstance().logError('Error sending email : ' + error);
+      return undefined;
+  }
+}
+/** 
+ * 
+ * Get random user name
+ */
+
+export function generateUniqueUsername(fullName: string): string {
+  const randomNumber = Math.floor(1000 + Math.random() * 9000); // Generate random number between 1000 and 9999
+  const username = `${fullName}_${randomNumber}`.toLowerCase();
+  return username;
+}
+
+
+export function isTokenActive(token: string): { isActive: boolean; payload?: any } {
+  try {
+    const jwt = require("jsonwebtoken");
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "", {
+      ignoreExpiration: false,
+    });
+
+    Logger.getInstance().logSuccess(JSON.stringify(decoded));
+
+    // Return both the status and the payload
+    return { isActive: true, payload: decoded };
+  } catch (error) {
+    console.error(error);
+    // An error occurred while decoding the token
+    return { isActive: false };
+  }
+}
+
+/*
+ *
+ *
+ * Create JWT
+ */
+export async function createJwt(userId: string, email: string, isAdmin: boolean = false, expiresIn: string | null = null, timeZone: string | null = null): Promise<string> {
+  const jwt = require("jsonwebtoken");
+  const JWT_SECRET = process.env.JWT_SECRET;
+  const JWT_EXPIRES_IN = expiresIn || process.env.JWT_EXPIRES_IN || "1d";
+
+  if (!JWT_SECRET) {
+    Logger.getInstance().logError("JWT_SECRET not set in the environment variables");
+    throw new Error("JWT_SECRET not set in the environment variables");
+  }
+
+  return jwt.sign({ userId, email, isAdmin: isAdmin, timeZone }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+}
+
+/*
+ *
+ * Get client ip address
+ */
+export function getClientIP(req: Request): string {
+  // Check if the request is coming through a proxy
+  const forwardedFor = req.headers["x-forwarded-for"];
+  if (forwardedFor && typeof forwardedFor === "string") {
+    // Extract the client IP from the X-Forwarded-For header
+    const ips = forwardedFor.split(",");
+    return ips[0].trim();
+  }
+
+  // If not behind a proxy, simply use the remote address from the request
+  return req.ip || "";
+}
+
+/*
+ *
+ * Get client location
+ */
+export async function getClientLocation(req: Request): Promise<LocationInfo | undefined> {
+  const { IPINFO_TOKEN } = process.env;
+  if (IPINFO_TOKEN === undefined) {
+    Logger.getInstance().logError("IPINFO_TOKEN is not defined. Please set it in .env file");
+    return;
+  }
+
+  const clientIP = getClientIP(req);
+  console.log("Client IP: " + clientIP);
+
+  try {
+    // Make a request to the ipinfo.io API to get location information
+    const response = await axios.get<LocationInfo>(`https://ipinfo.io/${clientIP}?token=${IPINFO_TOKEN}`);
+    return response.data;
+  } catch (error) {
+    Logger.getInstance().logError("Error getting client location : " + error);
+    return;
+  }
+}
+
+/**
+ *
+ *
+ * Logger
+ */
+export class Logger {
+  private static instance: Logger;
+
+  private constructor() {}
+
+  public static getInstance(): Logger {
+    if (!Logger.instance) {
+      Logger.instance = new Logger();
+    }
+    return Logger.instance;
+  }
+
+  private log(message: any) {
+    console.log(message);
+  }
+
+  private logWithColor(message: string, color: string): void {
+    console.log(`${color}%s\x1b[0m`, message);
+  }
+
+  public logWarning(message: string): void {
+    this.logWithColor(`Warning: ${message}`, "\x1b[33m"); // Yellow
+  }
+
+  public logError(message: string): void {
+    this.logWithColor(`Error: ${message}`, "\x1b[31m"); // Red
+  }
+
+  public logSuccess(message: string): void {
+    this.logWithColor(`Success: ${message}`, "\x1b[32m"); // Green
+  }
+}
+
+/**
+ *
+ * Is input integer
+ */
+export function isInteger(value: any): boolean {
+  return Number.isInteger(value);
+}
+/**
+ *
+ * Is valid email
+ */
+export function isValidEmail(email: string): boolean {
+  // Regular expression for basic email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+/**
+ *
+ * Is valid UUID
+ */
+export function isValidUUID(uuid: string): boolean {
+  return validate(uuid);
+}
+
+/**
+ *
+ * Is valid string length
+ */
+export function isValidStringLength(value: string, min: number, max: number): boolean {
+  return value.length >= min && value.length <= max;
+}
+
+/**
+ *
+ * Is boolean
+ */
+export function isBoolean(value: any): boolean {
+  return typeof value === "boolean";
+}
+
+/**
+ *
+ * Is defined
+ */
+export function isDefined(value: any): boolean {
+  return value !== undefined && value !== null;
+}
 
 export type paymentMethod = "netbanking" | "card" | "wallet" | "upi";
 export enum EPaymentMethod {
@@ -802,6 +1002,7 @@ export async function signInOrSignUpWithGoogle(req: Request, res: Response): Pro
   }
 
   const verifiedToken = await verifyGoogleAuthToken(token);
+
   const oldUser = await doUserAlreadyExit(verifiedToken.email);
   if (oldUser) {
     // sign token and return
@@ -874,18 +1075,6 @@ export async function verifyGoogleAuthToken(token: string): Promise<IGoogleAuthT
   const name = userProfile.name;
   const picture = userProfile.picture;
   return { success: true, userId, email, name, profile: picture };
-}
-
-/** Create the JSON web token */
-export async function createJwt(userId: string, email: string, isAdmin: boolean = false): Promise<string> {
-  const jwt = require("jsonwebtoken");
-  const JWT_SECRET = process.env.JWT_SECRET;
-  const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1d";
-  if (!JWT_SECRET) {
-    throw new Error("JWT_SECRET not set");
-  }
-
-  return jwt.sign({ userId, email, isAdmin: isAdmin }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 }
 
 /** Verify the JSON WEB TOKEN */
@@ -972,6 +1161,7 @@ export async function signUpWithEmailAndPassword(req: Request, res: Response) {
       res.status(400).json({ message: "All input is required" });
       return;
     }
+    const prisma = PrismaClientSingleton.prisma;
 
     const userAlreadyExit = await doUserAlreadyExit(req.body.email);
     if (userAlreadyExit) {
@@ -984,7 +1174,6 @@ export async function signUpWithEmailAndPassword(req: Request, res: Response) {
     // Save the user to the database or perform any desired actions
     const profilePicture = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
 
-    const prisma = PrismaClientSingleton.prisma;
     await prisma.user.create({
       data: {
         timeZone: timeZone,
@@ -1018,8 +1207,8 @@ export async function signInWithEmailAndPassword(req: Request, res: Response) {
 
   const email = req.body.email;
   const password = req.body.password;
-
   const oldUser = await doUserAlreadyExit(email);
+
   if (!oldUser) {
     res.status(402).json({ message: "User does not exit" });
     return;
@@ -1056,6 +1245,8 @@ export async function signInAdmin(req: Request, res: Response) {
   const email = req.body.email;
   const password = req.body.password;
 
+  console.log("email :", email, "password :", password);
+
   if (!(email && password)) {
     res.status(400).json({ message: "All input is required" });
     return;
@@ -1088,6 +1279,8 @@ export async function signUpAdmin() {
   // extract the email and password from the ENV
   const email = process.env.ADMIN_EMAIL;
   const password = process.env.ADMIN_PASSWORD;
+
+  console.log("email", email, "password", password);
 
   if (!(email && password)) {
     throw new Error("Admin email and password are required");
@@ -1142,7 +1335,6 @@ export function createServer() {
   app.use("/server/auth", routerAuth);
   app.use("/server/api_public", routerPublic);
   app.use("/server/api", authenticateUser, router);
-  app.use("/server/api/media", authenticateUser, routerMedia);
   app.use("/server/api_admin", authenticateUser, authenticateAdmin, routerAdmin);
 
   app.get("/server/", (req, res) => {
@@ -1228,6 +1420,7 @@ export interface Resume {
 
 import { faker } from "@faker-js/faker";
 import axios from "axios";
+import { EmailOptions, LocationInfo } from "./schema";
 
 // Generate dummy data for the Resume interface
 export function generateDummyResume(): Resume {
@@ -1342,16 +1535,16 @@ export function generateDummyResume(): Resume {
 export function formatDate(utcTimestamp: Date, timeZone: string) {
   const utcDate = new Date(utcTimestamp);
 
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    timeZone:timeZone,
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: timeZone,
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   });
 
   const convertedDateStr = formatter.format(utcDate);
   return convertedDateStr;
-} 
+}
 
 /** Generate the resume HTML */
 export function generateResumeHTML(resume: Resume, timeZone: string) {
@@ -1940,75 +2133,6 @@ export function razorpayPrice(price: number) {
   return +(+price * 100).toFixed(0);
 }
 
-/**
- *
- * Create new premium resume template
- */
-export async function createPremiumTemplatePlan() {
-  const nameOfPlan = "Premium";
-  const price = razorpayPrice(499.00); // 10 Dollar
-  const Razorpay = require("razorpay");
-  const razorpayKeyID = process.env.RAZORPAY_KEY_ID;
-  const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET;
-  const adminEmail = process.env.ADMIN_EMAIL;
-  const instance = new Razorpay({ key_id: razorpayKeyID, key_secret: razorpayKeySecret });
-  const prisma = PrismaClientSingleton.prisma;
-
-  // check if the plan already created in the database
-  const oldPlan = await prisma.admin.findUnique({
-    where: {
-      email: adminEmail,
-    },
-    select: {
-      premiumTemplatePlans:true
-    },
-  });
-
-  if (oldPlan && oldPlan.premiumTemplatePlans.length !== 0) {
-    return true;
-  }
-
-  // Is already created on razorpay
-  const allCreatedPlans = (await instance.plans.all()) as templatePlans;
-  const marsPlan = allCreatedPlans.items.find((p) => p.item.name.toLowerCase() === nameOfPlan.toLowerCase());
-
-  let createdPlanID = marsPlan ? marsPlan.id : "";
-
-  if (allCreatedPlans.count === 0 || !!!marsPlan) {
-    const createdPlan = (await instance.plans.create({
-      period: "monthly",
-      interval: 1,
-      item: {
-        name: nameOfPlan,
-        amount: price,
-        currency: "INR",
-        description: "Access all the premium templates",
-      },
-    })) as PremiumTemplatePlan;
-
-    createdPlanID = createdPlan.id;
-  }
-
-  // this means not created in database yet , create new one
-  await prisma.admin.update({
-    where: {
-      email: adminEmail,
-    },
-    data: {
-      premiumTemplatePlans: {
-        create: {
-          currency: "INR",
-          description: "Access all the premium templates",
-          interval: 1,
-          name: nameOfPlan,
-          period: "MONTHLY",
-          planID: createdPlanID,
-          price: price,
-        },
-      },
-    },
-  });
-}
 
 /**
  * Create localtunnel for the testing webhook
