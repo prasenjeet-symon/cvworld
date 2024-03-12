@@ -96,6 +96,16 @@ class _DashboardHeaderState extends State<DashboardHeader> {
               child: const Text('Contact Us', style: TextStyle(color: Colors.white)),
             ),
           ),
+          // Domain
+          Container(
+            margin: const EdgeInsets.only(right: 10),
+            child: TextButton(
+              onPressed: () {
+                context.pushNamed(RouteNames.dashboardDomain);
+              },
+              child: const Text('Domain', style: TextStyle(color: Colors.white)),
+            ),
+          ),
           // My Data Menu Item
           Container(
             margin: const EdgeInsets.only(right: 10),

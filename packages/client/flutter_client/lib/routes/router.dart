@@ -6,6 +6,7 @@ import 'package:cvworld/client/pages/contact-us-page/contact-us-page.dart';
 import 'package:cvworld/client/pages/dashboard/account-page/account-page.dart';
 import 'package:cvworld/client/pages/dashboard/account-setting/account-setting.dart';
 import 'package:cvworld/client/pages/dashboard/dashboard/dashboard.dart';
+import 'package:cvworld/client/pages/dashboard/domain-page/domain-page.dart';
 import 'package:cvworld/client/pages/dashboard/market-place/market-place.dart';
 import 'package:cvworld/client/pages/dashboard/templates-page/templates-page.dart';
 import 'package:cvworld/client/pages/dashboard/transaction-page/transaction-page.dart';
@@ -49,6 +50,7 @@ class RouteNames {
   static const String dashboardAccount = '/dashboard/account';
   static const String dashboardTransactions = '/dashboard/transactions';
   static const String dashboardTemplates = '/dashboard/templates';
+  static const String dashboardDomain = '/dashboard/domain';
 
   /// ADMIN
   /// Admin related routes
@@ -224,6 +226,12 @@ final goRouter = GoRouter(
       path: '/dashboard/account',
       builder: (context, state) => const AccountPage(),
       name: RouteNames.dashboardAccount,
+    ),
+    // Dashboard domain page
+    GoRoute(
+      path: '/dashboard/domain',
+      builder: (context, state) => const DomainPage(),
+      name: RouteNames.dashboardDomain,
     ),
 
     // Dashboard transactions page

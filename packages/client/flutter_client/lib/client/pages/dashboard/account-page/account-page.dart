@@ -8,6 +8,7 @@ import 'package:cvworld/client/datasource/utils.dart';
 import 'package:cvworld/client/pages/dashboard/account-page/account-page.mobile.dart';
 import 'package:cvworld/client/pages/dashboard/account-page/account-page.web.dart';
 import 'package:cvworld/client/shared/confirmation-dialog/confirmation-dialog.dart';
+import 'package:cvworld/client/shared/validators/user-name.validator.dart';
 import 'package:cvworld/client/utils.dart';
 import 'package:cvworld/routes/router.dart';
 import 'package:file_picker/file_picker.dart';
@@ -277,6 +278,7 @@ class _AccountPageDetailsState extends State<AccountPageDetails> {
   ///
   /// Edit user name
   _editUserName() async {
+    final _formKey = GlobalKey<FormState>();
     TextEditingController userNameController = TextEditingController();
     userNameController.text = user?.userName ?? '';
 
@@ -284,41 +286,50 @@ class _AccountPageDetailsState extends State<AccountPageDetails> {
       context: context,
       builder: (context) {
         return Dialog(
-          child: Container(
-            width: 400,
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Edit User Name', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 10),
-                Container(
-                  margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                  width: double.infinity,
-                  child: TextField(
-                    controller: userNameController,
-                    decoration: const InputDecoration(labelText: 'User Name', border: OutlineInputBorder()),
+          child: Form(
+            key: _formKey,
+            child: Container(
+              width: 400,
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Edit User Name', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 10),
+                  Container(
+                    margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                    width: double.infinity,
+                    child: TextFormField(
+                      validator: UsernameValidator.validate,
+                      controller: userNameController,
+                      decoration: const InputDecoration(
+                        labelText: 'User Name',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Cancel'),
-                  ),
-                  const SizedBox(width: 10),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, foregroundColor: Colors.white),
-                    onPressed: () {
-                      Navigator.of(context).pop(userNameController.text);
-                    },
-                    child: const Text('Save'),
-                  )
-                ])
-              ],
+                  const SizedBox(height: 10),
+                  Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Cancel'),
+                    ),
+                    const SizedBox(width: 10),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, foregroundColor: Colors.white),
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          Navigator.of(context).pop(userNameController.text);
+                        }
+                      },
+                      child: const Text('Save'),
+                    )
+                  ])
+                ],
+              ),
             ),
           ),
         );
